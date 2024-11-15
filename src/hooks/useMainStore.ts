@@ -1,4 +1,4 @@
-import { MainStore, User } from '@/types'
+import { MainStore, ModelUser as User } from '@/types'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 

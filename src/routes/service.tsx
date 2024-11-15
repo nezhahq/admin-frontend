@@ -1,12 +1,13 @@
 import { swrFetcher } from "@/api/api"
 import { Checkbox } from "@/components/ui/checkbox"
+import { ServiceCard } from "@/components/service"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ModelServer as Server } from "@/types"
+import { ModelService as Service } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import useSWR from "swr"
 
-export default function ServerPage() {
-    const columns: ColumnDef<Server>[] = [
+export default function ServicePage() {
+    const columns: ColumnDef<Service>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -40,9 +41,9 @@ export default function ServerPage() {
             accessorFn: (row) => row.name,
         },
         {
-            header: "Host",
-            accessorKey: "host.ip",
-            accessorFn: (row) => row.host?.ip,
+            header: "Type",
+            accessorKey: "service.type",
+            accessorFn: (row) => row.type,
         },
         {
             id: "actions",
@@ -56,7 +57,7 @@ export default function ServerPage() {
         },
     ]
 
-    const { data, error, isLoading } = useSWR<Server[]>('/api/v1/server', swrFetcher)
+    const { data, error, isLoading } = useSWR<Service[]>('/api/v1/service', swrFetcher)
 
     const table = useReactTable({
         data: data ?? [],
@@ -67,8 +68,9 @@ export default function ServerPage() {
     return <div className="px-9">
         <div className="flex space-between mt-4 pb-4">
             <h1 className="text-3xl font-bold tracking-tight">
-                Server
+                Service
             </h1>
+            <ServiceCard className="ml-auto" />
         </div>
         <Table>
             <TableHeader>
@@ -112,5 +114,5 @@ export default function ServerPage() {
                 )}
             </TableBody>
         </Table>
-    </div>
+    </div >
 }

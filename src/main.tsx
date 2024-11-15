@@ -12,6 +12,7 @@ import ErrorPage from "./error-page";
 import ProtectedRoute from './routes/protect';
 import LoginPage from './routes/login';
 import ServerPage from './routes/server';
+import ServicePage from './routes/service';
 import { AuthProvider } from './hooks/useAuth';
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <ServerPage />,
+      },
+      {
+        path: "/dashboard/service",
+        element: <ServicePage />,
       },
     ]
   },
