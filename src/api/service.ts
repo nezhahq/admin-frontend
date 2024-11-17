@@ -2,11 +2,11 @@ import { ModelServiceForm } from "@/types"
 import { fetcher, FetcherMethod } from "./api"
 
 export const createService = async (data: ModelServiceForm): Promise<number> => {
-    return fetcher<number>(FetcherMethod.POST, '/api/v1/profile', data)
+    return fetcher<number>(FetcherMethod.POST, '/api/v1/service', data)
 }
 
 export const updateService = async (id: number, data: ModelServiceForm): Promise<void> => {
-    return fetcher<void>(FetcherMethod.PATCH, `/api/v1/profile/${id}`, data)
+    return fetcher<void>(FetcherMethod.PATCH, `/api/v1/service/${id}`, data)
 }
 
 export const deleteService = async (id: number[]): Promise<void> => {

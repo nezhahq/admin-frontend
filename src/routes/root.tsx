@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 export default function Root() {
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <Card className="text-sm max-w-6xl mx-auto mt-5 min-h-[90%] flex flex-col justify-between">
+            <Card className="text-sm max-w-7xl mx-auto mt-5 min-h-[90%] flex flex-col justify-between">
                 <div>
                     <Header />
                     <Outlet />

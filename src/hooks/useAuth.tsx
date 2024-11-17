@@ -32,8 +32,9 @@ export const AuthProvider = ({ children }: {
 
     const login = async (username: string, password: string) => {
         try {
-            await loginRequest(username, password)
-            setProfile({ username: username });
+            await loginRequest(username, password);
+            const user = await getProfile();
+            setProfile(user);
             navigate("/dashboard");
         } catch (error: any) {
             toast(error.message);

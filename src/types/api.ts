@@ -142,14 +142,16 @@ export interface ModelAlertRule {
 }
 
 export interface ModelAlertRuleForm {
-  enable: boolean;
+  enable?: boolean;
   /** 失败时触发的任务id */
   fail_trigger_tasks: number[];
+  /** @minLength 1 */
   name: string;
   notification_group_id: number;
   /** 恢复时触发的任务id */
   recover_trigger_tasks: number[];
   rules: ModelRule[];
+  /** @default 0 */
   trigger_mode: number;
 }
 
@@ -219,43 +221,52 @@ export interface ModelCron {
 }
 
 export interface ModelCronForm {
-  command: string;
+  command?: string;
+  /** @default 0 */
   cover: number;
   id: number;
+  /** @minLength 1 */
   name: string;
   notification_group_id: number;
-  push_successful: boolean;
+  push_successful?: boolean;
   scheduler: string;
   servers: number[];
-  /** 0:计划任务 1:触发任务 */
+  /**
+   * 0:计划任务 1:触发任务
+   * @default 0
+   */
   task_type: number;
 }
 
 export interface ModelCycleTransferStats {
-  from?: string;
-  max?: number;
-  min?: number;
-  name?: string;
-  nextUpdate?: Record<string, string>;
-  serverName?: Record<string, string>;
-  to?: string;
-  transfer?: Record<string, number>;
+  from: string;
+  max: number;
+  min: number;
+  name: string;
+  next_update: Record<string, string>;
+  server_name: Record<string, string>;
+  to: string;
+  transfer: Record<string, number>;
 }
 
 export interface ModelDDNSForm {
-  access_id: string;
-  access_secret: string;
+  access_id?: string;
+  access_secret?: string;
   domains: string[];
-  enable_ipv4: boolean;
-  enable_ipv6: boolean;
+  enable_ipv4?: boolean;
+  enable_ipv6?: boolean;
+  /** @default 3 */
   max_retries: number;
+  /** @minLength 1 */
   name: string;
   provider: string;
-  webhook_headers: string;
-  webhook_method: number;
-  webhook_request_body: string;
-  webhook_request_type: number;
-  webhook_url: string;
+  webhook_headers?: string;
+  /** @default 1 */
+  webhook_method?: number;
+  webhook_request_body?: string;
+  /** @default 1 */
+  webhook_request_type?: number;
+  webhook_url?: string;
 }
 
 export interface ModelDDNSProfile {
@@ -328,16 +339,17 @@ export interface ModelNAT {
   created_at: string;
   deleted_at: GormDeletedAt;
   domain: string;
-  host?: string;
+  host: string;
   id: number;
-  name?: string;
-  serverID?: number;
+  name: string;
+  server_id: number;
   updated_at: string;
 }
 
 export interface ModelNATForm {
   domain: string;
   host: string;
+  /** @minLength 1 */
   name: string;
   server_id: number;
 }
@@ -357,14 +369,15 @@ export interface ModelNotification {
 }
 
 export interface ModelNotificationForm {
+  /** @minLength 1 */
   name: string;
   request_body: string;
   request_header: string;
   request_method: number;
   request_type: number;
-  skip_check: boolean;
+  skip_check?: boolean;
   url: string;
-  verify_tls: boolean;
+  verify_tls?: boolean;
 }
 
 export interface ModelNotificationGroup {
@@ -376,6 +389,7 @@ export interface ModelNotificationGroup {
 }
 
 export interface ModelNotificationGroupForm {
+  /** @minLength 1 */
   name: string;
   notifications: number[];
 }
@@ -442,17 +456,20 @@ export interface ModelServer {
 export interface ModelServerForm {
   /** DDNS配置 */
   ddns_profiles: number[];
-  /** 展示排序，越大越靠前 */
+  /**
+   * 展示排序，越大越靠前
+   * @default 0
+   */
   display_index: number;
   /** 启用DDNS */
-  enable_ddns: boolean;
+  enable_ddns?: boolean;
   /** 对游客隐藏 */
-  hide_for_guest: boolean;
+  hide_for_guest?: boolean;
   name: string;
   /** 管理员可见备注 */
-  note: string;
+  note?: string;
   /** 公开备注 */
-  public_note: string;
+  public_note?: string;
 }
 
 export interface ModelServerGroup {
@@ -464,6 +481,7 @@ export interface ModelServerGroup {
 }
 
 export interface ModelServerGroupForm {
+  /** @minLength 1 */
   name: string;
   servers: number[];
 }
@@ -501,15 +519,18 @@ export interface ModelService {
 export interface ModelServiceForm {
   cover: number;
   duration: number;
-  enable_show_in_service: boolean;
-  enable_trigger_task: boolean;
+  enable_show_in_service?: boolean;
+  enable_trigger_task?: boolean;
   fail_trigger_tasks: number[];
-  latency_notify: boolean;
+  latency_notify?: boolean;
+  /** @default 0 */
   max_latency: number;
+  /** @default 0 */
   min_latency: number;
+  /** @minLength 1 */
   name: string;
   notification_group_id: number;
-  notify: boolean;
+  notify?: boolean;
   recover_trigger_tasks: number[];
   skip_servers: Record<string, boolean>;
   target: string;
@@ -526,30 +547,30 @@ export interface ModelServiceInfos {
 }
 
 export interface ModelServiceResponse {
-  cycleTransferStats?: Record<string, ModelCycleTransferStats>;
-  services?: Record<string, ModelServiceResponseItem>;
+  cycle_transfer_stats: Record<string, ModelCycleTransferStats>;
+  services: Record<string, ModelServiceResponseItem>;
 }
 
 export interface ModelServiceResponseItem {
-  currentDown?: number;
-  currentUp?: number;
-  delay?: number[];
-  down?: number[];
-  service?: ModelService;
-  totalDown?: number;
-  totalUp?: number;
-  up?: number[];
+  current_down: number;
+  current_up: number;
+  delay: number[];
+  down: number[];
+  service: ModelService;
+  total_down: number;
+  total_up: number;
+  up: number[];
 }
 
 export interface ModelSettingForm {
   cover: number;
-  custom_code: string;
-  custom_code_dashboard: string;
-  custom_nameservers: string;
-  enable_ip_change_notification: boolean;
-  enable_plain_ip_in_notification: boolean;
-  ignored_ip_notification: string;
-  install_host: string;
+  custom_code?: string;
+  custom_code_dashboard?: string;
+  custom_nameservers?: string;
+  enable_ip_change_notification?: boolean;
+  enable_plain_ip_in_notification?: boolean;
+  ignored_ip_notification?: string;
+  install_host?: string;
   /** IP变更提醒的通知组 */
   ip_change_notification_group_id: number;
   language: string;

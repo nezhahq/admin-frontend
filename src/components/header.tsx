@@ -13,12 +13,14 @@ import { NzNavigationMenuLink } from "./xui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router-dom";
-
+import { Link, useLocation } from "react-router-dom";
 
 export default function Header() {
-    const { logout } = useAuth()
-    const profile = useMainStore(store => store.profile)
+    const { logout } = useAuth();
+    const profile = useMainStore(store => store.profile);
+
+    const location = useLocation();
+
     return <header className="h-16 flex items-center border-b-2 px-4">
         <NavigationMenu className="max-w-full">
             <NavigationMenuList>
@@ -31,12 +33,12 @@ export default function Header() {
                 {
                     profile && <>
                         <NavigationMenuItem>
-                            <NzNavigationMenuLink asChild active className={navigationMenuTriggerStyle()}>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard"} className={navigationMenuTriggerStyle()}>
                                 <Link to="/dashboard">Server</Link>
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NzNavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/service"} className={navigationMenuTriggerStyle()}>
                                 <Link to="/dashboard/service">Service</Link>
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
