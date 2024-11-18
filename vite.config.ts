@@ -11,6 +11,11 @@ export default defineConfig({
         target: 'http://localhost:8008',
         changeOrigin: true,
       },
+      '/api/v1/ws': {
+        target: 'http://localhost:8008',
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
   resolve: {

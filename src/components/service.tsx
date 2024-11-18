@@ -37,7 +37,7 @@ import { conv } from "@/lib/utils"
 import { useState } from "react"
 import { KeyedMutator } from "swr"
 import { asOptionalField } from "@/lib/utils"
-import { EditButton, PlusButton } from "@/components/xui/icon-buttons"
+import { IconButton } from "@/components/xui/icon-button"
 import { serviceTypes, serviceCoverageTypes } from "@/types"
 
 interface ServiceCardProps {
@@ -102,9 +102,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
             <DialogTrigger asChild>
                 {data
                     ?
-                    <EditButton variant="outline" />
+                    <IconButton variant="outline" icon="edit" />
                     :
-                    <PlusButton />
+                    <IconButton icon="plus" />
                 }
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">

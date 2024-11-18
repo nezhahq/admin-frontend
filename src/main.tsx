@@ -14,6 +14,7 @@ import LoginPage from './routes/login';
 import ServerPage from './routes/server';
 import ServicePage from './routes/service';
 import { AuthProvider } from './hooks/useAuth';
+import { TerminalPage } from './components/terminal';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/service",
         element: <ServicePage />,
+      },
+      {
+        path: "/dashboard/terminal/:id",
+        element: <TerminalPage />,
       },
     ]
   },

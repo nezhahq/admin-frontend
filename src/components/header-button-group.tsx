@@ -1,21 +1,22 @@
-import { Button } from "@/components/ui/button";
-import { TrashButton } from "@/components/xui/icon-buttons";
+import { buttonVariants } from "@/components/ui/button";
+import { IconButton } from "@/components/xui/icon-button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog"
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { KeyedMutator } from "swr";
 import { toast } from "sonner"
 
 interface ButtonGroupProps<T> {
     className?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     delete: { fn: (id: number[]) => Promise<void>, id: number[], mutate: KeyedMutator<T> };
 }
 
@@ -29,7 +30,7 @@ export function HeaderButtonGroup<T>({ className, children, delete: { fn, id, mu
         <div className={className}>
             {id.length < 1 ? (
                 <>
-                    <TrashButton variant="destructive" onClick={() => {
+                    <IconButton variant="destructive" icon="trash" onClick={() => {
                         toast("Error", {
                             description: "No rows are selected."
                         });
@@ -38,24 +39,23 @@ export function HeaderButtonGroup<T>({ className, children, delete: { fn, id, mu
                 </>
             ) : (
                 <>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <TrashButton variant="destructive" />
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-lg">
-                            <DialogHeader>
-                                <DialogTitle>Confirm Deletion?</DialogTitle>
-                                <DialogDescription>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <IconButton variant="destructive" icon="trash" />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="sm:max-w-lg">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Confirm Deletion?</AlertDialogTitle>
+                                <AlertDialogDescription>
                                     This operation is unrecoverable!
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button type="submit" variant="destructive" onClick={handleDelete}>Confirm</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>Confirm</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                     {children}
                 </>
             )}

@@ -15,12 +15,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 
 export default function ServicePage() {
-    const { data, mutate, error, isLoading } = useSWR<ModelServiceResponse>('/api/v1/service', swrFetcher)
+    const { data, mutate, error, isLoading } = useSWR<ModelServiceResponse>('/api/v1/service', swrFetcher);
 
     useEffect(() => {
         if (error)
             toast("Error", {
-                description: "Error fetching resource.",
+                description: `Error fetching resource: ${error.message}.`,
             })
     }, [error])
 
@@ -55,12 +55,26 @@ export default function ServicePage() {
         {
             header: "Name",
             accessorKey: "service.name",
-            accessorFn: row => row.service.name,
+            cell: ({ row }) => {
+                const s = row.original;
+                return (
+                    <div className="max-w-24 whitespace-normal break-words">
+                        {s.service.name}
+                    </div>
+                )
+            }
         },
         {
             header: "Target",
             accessorKey: "service.target",
-            accessorFn: row => row.service.target,
+            cell: ({ row }) => {
+                const s = row.original;
+                return (
+                    <div className="max-w-24 whitespace-normal break-words">
+                        {s.service.target}
+                    </div>
+                )
+            }
         },
         {
             header: "Coverage",
@@ -97,7 +111,7 @@ export default function ServicePage() {
             accessorFn: row => row.service.notification_group_id,
         },
         {
-            header: "Enable Trigger Task",
+            header: "On Trigger",
             accessorKey: "service.triggerTask",
             accessorFn: row => row.service.enable_trigger_task ?? false,
         },

@@ -1,16 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { TrashButton } from "@/components/xui/icon-buttons";
+import { IconButton } from "@/components/xui/icon-button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog"
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { KeyedMutator } from "swr";
+import { buttonVariants } from "@/components/ui/button"
 
 interface ButtonGroupProps<T> {
     className?: string;
@@ -27,24 +28,23 @@ export function ActionButtonGroup<T>({ className, children, delete: { fn, id, mu
     return (
         <div className={className}>
             {children}
-            <Dialog>
-                <DialogTrigger asChild>
-                    <TrashButton variant="outline" />
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle>Confirm Deletion?</DialogTitle>
-                        <DialogDescription>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <IconButton variant="outline" icon="trash" />
+                </AlertDialogTrigger>
+                <AlertDialogContent className="sm:max-w-lg">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Deletion?</AlertDialogTitle>
+                        <AlertDialogDescription>
                             This operation is unrecoverable!
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="submit" variant="destructive" onClick={handleDelete}>Confirm</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>Confirm</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
