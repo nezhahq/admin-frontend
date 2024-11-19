@@ -29,8 +29,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelService, ModelServiceResponse } from "@/types"
-import { createService, updateService } from "@/api/service"
+import { ModelDDNSProfile } from "@/types"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { conv } from "@/lib/utils"
@@ -38,50 +37,40 @@ import { useState } from "react"
 import { KeyedMutator } from "swr"
 import { asOptionalField } from "@/lib/utils"
 import { IconButton } from "@/components/xui/icon-button"
-import { serviceTypes, serviceCoverageTypes } from "@/types"
+import { ddnsTypes, ddnsRequestTypes } from "@/types"
+import { createDDNSProfile, updateDDNSProfile } from "@/api/ddns"
+import { Textarea } from "./ui/textarea"
 
-interface ServiceCardProps {
-    data?: ModelService;
-    mutate: KeyedMutator<ModelServiceResponse>;
+interface DDNSCardProps {
+    data?: ModelDDNSProfile;
+    providers: string[];
+    mutate: KeyedMutator<ModelDDNSProfile[]>;
 }
 
-const serviceFormSchema = z.object({
-    cover: z.coerce.number().int().min(0),
-    duration: z.coerce.number().int().min(30),
-    enable_show_in_service: asOptionalField(z.boolean()),
-    enable_trigger_task: asOptionalField(z.boolean()),
-    fail_trigger_tasks: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
-    latency_notify: asOptionalField(z.boolean()),
-    max_latency: z.coerce.number().int().min(0),
-    min_latency: z.coerce.number().int().min(0),
+const ddnsFormSchema = z.object({
+    max_retries: z.coerce.number().int().min(1),
+    enable_ipv4: asOptionalField(z.boolean()),
+    enable_ipv6: asOptionalField(z.boolean()),
     name: z.string().min(1),
-    notification_group_id: z.coerce.number().int(),
-    notify: asOptionalField(z.boolean()),
-    recover_trigger_tasks: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
-    skip_servers: z.record(z.boolean()),
-    target: z.string().url(),
-    type: z.coerce.number().int().min(0),
+    provider: z.string(),
+    domains: z.array(z.string()),
+    access_id: asOptionalField(z.string()),
+    access_secret: asOptionalField(z.string()),
+    webhook_url: asOptionalField(z.string().url()),
+    webhook_method: asOptionalField(z.coerce.number().int().min(1).max(255)),
+    webhook_request_type: asOptionalField(z.coerce.number().int().min(1).max(255).default(1)),
+    webhook_request_body: asOptionalField(z.string()),
+    webhook_headers: asOptionalField(z.string()),
 });
 
-export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
-    const form = useForm<z.infer<typeof serviceFormSchema>>({
-        resolver: zodResolver(serviceFormSchema),
+export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) => {
+    const form = useForm<z.infer<typeof ddnsFormSchema>>({
+        resolver: zodResolver(ddnsFormSchema),
         defaultValues: data ? data : {
-            type: 1,
-            cover: 0,
+            max_retries: 3,
             name: "",
-            target: "",
-            max_latency: 0.0,
-            min_latency: 0.0,
-            duration: 30,
-            notification_group_id: 0,
-            fail_trigger_tasks: [],
-            recover_trigger_tasks: [],
-            skip_servers: {},
+            provider: "dummy",
+            domains: [],
         },
         resetOptions: {
             keepDefaultValues: false,
@@ -90,8 +79,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false);
 
-    const onSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
-        data?.id ? await updateService(data.id, values) : await createService(values);
+    const onSubmit = async (values: z.infer<typeof ddnsFormSchema>) => {
+        data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values);
         setOpen(false);
         await mutate();
         form.reset();
@@ -111,7 +100,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Service</DialogTitle>
+                            <DialogTitle>New DDNS Profile</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -121,10 +110,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Service Name</FormLabel>
+                                            <FormLabel>Name</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="My Service Monitor"
+                                                    placeholder="My DDNS Profile"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -134,26 +123,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="target"
+                                    name="provider"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Target</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="HTTP (https://t.tt)｜Ping (t.tt)｜TCP (t.tt:80)"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Type</FormLabel>
+                                            <FormLabel>Provider</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -161,8 +134,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(serviceTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                    {providers.map((v, i) => (
+                                                        <SelectItem key={i} value={v}>{v}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -172,196 +145,13 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="enable_show_in_service"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">Show in Service</Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="duration"
+                                    name="domains"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Interval (s)</FormLabel>
+                                            <FormLabel>Domains (separate with comma)</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    type="number"
-                                                    placeholder="30"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="cover"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Coverage</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select service type" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {Object.entries(serviceCoverageTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="skip_servers"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Specific Servers (separate with comma)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.recordToStr(field.value ?? {})}
-                                                    onChange={e => {
-                                                        const rec = conv.strToRecord(e.target.value);
-                                                        field.onChange(rec);
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="notification_group_id"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Notification Group ID</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="1"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="notify"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">Enable Failure Notification</Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="max_latency"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Maximum Latency Time (ms)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="100.88"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="min_latency"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Minimum Latency Time (ms)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="100.88"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="latency_notify"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">Enable Latency Notification</Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="enable_trigger_task"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">Enable Trigger Task</Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="fail_trigger_tasks"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tasks to trigger on an alarm (Separate with comma)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
+                                                    placeholder="www.example.com"
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
                                                     onChange={e => {
@@ -376,20 +166,178 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="recover_trigger_tasks"
+                                    name="access_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Tasks to trigger after recovery (Separate with comma)</FormLabel>
+                                            <FormLabel>Credential 1</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="1,2,3"
+                                                    placeholder="Token ID"
                                                     {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
-                                                        field.onChange(arr);
-                                                    }}
                                                 />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="access_secret"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Credential 2</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Token Secret"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="max_retries"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Maximum retry attempts</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="3"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="webhook_url"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook URL</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="https://ddns.example.com/?record=#record#"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="webhook_method"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook Request Method</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Webhook Request Method" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {Object.entries(ddnsTypes).map(([k, v]) => (
+                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="webhook_request_type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook Request Type</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Webhook Request Type" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {Object.entries(ddnsRequestTypes).map(([k, v]) => (
+                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="webhook_headers"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook Request Headers</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    className="resize-y"
+                                                    placeholder='{"User-Agent":"Nezha-Agent"}'
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="webhook_request_body"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Webhook Request Body</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    className="resize-y"
+                                                    placeholder='{&#13;&#10; "ip": #ip#,&#13;&#10; "domain": "#domain#"&#13;&#10;}'
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="enable_ipv4"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                    <Label className="text-sm">Enable IPv4</Label>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="enable_ipv6"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                    <Label className="text-sm">Enable IPv6</Label>
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

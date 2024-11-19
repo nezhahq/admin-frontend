@@ -42,6 +42,16 @@ export default function Header() {
                                 <Link to="/dashboard/service">Service</Link>
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/ddns"} className={navigationMenuTriggerStyle()}>
+                                <Link to="/dashboard/ddns">Dynamic DNS</Link>
+                            </NzNavigationMenuLink>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/nat"} className={navigationMenuTriggerStyle()}>
+                                <Link to="/dashboard/nat">NAT Traversal</Link>
+                            </NzNavigationMenuLink>
+                        </NavigationMenuItem>
                     </>
                 }
             </NavigationMenuList>

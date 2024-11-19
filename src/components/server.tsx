@@ -42,7 +42,7 @@ const serverFormSchema = z.object({
     name: z.string().min(1),
     note: asOptionalField(z.string()),
     public_note: asOptionalField(z.string()),
-    display_index: z.number(),
+    display_index: z.number().int(),
     hide_for_guest: asOptionalField(z.boolean()),
     enable_ddns: asOptionalField(z.boolean()),
     ddns_profiles: z.array(z.string()).transform((v => {

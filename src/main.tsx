@@ -15,6 +15,8 @@ import ServerPage from './routes/server';
 import ServicePage from './routes/service';
 import { AuthProvider } from './hooks/useAuth';
 import { TerminalPage } from './components/terminal';
+import DDNSPage from './routes/ddns';
+import NATPage from './routes/nat';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,14 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/service",
         element: <ServicePage />,
+      },
+      {
+        path: "/dashboard/ddns",
+        element: <DDNSPage />,
+      },
+      {
+        path: "/dashboard/nat",
+        element: <NATPage />,
       },
       {
         path: "/dashboard/terminal/:id",
