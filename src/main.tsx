@@ -20,6 +20,7 @@ import NATPage from './routes/nat';
 import ServerGroupPage from './routes/server-group';
 import NotificationGroupPage from './routes/notification-group';
 import { ServerProvider } from './hooks/useServer';
+import CronPage from './routes/cron';
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/service",
         element: <ServicePage />,
+      },
+      {
+        path: "/dashboard/cron",
+        element: <CronPage />,
       },
       {
         path: "/dashboard/ddns",

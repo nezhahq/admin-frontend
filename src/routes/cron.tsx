@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ModelCron } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import useSWR from "swr"
 import { useEffect } from "react"
@@ -8,13 +9,13 @@ import { ActionButtonGroup } from "@/components/action-button-group"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
-import { ModelNotificationGroupResponseItem } from "@/types"
-import { deleteNotificationGroups } from "@/api/notification-group"
-import { GroupTab } from "@/components/group-tab"
-import { NotificationGroupCard } from "@/components/notification-group"
+import { deleteCron, runCron } from "@/api/cron"
+import { CronCard } from "@/components/cron"
+import { cronTypes } from "@/types"
+import { IconButton } from "@/components/xui/icon-button"
 
-export default function NotificationGroupPage() {
-    const { data, mutate, error, isLoading } = useSWR<ModelNotificationGroupResponseItem[]>("/api/v1/notification-group", swrFetcher);
+export default function CronPage() {
+    const { data, mutate, error, isLoading } = useSWR<ModelCron[]>('/api/v1/cron', swrFetcher);
 
     useEffect(() => {
         if (error)
@@ -23,7 +24,7 @@ export default function NotificationGroupPage() {
             })
     }, [error])
 
-    const columns: ColumnDef<ModelNotificationGroupResponseItem>[] = [
+    const columns: ColumnDef<ModelCron>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -49,7 +50,7 @@ export default function NotificationGroupPage() {
         {
             header: "ID",
             accessorKey: "id",
-            accessorFn: row => row.group.id,
+            accessorFn: row => row.id,
         },
         {
             header: "Name",
@@ -57,16 +58,75 @@ export default function NotificationGroupPage() {
             cell: ({ row }) => {
                 const s = row.original;
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
-                        {s.group.name}
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.name}
                     </div>
                 )
             }
         },
         {
-            header: "Notifiers (ID)",
-            accessorKey: "notifications",
-            accessorFn: row => row.notifications,
+            header: "Task Type",
+            accessorKey: "taskType",
+            accessorFn: row => cronTypes[row.task_type] || '',
+        },
+        {
+            header: "Cron Expression",
+            accessorKey: "scheduler",
+            accessorFn: row => row.scheduler,
+        },
+        {
+            header: "Command",
+            accessorKey: "command",
+            cell: ({ row }) => {
+                const s = row.original;
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        {s.command}
+                    </div>
+                )
+            }
+        },
+        {
+            header: "Notifier Group",
+            accessorKey: "ngroup",
+            accessorFn: row => row.notification_group_id,
+        },
+        {
+            header: "Send Success Notification",
+            accessorKey: "pushSuccessful",
+            accessorFn: row => row.push_successful ?? false,
+        },
+        {
+            header: "Coverage",
+            accessorKey: "cover",
+            accessorFn: row => {
+                switch (row.cover) {
+                    case 0: {
+                        return "Ignore All"
+                    }
+                    case 1: {
+                        return "Cover All"
+                    }
+                    case 2: {
+                        return "On alert"
+                    }
+                }
+            },
+        },
+        {
+            header: "Specific Servers",
+            accessorKey: "servers",
+            accessorFn: row => row.servers,
+        },
+        {
+            header: "Last Execution",
+            accessorKey: "lastExecution",
+            accessorFn: row => row.last_executed_at
+        },
+        {
+            header: "Last Result",
+            accessorKey: "lastResult",
+            accessorFn: row => row.last_result ?? false,
         },
         {
             id: "actions",
@@ -74,12 +134,26 @@ export default function NotificationGroupPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <ActionButtonGroup className="flex gap-2" delete={{
-                        fn: deleteNotificationGroups,
-                        id: s.group.id,
-                        mutate: mutate,
-                    }}>
-                        <NotificationGroupCard mutate={mutate} data={s} />
+                    <ActionButtonGroup className="flex gap-2" delete={{ fn: deleteCron, id: s.id, mutate: mutate }}>
+                        <>
+                            <IconButton variant="outline" icon="play" onClick={
+                                async () => {
+                                    try {
+                                        await runCron(s.id);
+                                    } catch (e) {
+                                        console.log(e);
+                                        toast("Error executing task", {
+                                            description: "Please see the console for details.",
+                                        })
+                                        await mutate()
+                                    }
+                                    toast("Success", {
+                                        description: "The task triggered successfully.",
+                                    })
+                                    await mutate()
+                                }} />
+                            <CronCard mutate={mutate} data={s} />
+                        </>
                     </ActionButtonGroup>
                 )
             },
@@ -97,13 +171,15 @@ export default function NotificationGroupPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <GroupTab />
-                <HeaderButtonGroup className="flex gap-2 ml-auto" delete={{
-                    fn: deleteNotificationGroups,
-                    id: selectedRows.map(r => r.original.group.id),
-                    mutate: mutate
+                <h1 className="flex-1 text-3xl font-bold tracking-tight">
+                    Task
+                </h1>
+                <HeaderButtonGroup className="flex-2 flex ml-auto gap-2" delete={{
+                    fn: deleteCron,
+                    id: selectedRows.map(r => r.original.id),
+                    mutate: mutate,
                 }}>
-                    <NotificationGroupCard mutate={mutate} />
+                    <CronCard mutate={mutate} />
                 </HeaderButtonGroup>
             </div>
             {isLoading ? (
@@ -156,6 +232,6 @@ export default function NotificationGroupPage() {
                     </TableBody>
                 </Table>
             )}
-        </div>
+        </div >
     )
 }

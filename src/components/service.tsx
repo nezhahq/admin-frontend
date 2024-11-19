@@ -214,7 +214,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select service type" />
+                                                        <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -253,7 +253,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="notification_group_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notification Group ID</FormLabel>
+                                            <FormLabel>Notifier Group ID</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"

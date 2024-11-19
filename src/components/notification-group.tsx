@@ -76,7 +76,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Server Group</DialogTitle>
+                            <DialogTitle>New Notifier Group</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -102,7 +102,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                     name="notifications"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notification Methods</FormLabel>
+                                            <FormLabel>Notifiers</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"

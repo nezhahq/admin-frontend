@@ -216,7 +216,6 @@ export interface ModelCronForm {
   command?: string;
   /** @default 0 */
   cover: number;
-  id: number;
   /** @minLength 1 */
   name: string;
   notification_group_id: number;

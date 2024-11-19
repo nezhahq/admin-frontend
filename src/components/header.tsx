@@ -43,6 +43,11 @@ export default function Header() {
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/cron"} className={navigationMenuTriggerStyle()}>
+                                <Link to="/dashboard/cron">Task</Link>
+                            </NzNavigationMenuLink>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
                             <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/ddns"} className={navigationMenuTriggerStyle()}>
                                 <Link to="/dashboard/ddns">Dynamic DNS</Link>
                             </NzNavigationMenuLink>
@@ -54,7 +59,7 @@ export default function Header() {
                         </NavigationMenuItem>
                         <NavigationMenuItem>
                             <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/server-group" || location.pathname === "/dashboard/notification-group"} className={navigationMenuTriggerStyle()}>
-                                <Link to="/dashboard/server-group">Groups</Link>
+                                <Link to="/dashboard/server-group">Group</Link>
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
                     </>

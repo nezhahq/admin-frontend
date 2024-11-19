@@ -106,7 +106,7 @@ export default function ServicePage() {
             accessorFn: row => row.service.duration,
         },
         {
-            header: "Notification Group ID",
+            header: "Notifier Group ID",
             accessorKey: "service.ngroup",
             accessorFn: row => row.service.notification_group_id,
         },

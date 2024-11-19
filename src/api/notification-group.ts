@@ -10,5 +10,5 @@ export const updateNotificationGroup = async (id: number, data: ModelNotificatio
 }
 
 export const deleteNotificationGroups = async (id: number[]): Promise<void> => {
-    return fetcher<void>(FetcherMethod.POST, `/api/v1/batch-delete/notification-group`, id)
+    return fetcher<void>(FetcherMethod.POST, `/api/v1/batch-delete/notification-group`, id);
 }
