@@ -1,25 +1,20 @@
 import { swrFetcher } from "@/api/api"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ModelServer as Server } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import useSWR from "swr"
-import { HeaderButtonGroup } from "@/components/header-button-group"
-import { deleteServer } from "@/api/server"
-import { ServerCard } from "@/components/server"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ActionButtonGroup } from "@/components/action-button-group"
 import { useEffect } from "react"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
-import { IconButton } from "@/components/xui/icon-button"
-import { InstallCommandsMenu } from "@/components/install-commands"
-import { NoteMenu } from "@/components/note-menu"
-import { TerminalButton } from "@/components/terminal"
-import { useServer } from "@/hooks/useServer"
+import { ModelServerGroupResponseItem } from "@/types"
+import { deleteServerGroups } from "@/api/server-group"
+import { GroupTab } from "@/components/group-tab"
+import { ServerGroupCard } from "@/components/server-group"
 
-export default function ServerPage() {
-    const { data, mutate, error, isLoading } = useSWR<Server[]>('/api/v1/server', swrFetcher);
-    const { serverGroups } = useServer();
+export default function ServerGroupPage() {
+    const { data, mutate, error, isLoading } = useSWR<ModelServerGroupResponseItem[]>("/api/v1/server-group", swrFetcher);
 
     useEffect(() => {
         if (error)
@@ -28,7 +23,7 @@ export default function ServerPage() {
             })
     }, [error])
 
-    const columns: ColumnDef<Server>[] = [
+    const columns: ColumnDef<ModelServerGroupResponseItem>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -54,7 +49,7 @@ export default function ServerPage() {
         {
             header: "ID",
             accessorKey: "id",
-            accessorFn: row => `${row.id}(${row.display_index})`,
+            accessorFn: row => row.group.id,
         },
         {
             header: "Name",
@@ -62,73 +57,29 @@ export default function ServerPage() {
             cell: ({ row }) => {
                 const s = row.original;
                 return (
-                    <div className="max-w-24 whitespace-normal break-words">
-                        {s.name}
+                    <div className="max-w-48 whitespace-normal break-words">
+                        {s.group.name}
                     </div>
                 )
             }
         },
         {
-            header: "Groups",
-            accessorKey: "groups",
-            accessorFn: row => {
-                return serverGroups?.filter(sg => sg.servers.includes(row.id))
-                    .map(sg => sg.group.id)
-                    || [];
-            },
-        },
-        {
-            id: "ip",
-            header: "IP",
-            accessorKey: "host.ip",
-            cell: ({ row }) => {
-                const s = row.original;
-                return (
-                    <div className="max-w-24 whitespace-normal break-words">
-                        {s.host.ip}
-                    </div>
-                )
-            }
-        },
-        {
-            header: "Version",
-            accessorKey: "host.version",
-            accessorFn: row => row.host.version || "Unknown",
-        },
-        {
-            header: "Enable DDNS",
-            accessorKey: "enableDDNS",
-            accessorFn: row => row.enable_ddns ?? false,
-        },
-        {
-            header: "Hide from Guest",
-            accessorKey: "hideForGuest",
-            accessorFn: row => row.hide_for_guest ?? false,
-        },
-        {
-            id: "installCommands",
-            header: "Install commands",
-            cell: () => <InstallCommandsMenu />,
-        },
-        {
-            id: "note",
-            header: "Note",
-            cell: ({ row }) => {
-                const s = row.original;
-                return <NoteMenu note={{ private: s.note, public: s.public_note }} />;
-            },
+            header: "Servers (ID)",
+            accessorKey: "servers",
+            accessorFn: row => row.servers,
         },
         {
             id: "actions",
             header: "Actions",
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
-                    <ActionButtonGroup className="flex gap-2" delete={{ fn: deleteServer, id: s.id, mutate: mutate }}>
-                        <>
-                            <TerminalButton id={s.id} />
-                            <ServerCard mutate={mutate} data={s} />
-                        </>
+                    <ActionButtonGroup className="flex gap-2" delete={{
+                        fn: deleteServerGroups,
+                        id: s.group.id,
+                        mutate: mutate,
+                    }}>
+                        <ServerGroupCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
                 )
             },
@@ -146,15 +97,13 @@ export default function ServerPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <h1 className="text-3xl font-bold tracking-tight">
-                    Server
-                </h1>
-                <HeaderButtonGroup className="flex-2 flex ml-auto gap-2" delete={{
-                    fn: deleteServer,
-                    id: selectedRows.map(r => r.original.id),
-                    mutate: mutate,
+                <GroupTab />
+                <HeaderButtonGroup className="flex ml-auto gap-2" delete={{
+                    fn: deleteServerGroups,
+                    id: selectedRows.map(r => r.original.group.id),
+                    mutate: mutate
                 }}>
-                    <IconButton icon="update" />
+                    <ServerGroupCard mutate={mutate} />
                 </HeaderButtonGroup>
             </div>
             {isLoading ? (

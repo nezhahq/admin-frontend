@@ -17,6 +17,9 @@ import { AuthProvider } from './hooks/useAuth';
 import { TerminalPage } from './components/terminal';
 import DDNSPage from './routes/ddns';
 import NATPage from './routes/nat';
+import ServerGroupPage from './routes/server-group';
+import NotificationGroupPage from './routes/notification-group';
+import { ServerProvider } from './hooks/useServer';
 
 const router = createBrowserRouter([
   {
@@ -30,7 +33,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <ServerPage />,
+        element: <ServerProvider withServerGroup><ServerPage /></ServerProvider>,
       },
       {
         path: "/dashboard/service",
@@ -43,6 +46,14 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/nat",
         element: <NATPage />,
+      },
+      {
+        path: "/dashboard/server-group",
+        element: <ServerProvider withServer><ServerGroupPage /></ServerProvider>,
+      },
+      {
+        path: "/dashboard/notification-group",
+        element: <NotificationGroupPage />,
       },
       {
         path: "/dashboard/terminal/:id",

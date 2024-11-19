@@ -21,8 +21,8 @@ export default function Header() {
 
     const location = useLocation();
 
-    return <header className="h-16 flex items-center border-b-2 px-4">
-        <NavigationMenu className="max-w-full">
+    return <header className="h-16 flex items-center border-b-2 px-4 overflow-x-auto">
+        <NavigationMenu className="sm:max-w-full">
             <NavigationMenuList>
                 <Card>
                     <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + ' !text-foreground'}>
@@ -50,6 +50,11 @@ export default function Header() {
                         <NavigationMenuItem>
                             <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/nat"} className={navigationMenuTriggerStyle()}>
                                 <Link to="/dashboard/nat">NAT Traversal</Link>
+                            </NzNavigationMenuLink>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/server-group" || location.pathname === "/dashboard/notification-group"} className={navigationMenuTriggerStyle()}>
+                                <Link to="/dashboard/server-group">Groups</Link>
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
                     </>

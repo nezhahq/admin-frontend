@@ -117,15 +117,8 @@ export interface GithubComNaibaNezhaModelCommonResponseUint64 {
   success: boolean;
 }
 
-export interface GormDeletedAt {
-  time?: string;
-  /** Valid is true if Time is not NULL */
-  valid?: boolean;
-}
-
 export interface ModelAlertRule {
   created_at: string;
-  deleted_at: GormDeletedAt;
   enable: boolean;
   /** 失败时执行的触发任务id */
   fail_trigger_tasks: number[];
@@ -201,7 +194,6 @@ export interface ModelCron {
   cover: number;
   created_at: string;
   cron_job_id: number;
-  deleted_at: GormDeletedAt;
   id: number;
   /** 最后一次执行时间 */
   last_executed_at: string;
@@ -273,7 +265,6 @@ export interface ModelDDNSProfile {
   access_id: string;
   access_secret: string;
   created_at: string;
-  deleted_at: GormDeletedAt;
   domains: string[];
   enable_ipv4: boolean;
   enable_ipv6: boolean;
@@ -337,7 +328,6 @@ export interface ModelLoginResponse {
 
 export interface ModelNAT {
   created_at: string;
-  deleted_at: GormDeletedAt;
   domain: string;
   host: string;
   id: number;
@@ -356,7 +346,6 @@ export interface ModelNATForm {
 
 export interface ModelNotification {
   created_at: string;
-  deleted_at: GormDeletedAt;
   id: number;
   name: string;
   request_body: string;
@@ -382,7 +371,6 @@ export interface ModelNotificationForm {
 
 export interface ModelNotificationGroup {
   created_at: string;
-  deleted_at: GormDeletedAt;
   id: number;
   name: string;
   updated_at: string;
@@ -433,7 +421,6 @@ export interface ModelServer {
   created_at: string;
   /** DDNS配置 */
   ddns_profiles: number[];
-  deleted_at: GormDeletedAt;
   /** 展示排序，越大越靠前 */
   display_index: number;
   /** 启用DDNS */
@@ -474,7 +461,6 @@ export interface ModelServerForm {
 
 export interface ModelServerGroup {
   created_at: string;
-  deleted_at: GormDeletedAt;
   id: number;
   name: string;
   updated_at: string;
@@ -494,7 +480,6 @@ export interface ModelServerGroupResponseItem {
 export interface ModelService {
   cover: number;
   created_at: string;
-  deleted_at: GormDeletedAt;
   duration: number;
   enable_show_in_service: boolean;
   enable_trigger_task: boolean;
@@ -601,7 +586,6 @@ export interface ModelTerminalForm {
 
 export interface ModelUser {
   created_at: string;
-  deleted_at: GormDeletedAt;
   id: number;
   password: string;
   updated_at: string;
