@@ -8,13 +8,15 @@ import { ActionButtonGroup } from "@/components/action-button-group"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
-import { ModelNotificationGroupResponseItem } from "@/types"
-import { deleteNotificationGroups } from "@/api/notification-group"
-import { GroupTab } from "@/components/group-tab"
-import { NotificationGroupCard } from "@/components/notification-group"
+import { ModelNotification } from "@/types"
+import { deleteNotification } from "@/api/notification"
+import { NotificationTab } from "@/components/notification-tab"
+import { NotifierCard } from "@/components/notifier"
+import { useNotification } from "@/hooks/useNotfication"
 
-export default function NotificationGroupPage() {
-    const { data, mutate, error, isLoading } = useSWR<ModelNotificationGroupResponseItem[]>("/api/v1/notification-group", swrFetcher);
+export default function NotificationPage() {
+    const { data, mutate, error, isLoading } = useSWR<ModelNotification[]>("/api/v1/notification", swrFetcher);
+    const { notifierGroup } = useNotification();
 
     useEffect(() => {
         if (error)
@@ -23,7 +25,7 @@ export default function NotificationGroupPage() {
             })
     }, [error])
 
-    const columns: ColumnDef<ModelNotificationGroupResponseItem>[] = [
+    const columns: ColumnDef<ModelNotification>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -49,7 +51,7 @@ export default function NotificationGroupPage() {
         {
             header: "ID",
             accessorKey: "id",
-            accessorFn: row => row.group.id,
+            accessorFn: row => row.id,
         },
         {
             header: "Name",
@@ -57,16 +59,37 @@ export default function NotificationGroupPage() {
             cell: ({ row }) => {
                 const s = row.original;
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
-                        {s.group.name}
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.name}
                     </div>
                 )
             }
         },
         {
-            header: "Notifiers (ID)",
-            accessorKey: "notifications",
-            accessorFn: row => row.notifications,
+            header: "Groups",
+            accessorKey: "groups",
+            accessorFn: row => {
+                return notifierGroup?.filter(ng => ng.notifications?.includes(row.id))
+                    .map(ng => ng.group.id)
+                    || [];
+            },
+        },
+        {
+            header: "URL",
+            accessorKey: "url",
+            cell: ({ row }) => {
+                const s = row.original;
+                return (
+                    <div className="max-w-64 whitespace-normal break-words">
+                        {s.url}
+                    </div>
+                )
+            }
+        },
+        {
+            header: "Verify TLS",
+            accessorKey: "verify_tls",
+            accessorFn: row => row.verify_tls,
         },
         {
             id: "actions",
@@ -75,11 +98,11 @@ export default function NotificationGroupPage() {
                 const s = row.original
                 return (
                     <ActionButtonGroup className="flex gap-2" delete={{
-                        fn: deleteNotificationGroups,
-                        id: s.group.id,
+                        fn: deleteNotification,
+                        id: s.id,
                         mutate: mutate,
                     }}>
-                        <NotificationGroupCard mutate={mutate} data={s} />
+                        <NotifierCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
                 )
             },
@@ -97,13 +120,13 @@ export default function NotificationGroupPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4 gap-[60%]">
-                <GroupTab className="flex-1" />
+                <NotificationTab className="flex-1" />
                 <HeaderButtonGroup className="flex-2 flex gap-2 ml-auto" delete={{
-                    fn: deleteNotificationGroups,
-                    id: selectedRows.map(r => r.original.group.id),
+                    fn: deleteNotification,
+                    id: selectedRows.map(r => r.original.id),
                     mutate: mutate
                 }}>
-                    <NotificationGroupCard mutate={mutate} />
+                    <NotifierCard mutate={mutate} />
                 </HeaderButtonGroup>
             </div>
             {isLoading ? (

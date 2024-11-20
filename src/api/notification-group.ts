@@ -1,4 +1,4 @@
-import { ModelNotificationGroupForm } from "@/types"
+import { ModelNotificationGroupForm, ModelNotificationGroupResponseItem } from "@/types"
 import { fetcher, FetcherMethod } from "./api"
 
 export const createNotificationGroup = async (data: ModelNotificationGroupForm): Promise<number> => {
@@ -11,4 +11,8 @@ export const updateNotificationGroup = async (id: number, data: ModelNotificatio
 
 export const deleteNotificationGroups = async (id: number[]): Promise<void> => {
     return fetcher<void>(FetcherMethod.POST, `/api/v1/batch-delete/notification-group`, id);
+}
+
+export const getNotificationGroups = async (): Promise<ModelNotificationGroupResponseItem[]> => {
+    return fetcher<ModelNotificationGroupResponseItem[]>(FetcherMethod.GET, '/api/v1/notification-group', null);
 }

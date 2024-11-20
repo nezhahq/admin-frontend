@@ -48,6 +48,11 @@ export default function Header() {
                             </NzNavigationMenuLink>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
+                            <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/notification" || location.pathname === "/dashboard/alert-rule"} className={navigationMenuTriggerStyle()}>
+                                <Link to="/dashboard/notification">Notification</Link>
+                            </NzNavigationMenuLink>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
                             <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/ddns"} className={navigationMenuTriggerStyle()}>
                                 <Link to="/dashboard/ddns">Dynamic DNS</Link>
                             </NzNavigationMenuLink>

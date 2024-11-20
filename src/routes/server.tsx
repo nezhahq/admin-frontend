@@ -72,7 +72,7 @@ export default function ServerPage() {
             header: "Groups",
             accessorKey: "groups",
             accessorFn: row => {
-                return serverGroups?.filter(sg => sg.servers.includes(row.id))
+                return serverGroups?.filter(sg => sg.servers?.includes(row.id))
                     .map(sg => sg.group.id)
                     || [];
             },

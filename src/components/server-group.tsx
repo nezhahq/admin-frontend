@@ -27,7 +27,7 @@ import { useState } from "react"
 import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
 import { createServerGroup, updateServerGroup } from "@/api/server-group"
-import { MultiSelect } from "@/components/xui/multi-select";
+import { MultiSelect } from "@/components/xui/multi-select"
 import { useServer } from "@/hooks/useServer"
 
 interface ServerGroupCardProps {

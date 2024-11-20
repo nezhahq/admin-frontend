@@ -1,4 +1,4 @@
-import { ModelTerminalForm, ModelCreateTerminalResponse } from "@/types";
+import { ModelCreateTerminalResponse } from "@/types";
 import { fetcher, FetcherMethod } from "./api"
 
 export const createTerminal = async (id: number): Promise<ModelCreateTerminalResponse> => {

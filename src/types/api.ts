@@ -390,19 +390,22 @@ export interface ModelRule {
   /** 覆盖范围 RuleCoverAll/IgnoreAll */
   cover: number;
   /** 流量统计周期 */
-  cycle_interval: number;
+  cycle_interval?: number;
   /** 流量统计的开始时间 */
-  cycle_start: string;
-  /** 流量统计周期单位，默认hour,可选(hour, day, week, month, year) */
-  cycle_unit: string;
+  cycle_start?: string;
+  /**
+   * 流量统计周期单位，默认hour,可选(hour, day, week, month, year)
+   * @default "hour"
+   */
+  cycle_unit?: "hour" | "day" | "week" | "month" | "year";
   /** 持续时间 (秒) */
-  duration: number;
+  duration?: number;
   /** 覆盖范围的排除 */
-  ignore: Record<string, boolean>;
+  ignore?: Record<string, boolean>;
   /** 最大阈值 (百分比、字节 kb ÷ 1024) */
-  max: number;
+  max?: number;
   /** 最小阈值 (百分比、字节 kb ÷ 1024) */
-  min: number;
+  min?: number;
   /**
    * 指标类型，cpu、memory、swap、disk、net_in_speed、net_out_speed
    * net_all_speed、transfer_in、transfer_out、transfer_all、offline

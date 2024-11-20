@@ -116,7 +116,7 @@ export default function ServicePage() {
             accessorFn: row => row.service.enable_trigger_task ?? false,
         },
         {
-            header: "Tasks to trigger on an alarm",
+            header: "Tasks to trigger on alert",
             accessorKey: "service.failTriggerTasks",
             accessorFn: row => row.service.fail_trigger_tasks,
         },

@@ -27,7 +27,8 @@ import { useState } from "react"
 import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
 import { createNotificationGroup, updateNotificationGroup } from "@/api/notification-group"
-import { conv } from "@/lib/utils"
+import { MultiSelect } from "@/components/xui/multi-select"
+import { useNotification } from "@/hooks/useNotfication"
 
 interface NotificationGroupCardProps {
     data?: ModelNotificationGroupResponseItem;
@@ -44,7 +45,10 @@ const notificationGroupFormSchema = z.object({
 export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ data, mutate }) => {
     const form = useForm<z.infer<typeof notificationGroupFormSchema>>({
         resolver: zodResolver(notificationGroupFormSchema),
-        defaultValues: data ? data : {
+        defaultValues: data ? {
+            name: data.group.name,
+            notifications: data.notifications,
+        } : {
             name: "",
             notifications: [],
         },
@@ -61,6 +65,12 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
         await mutate();
         form.reset();
     }
+
+    const { notifiers } = useNotification();
+    const notifierList = notifiers?.map(n => ({
+        value: `${n.id}`,
+        label: n.name,
+    })) || [{ value: "", label: "" }];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -103,17 +113,11 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Notifiers</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
-                                                        field.onChange(arr);
-                                                    }}
-                                                />
-                                            </FormControl>
+                                            <MultiSelect
+                                                options={notifierList}
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value?.map(String)}
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}

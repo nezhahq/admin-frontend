@@ -29,48 +29,43 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelDDNSProfile } from "@/types"
+import { ModelNotification } from "@/types"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { conv } from "@/lib/utils"
 import { useState } from "react"
 import { KeyedMutator } from "swr"
 import { asOptionalField } from "@/lib/utils"
 import { IconButton } from "@/components/xui/icon-button"
-import { ddnsTypes, ddnsRequestTypes } from "@/types"
-import { createDDNSProfile, updateDDNSProfile } from "@/api/ddns"
+import { nrequestTypes, nrequestMethods } from "@/types"
+import { createNotification, updateNotification } from "@/api/notification"
 import { Textarea } from "./ui/textarea"
 
-interface DDNSCardProps {
-    data?: ModelDDNSProfile;
-    providers: string[];
-    mutate: KeyedMutator<ModelDDNSProfile[]>;
+interface NotifierCardProps {
+    data?: ModelNotification;
+    mutate: KeyedMutator<ModelNotification[]>;
 }
 
-const ddnsFormSchema = z.object({
-    max_retries: z.coerce.number().int().min(1),
-    enable_ipv4: asOptionalField(z.boolean()),
-    enable_ipv6: asOptionalField(z.boolean()),
+const notificationFormSchema = z.object({
     name: z.string().min(1),
-    provider: z.string(),
-    domains: z.array(z.string()),
-    access_id: asOptionalField(z.string()),
-    access_secret: asOptionalField(z.string()),
-    webhook_url: asOptionalField(z.string().url()),
-    webhook_method: asOptionalField(z.coerce.number().int().min(1).max(255)),
-    webhook_request_type: asOptionalField(z.coerce.number().int().min(1).max(255)),
-    webhook_request_body: asOptionalField(z.string()),
-    webhook_headers: asOptionalField(z.string()),
+    url: z.string().url(),
+    request_method: z.coerce.number().int().min(1).max(255),
+    request_type: z.coerce.number().int().min(1).max(255),
+    request_header: z.string(),
+    request_body: z.string(),
+    verify_tls: asOptionalField(z.boolean()),
+    skip_check: asOptionalField(z.boolean()),
 });
 
-export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) => {
-    const form = useForm<z.infer<typeof ddnsFormSchema>>({
-        resolver: zodResolver(ddnsFormSchema),
+export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
+    const form = useForm<z.infer<typeof notificationFormSchema>>({
+        resolver: zodResolver(notificationFormSchema),
         defaultValues: data ? data : {
-            max_retries: 3,
             name: "",
-            provider: "dummy",
-            domains: [],
+            url: "",
+            request_method: 1,
+            request_type: 1,
+            request_header: "",
+            request_body: "",
         },
         resetOptions: {
             keepDefaultValues: false,
@@ -79,8 +74,8 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
 
     const [open, setOpen] = useState(false);
 
-    const onSubmit = async (values: z.infer<typeof ddnsFormSchema>) => {
-        data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values);
+    const onSubmit = async (values: z.infer<typeof notificationFormSchema>) => {
+        data?.id ? await updateNotification(data.id, values) : await createNotification(values);
         setOpen(false);
         await mutate();
         form.reset();
@@ -100,7 +95,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New DDNS Profile</DialogTitle>
+                            <DialogTitle>New Notifier</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -113,7 +108,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="My DDNS Profile"
+                                                    placeholder="My Notifier"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -123,126 +118,33 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="provider"
+                                    name="url"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Provider</FormLabel>
+                                            <FormLabel>URL</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="request_method"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Request Method</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select service type" />
+                                                        <SelectValue placeholder="Request Method" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {providers.map((v, i) => (
-                                                        <SelectItem key={i} value={v}>{v}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="domains"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Domains (separate with comma)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="www.example.com"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
-                                                        field.onChange(arr);
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="access_id"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Credential 1</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Token ID"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="access_secret"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Credential 2</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Token Secret"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="max_retries"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Maximum retry attempts</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="3"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="webhook_url"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Webhook URL</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="https://ddns.example.com/?record=#record#"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="webhook_method"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Webhook Request Method</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Webhook Request Method" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {Object.entries(ddnsTypes).map(([k, v]) => (
+                                                    {Object.entries(nrequestMethods).map(([k, v]) => (
                                                         <SelectItem key={k} value={k}>{v}</SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -253,18 +155,18 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="webhook_request_type"
+                                    name="request_type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Webhook Request Type</FormLabel>
+                                            <FormLabel>Request Type</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Webhook Request Type" />
+                                                        <SelectValue placeholder="Request Type" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(ddnsRequestTypes).map(([k, v]) => (
+                                                    {Object.entries(nrequestTypes).map(([k, v]) => (
                                                         <SelectItem key={k} value={k}>{v}</SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -275,10 +177,10 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="webhook_headers"
+                                    name="request_header"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Webhook Request Headers</FormLabel>
+                                            <FormLabel>Header</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
@@ -292,14 +194,14 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="webhook_request_body"
+                                    name="request_body"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Webhook Request Body</FormLabel>
+                                            <FormLabel>Body</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    className="resize-y"
-                                                    placeholder='{&#13;&#10; "ip": #ip#,&#13;&#10; "domain": "#domain#"&#13;&#10;}'
+                                                    className="resize-y h-[240px]"
+                                                    placeholder='{&#13;&#10;  "content":"#NEZHA#",&#13;&#10;  "ServerName":"#SERVER.NAME#",&#13;&#10;  "ServerIP":"#SERVER.IP#",&#13;&#10;  "ServerIPV4":"#SERVER.IPV4#",&#13;&#10;  "ServerIPV6":"#SERVER.IPV6#",&#13;&#10;  "CPU":"#SERVER.CPU#",&#13;&#10;  "MEM":"#SERVER.MEM#",&#13;&#10;  "SWAP":"#SERVER.SWAP#",&#13;&#10;  "DISK":"#SERVER.DISK#",&#13;&#10;  "NetInSpeed":"#SERVER.NETINSPEED#",&#13;&#10;  "NetOutSpeed":"#SERVER.NETOUTSPEED#",&#13;&#10;  "TransferIn":"#SERVER.TRANSFERIN#",&#13;&#10;  "TranferOut":"#SERVER.TRANSFEROUT#",&#13;&#10;  "Load1":"#SERVER.LOAD1#",&#13;&#10;  "Load5":"#SERVER.LOAD5#",&#13;&#10;  "Load15":"#SERVER.LOAD15#",&#13;&#10;  "TCP_CONN_COUNT":"#SERVER.TCPCONNCOUNT",&#13;&#10;  "UDP_CONN_COUNT":"#SERVER.UDPCONNCOUNT"&#13;&#10;}'
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -309,7 +211,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="enable_ipv4"
+                                    name="verify_tls"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
                                             <FormControl>
@@ -318,7 +220,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable IPv4</Label>
+                                                    <Label className="text-sm">Verify TLS</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -327,7 +229,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="enable_ipv6"
+                                    name="skip_check"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
                                             <FormControl>
@@ -336,7 +238,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable IPv6</Label>
+                                                    <Label className="text-sm">Do Not Send Test Message</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />

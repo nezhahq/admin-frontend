@@ -8,13 +8,13 @@ import { ActionButtonGroup } from "@/components/action-button-group"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
-import { ModelNotificationGroupResponseItem } from "@/types"
-import { deleteNotificationGroups } from "@/api/notification-group"
-import { GroupTab } from "@/components/group-tab"
-import { NotificationGroupCard } from "@/components/notification-group"
+import { ModelAlertRule, triggerModes } from "@/types"
+import { deleteAlertRules } from "@/api/alert-rule"
+import { NotificationTab } from "@/components/notification-tab"
+import { AlertRuleCard } from "@/components/alert-rule"
 
-export default function NotificationGroupPage() {
-    const { data, mutate, error, isLoading } = useSWR<ModelNotificationGroupResponseItem[]>("/api/v1/notification-group", swrFetcher);
+export default function AlertRulePage() {
+    const { data, mutate, error, isLoading } = useSWR<ModelAlertRule[]>("/api/v1/alert-rule", swrFetcher);
 
     useEffect(() => {
         if (error)
@@ -23,7 +23,7 @@ export default function NotificationGroupPage() {
             })
     }, [error])
 
-    const columns: ColumnDef<ModelNotificationGroupResponseItem>[] = [
+    const columns: ColumnDef<ModelAlertRule>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -49,7 +49,7 @@ export default function NotificationGroupPage() {
         {
             header: "ID",
             accessorKey: "id",
-            accessorFn: row => row.group.id,
+            accessorFn: row => row.id,
         },
         {
             header: "Name",
@@ -57,16 +57,41 @@ export default function NotificationGroupPage() {
             cell: ({ row }) => {
                 const s = row.original;
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
-                        {s.group.name}
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.name}
                     </div>
                 )
             }
         },
         {
-            header: "Notifiers (ID)",
-            accessorKey: "notifications",
-            accessorFn: row => row.notifications,
+            header: "Notifier Group",
+            accessorKey: "ngroup",
+            accessorFn: row => row.notification_group_id,
+        },
+        {
+            header: "Trigger Mode",
+            accessorKey: "trigger Mode",
+            accessorFn: row => triggerModes[row.trigger_mode] || '',
+        },
+        {
+            header: "Rules",
+            accessorKey: "rules",
+            accessorFn: row => JSON.stringify(row.rules),
+        },
+        {
+            header: "Tasks to trigger on alert",
+            accessorKey: "failTriggerTasks",
+            accessorFn: row => row.fail_trigger_tasks,
+        },
+        {
+            header: "Tasks to trigger after recovery",
+            accessorKey: "recoverTriggerTasks",
+            accessorFn: row => row.recover_trigger_tasks,
+        },
+        {
+            header: "Enable",
+            accessorKey: "enable",
+            accessorFn: row => row.enable,
         },
         {
             id: "actions",
@@ -75,11 +100,11 @@ export default function NotificationGroupPage() {
                 const s = row.original
                 return (
                     <ActionButtonGroup className="flex gap-2" delete={{
-                        fn: deleteNotificationGroups,
-                        id: s.group.id,
+                        fn: deleteAlertRules,
+                        id: s.id,
                         mutate: mutate,
                     }}>
-                        <NotificationGroupCard mutate={mutate} data={s} />
+                        <AlertRuleCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
                 )
             },
@@ -97,13 +122,13 @@ export default function NotificationGroupPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4 gap-[60%]">
-                <GroupTab className="flex-1" />
+                <NotificationTab className="flex-1" />
                 <HeaderButtonGroup className="flex-2 flex gap-2 ml-auto" delete={{
-                    fn: deleteNotificationGroups,
-                    id: selectedRows.map(r => r.original.group.id),
-                    mutate: mutate
+                    fn: deleteAlertRules,
+                    id: selectedRows.map(r => r.original.id),
+                    mutate: mutate,
                 }}>
-                    <NotificationGroupCard mutate={mutate} />
+                    <AlertRuleCard mutate={mutate} />
                 </HeaderButtonGroup>
             </div>
             {isLoading ? (

@@ -20,7 +20,10 @@ import NATPage from './routes/nat';
 import ServerGroupPage from './routes/server-group';
 import NotificationGroupPage from './routes/notification-group';
 import { ServerProvider } from './hooks/useServer';
+import { NotificationProvider } from './hooks/useNotfication';
 import CronPage from './routes/cron';
+import NotificationPage from './routes/notification';
+import AlertRulePage from './routes/alert-rule';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +48,14 @@ const router = createBrowserRouter([
         element: <CronPage />,
       },
       {
+        path: "/dashboard/notification",
+        element: <NotificationProvider withNotifierGroup><NotificationPage /></NotificationProvider>,
+      },
+      {
+        path: "/dashboard/alert-rule",
+        element: <AlertRulePage />,
+      },
+      {
         path: "/dashboard/ddns",
         element: <DDNSPage />,
       },
@@ -58,7 +69,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard/notification-group",
-        element: <NotificationGroupPage />,
+        element: <NotificationProvider withNotifier><NotificationGroupPage /></NotificationProvider>,
       },
       {
         path: "/dashboard/terminal/:id",
