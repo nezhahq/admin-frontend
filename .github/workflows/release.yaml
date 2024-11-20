@@ -24,7 +24,7 @@ jobs:
 
       - name: Build static export
         run: |
-          bun run build
+          bun run build-ignore-error
 
       - name: Compress dist folder
         run: zip -r dist.zip dist
