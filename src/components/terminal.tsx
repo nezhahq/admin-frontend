@@ -40,7 +40,7 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
             setClose(true);
         },
         onError: (e) => {
-            console.log(e);
+            console.error(e);
             toast("Websocket error", {
                 description: "View console for details.",
             })
@@ -88,7 +88,7 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
             await sleep(1500);
             doResize();
         } catch (error) {
-            console.log('resize error', error);
+            console.error('resize error', error);
         } finally {
             sendResize.current = false;
         }
@@ -134,7 +134,7 @@ export const TerminalPage = () => {
                     toast("Terminal API Error", {
                         description: "View console for details.",
                     })
-                    console.log("fetch error", e);
+                    console.error("fetch error", e);
                     return;
                 }
             }

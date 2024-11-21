@@ -141,16 +141,17 @@ export default function CronPage() {
                                     try {
                                         await runCron(s.id);
                                     } catch (e) {
-                                        console.log(e);
+                                        console.error(e);
                                         toast("Error executing task", {
                                             description: "Please see the console for details.",
                                         })
-                                        await mutate()
+                                        await mutate();
+                                        return;
                                     }
                                     toast("Success", {
                                         description: "The task triggered successfully.",
                                     })
-                                    await mutate()
+                                    await mutate();
                                 }} />
                             <CronCard mutate={mutate} data={s} />
                         </>

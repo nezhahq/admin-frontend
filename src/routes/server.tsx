@@ -1,11 +1,11 @@
 import { swrFetcher } from "@/api/api"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ModelServer as Server } from "@/types"
+import { ModelServer as Server, ModelForceUpdateResponse } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import useSWR from "swr"
 import { HeaderButtonGroup } from "@/components/header-button-group"
-import { deleteServer } from "@/api/server"
+import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ServerCard } from "@/components/server"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ActionButtonGroup } from "@/components/action-button-group"
@@ -154,7 +154,34 @@ export default function ServerPage() {
                     id: selectedRows.map(r => r.original.id),
                     mutate: mutate,
                 }}>
-                    <IconButton icon="update" />
+                    <IconButton icon="update" onClick={
+                        async () => {
+                            const id = selectedRows.map(r => r.original.id);
+                            if (id.length < 1) {
+                                toast("Error", {
+                                    description: "No rows are selected."
+                                });
+                                return;
+                            }
+
+                            let resp: ModelForceUpdateResponse = {};
+                            try {
+                                resp = await forceUpdateServer(id);
+                            } catch (e) {
+                                console.error(e);
+                                toast("Error executing task", {
+                                    description: "Please see the console for details.",
+                                })
+                                return;
+                            }
+                            toast("Task executed successfully", {
+                                description: `Result (Server ID):
+                                    ${resp.success?.length ? `Success: ${resp.success.join(",")}, ` : ''}
+                                    ${resp.failure?.length ? `Failure: ${resp.failure.join(",")}, ` : ''}
+                                    ${resp.offline?.length ? `Offline: ${resp.offline.join(",")}` : ''}
+                                    `
+                            })
+                        }} />
                 </HeaderButtonGroup>
             </div>
             {isLoading ? (

@@ -1,9 +1,34 @@
-import { Plus, Edit2, Trash2, Terminal, CircleArrowUp, Clipboard, Check, FolderClosed, Play } from "lucide-react"
+import {
+    Plus,
+    Edit2,
+    Trash2,
+    Terminal,
+    CircleArrowUp,
+    Clipboard,
+    Check,
+    FolderClosed,
+    Play,
+    Download,
+    Upload,
+    Menu,
+} from "lucide-react"
 import { Button, ButtonProps } from "@/components/ui/button"
 import { forwardRef } from "react";
 
 export interface IconButtonProps extends ButtonProps {
-    icon: "clipboard" | "check" | "edit" | "trash" | "plus" | "terminal" | "update" | "folder-closed" | "play";
+    icon:
+    "clipboard" |
+    "check" |
+    "edit" |
+    "trash" |
+    "plus" |
+    "terminal" |
+    "update" |
+    "folder-closed" |
+    "play" |
+    "download" |
+    "upload" |
+    "menu";
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
@@ -37,6 +62,15 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props,
                     }
                     case "play": {
                         return <Play />;
+                    }
+                    case "download": {
+                        return <Download />;
+                    }
+                    case "upload": {
+                        return <Upload />;
+                    }
+                    case "menu": {
+                        return <Menu />;
                     }
                 }
             })()}

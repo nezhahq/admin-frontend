@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { z } from "zod"
+import { FMEntry, FMOpcode } from "@/types"
+import FMWorker from "./fm?worker"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -46,3 +48,68 @@ export const conv = {
 export const sleep = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
+
+export const fm = {
+  parseFMList: async (buf: ArrayBufferLike) => {
+    const dataView = new DataView(buf);
+    let offset = 4; // Identifier: 4 bytes (NZFN), not needed here
+
+    const pathLength = dataView.getUint32(offset);
+    offset += 4; // File Path Length: 4 bytes
+
+    const pathBuf = new Uint8Array(buf, offset, pathLength);
+    const path = new TextDecoder('utf-8').decode(pathBuf);
+    offset += pathLength; // Path: N bytes
+
+    const fmList: FMEntry[] = [];
+    while (offset < dataView.byteLength) {
+      const fileType = dataView.getUint8(offset);
+      offset += 1; // File Type: 1 byte
+
+      const nameLength = dataView.getUint8(offset);
+      offset += 1; // File Name Length: 1 byte
+
+      const nameBuf = new Uint8Array(buf, offset, nameLength);
+      const name = new TextDecoder('utf-8').decode(nameBuf);
+      offset += nameLength; // File Name: N bytes
+
+      fmList.push({
+        type: fileType,
+        name: name,
+      })
+    }
+
+    return { path, fmList };
+  },
+
+  buildUploadHeader: ({ path, file }: { path: string, file: File }) => {
+    const filePath = `${path}/${file.name}`;
+
+    // Build header (opcode + file size + path)
+    const filePathBytes = new TextEncoder().encode(filePath);
+    const header = new ArrayBuffer(1 + 8 + filePathBytes.length);
+    const headerView = new DataView(header);
+
+    headerView.setUint8(0, FMOpcode.Upload);
+    headerView.setBigUint64(1, BigInt(file.size), false);
+
+    new Uint8Array(header, 9).set(filePathBytes);
+    return header;
+  },
+
+  readFileAsArrayBuffer: async (blob: Blob): Promise<string | ArrayBuffer | null> => {
+    const reader = new FileReader();
+
+    return new Promise((resolve, reject) => {
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsArrayBuffer(blob);
+    });
+  },
+}
+
+export const fmWorker = new FMWorker();
+
+export function formatPath(path: string) {
+  return path.replace(/\/{2,}/g, '/');
+}

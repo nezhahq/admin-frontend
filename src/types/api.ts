@@ -93,6 +93,12 @@ export interface GithubComNaibaNezhaModelCommonResponseModelConfig {
   success: boolean;
 }
 
+export interface GithubComNaibaNezhaModelCommonResponseModelForceUpdateResponse {
+  data: ModelForceUpdateResponse;
+  error: string;
+  success: boolean;
+}
+
 export interface GithubComNaibaNezhaModelCommonResponseModelLoginResponse {
   data: ModelLoginResponse;
   error: string;
@@ -277,6 +283,12 @@ export interface ModelDDNSProfile {
   webhook_request_body: string;
   webhook_request_type: number;
   webhook_url: string;
+}
+
+export interface ModelForceUpdateResponse {
+  failure?: number[];
+  offline?: number[];
+  success?: number[];
 }
 
 export interface ModelHost {
