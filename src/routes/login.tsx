@@ -50,7 +50,7 @@ export default () => {
                             <FormItem>
                                 <FormLabel>Username</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="shadcn" {...field} />
+                                    <Input placeholder="shadcn" autoComplete="username" {...field} />
                                 </FormControl>
                                 <FormDescription>
                                     This is your public display name.
@@ -66,7 +66,7 @@ export default () => {
                             <FormItem>
                                 <FormLabel>Password</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder="shadcn" {...field} />
+                                    <Input type="password" placeholder="shadcn" autoComplete="current-password" {...field} />
                                 </FormControl>
                                 <FormDescription>
                                     This is your public display name.

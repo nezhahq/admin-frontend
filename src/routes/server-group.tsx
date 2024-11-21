@@ -54,6 +54,7 @@ export default function ServerGroupPage() {
         {
             header: "Name",
             accessorKey: "name",
+            accessorFn: row => row.group.name,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -96,8 +97,8 @@ export default function ServerGroupPage() {
 
     return (
         <div className="px-8">
-            <div className="flex mt-6 mb-4 gap-[60%]">
-                <GroupTab className="flex-1" />
+            <div className="flex mt-6 mb-4">
+                <GroupTab className="flex-1 mr-4 sm:max-w-[40%]" />
                 <HeaderButtonGroup className="flex-2 flex ml-auto gap-2" delete={{
                     fn: deleteServerGroups,
                     id: selectedRows.map(r => r.original.group.id),

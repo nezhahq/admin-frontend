@@ -62,6 +62,7 @@ export default function DDNSPage() {
         {
             header: "Name",
             accessorKey: "name",
+            accessorFn: row => row.name,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -89,6 +90,7 @@ export default function DDNSPage() {
         {
             header: "Domains",
             accessorKey: "domains",
+            accessorFn: row => row.domains,
             cell: ({ row }) => {
                 const s = row.original;
                 return (

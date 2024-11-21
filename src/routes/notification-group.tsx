@@ -54,6 +54,7 @@ export default function NotificationGroupPage() {
         {
             header: "Name",
             accessorKey: "name",
+            accessorFn: row => row.group.name,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -96,8 +97,8 @@ export default function NotificationGroupPage() {
 
     return (
         <div className="px-8">
-            <div className="flex mt-6 mb-4 gap-[60%]">
-                <GroupTab className="flex-1" />
+            <div className="flex mt-6 mb-4">
+                <GroupTab className="flex-1 mr-4 sm:max-w-[40%]" />
                 <HeaderButtonGroup className="flex-2 flex gap-2 ml-auto" delete={{
                     fn: deleteNotificationGroups,
                     id: selectedRows.map(r => r.original.group.id),

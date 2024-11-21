@@ -41,11 +41,23 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard/service",
-        element: <ServicePage />,
+        element: (
+          <ServerProvider withServer>
+            <NotificationProvider withNotifierGroup>
+              <ServicePage />
+            </NotificationProvider>
+          </ServerProvider>
+        ),
       },
       {
         path: "/dashboard/cron",
-        element: <CronPage />,
+        element: (
+          <ServerProvider withServer>
+            <NotificationProvider withNotifierGroup>
+              <CronPage />
+            </NotificationProvider>
+          </ServerProvider>
+        ),
       },
       {
         path: "/dashboard/notification",
@@ -53,7 +65,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard/alert-rule",
-        element: <AlertRulePage />,
+        element: <NotificationProvider withNotifierGroup><AlertRulePage /></NotificationProvider>,
       },
       {
         path: "/dashboard/ddns",

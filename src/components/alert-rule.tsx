@@ -40,6 +40,8 @@ import { asOptionalField } from "@/lib/utils"
 import { IconButton } from "@/components/xui/icon-button"
 import { triggerModes } from "@/types"
 import { Textarea } from "./ui/textarea"
+import { useNotification } from "@/hooks/useNotfication"
+import { Combobox } from "./ui/combobox"
 
 interface AlertRuleCardProps {
     data?: ModelAlertRule;
@@ -108,11 +110,18 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
 
     const onSubmit = async (values: z.infer<typeof alertRuleFormSchema>) => {
         values.rules = JSON.parse(values.rules_raw);
-        data?.id ? await updateAlertRule(data.id, values) : await createAlertRule(values);
+        const { rules_raw, ...requiredFields } = values;
+        data?.id ? await updateAlertRule(data.id, requiredFields) : await createAlertRule(requiredFields);
         setOpen(false);
         await mutate();
         form.reset();
     }
+
+    const { notifierGroup } = useNotification();
+    const ngroupList = notifierGroup?.map(ng => ({
+        value: `${ng.group.id}`,
+        label: ng.group.name,
+    })) || [{ value: "", label: "" }];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -169,12 +178,13 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="notification_group_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notifier Group ID</FormLabel>
+                                            <FormLabel>Notifier Group</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="0"
-                                                    {...field}
+                                                <Combobox
+                                                    placeholder="Search..."
+                                                    options={ngroupList}
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value.toString()}
                                                 />
                                             </FormControl>
                                             <FormMessage />

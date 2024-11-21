@@ -1,8 +1,13 @@
-import { ModelServer, ModelServerGroupResponseItem } from "@/types";
+import { ModelServerGroupResponseItem } from "@/types";
+
+export interface ServerIdentifierType {
+    id: number;
+    name: string;
+}
 
 export interface ServerStore {
-    server?: ModelServer[];
+    server?: ServerIdentifierType[];
     serverGroup?: ModelServerGroupResponseItem[];
-    setServer: (server?: ModelServer[]) => void;
+    setServer: (server?: ServerIdentifierType[]) => void;
     setServerGroup: (serverGroup?: ModelServerGroupResponseItem[]) => void;
 }

@@ -56,6 +56,7 @@ export default function NotificationPage() {
         {
             header: "Name",
             accessorKey: "name",
+            accessorFn: row => row.name,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -77,6 +78,7 @@ export default function NotificationPage() {
         {
             header: "URL",
             accessorKey: "url",
+            accessorFn: row => row.url,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -119,8 +121,8 @@ export default function NotificationPage() {
 
     return (
         <div className="px-8">
-            <div className="flex mt-6 mb-4 gap-[60%]">
-                <NotificationTab className="flex-1" />
+            <div className="flex mt-6 mb-4">
+                <NotificationTab className="flex-1 mr-4 sm:max-w-[40%]" />
                 <HeaderButtonGroup className="flex-2 flex gap-2 ml-auto" delete={{
                     fn: deleteNotification,
                     id: selectedRows.map(r => r.original.id),

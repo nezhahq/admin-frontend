@@ -43,6 +43,20 @@ export const conv = {
     }
     return arr;
   },
+  recordToStrArr: <T>(rec: Record<string, T>) => {
+    const arr: string[] = [];
+    for (const val of Object.keys(rec)) {
+      arr.push(val);
+    }
+    return arr;
+  },
+  arrToRecord: (arr: string[]) => {
+    const rec: Record<string, boolean> = {};
+    for (const val of arr) {
+      rec[val] = true;
+    }
+    return rec;
+  }
 }
 
 export const sleep = (ms: number) => {

@@ -39,6 +39,10 @@ import { KeyedMutator } from "swr"
 import { asOptionalField } from "@/lib/utils"
 import { IconButton } from "@/components/xui/icon-button"
 import { serviceTypes, serviceCoverageTypes } from "@/types"
+import { MultiSelect } from "./xui/multi-select"
+import { Combobox } from "./ui/combobox"
+import { useServer } from "@/hooks/useServer"
+import { useNotification } from "@/hooks/useNotfication"
 
 interface ServiceCardProps {
     data?: ModelService;
@@ -63,6 +67,7 @@ const serviceFormSchema = z.object({
         return v.filter(Boolean).map(Number);
     })),
     skip_servers: z.record(z.boolean()),
+    skip_servers_raw: z.array(z.string()),
     target: z.string().url(),
     type: z.coerce.number().int().min(0),
 });
@@ -70,7 +75,10 @@ const serviceFormSchema = z.object({
 export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     const form = useForm<z.infer<typeof serviceFormSchema>>({
         resolver: zodResolver(serviceFormSchema),
-        defaultValues: data ? data : {
+        defaultValues: data ? {
+            ...data,
+            skip_servers_raw: conv.recordToStrArr(data.skip_servers),
+        } : {
             type: 1,
             cover: 0,
             name: "",
@@ -82,6 +90,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
             fail_trigger_tasks: [],
             recover_trigger_tasks: [],
             skip_servers: {},
+            skip_servers_raw: [],
         },
         resetOptions: {
             keepDefaultValues: false,
@@ -91,11 +100,25 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     const [open, setOpen] = useState(false);
 
     const onSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
-        data?.id ? await updateService(data.id, values) : await createService(values);
+        values.skip_servers = conv.arrToRecord(values.skip_servers_raw);
+        const { skip_servers_raw, ...requiredFields } = values;
+        data?.id ? await updateService(data.id, requiredFields) : await createService(requiredFields);
         setOpen(false);
         await mutate();
         form.reset();
     }
+
+    const { servers } = useServer();
+    const serverList = servers?.map(s => ({
+        value: `${s.id}`,
+        label: s.name,
+    })) || [{ value: "", label: "" }];
+
+    const { notifierGroup } = useNotification();
+    const ngroupList = notifierGroup?.map(ng => ({
+        value: `${ng.group.id}`,
+        label: ng.group.name,
+    })) || [{ value: "", label: "" }];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -229,19 +252,15 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="skip_servers"
+                                    name="skip_servers_raw"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Specific Servers (separate with comma)</FormLabel>
+                                            <FormLabel>Specific Servers</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.recordToStr(field.value ?? {})}
-                                                    onChange={e => {
-                                                        const rec = conv.strToRecord(e.target.value);
-                                                        field.onChange(rec);
-                                                    }}
+                                                <MultiSelect
+                                                    options={serverList}
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -253,12 +272,13 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="notification_group_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notifier Group ID</FormLabel>
+                                            <FormLabel>Notifier Group</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="1"
-                                                    {...field}
+                                                <Combobox
+                                                    placeholder="Search..."
+                                                    options={ngroupList}
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value.toString()}
                                                 />
                                             </FormControl>
                                             <FormMessage />

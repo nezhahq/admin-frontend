@@ -33,7 +33,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
             (async () => {
                 try {
                     const n = await getNotification();
-                    setNotifier(n);
+                    const nData = n.map(({ id, name }) => ({ id, name }));
+                    setNotifier(nData);
                 } catch (error) {
                     setNotifier(undefined);
                 }

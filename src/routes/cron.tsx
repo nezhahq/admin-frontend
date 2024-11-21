@@ -99,19 +99,27 @@ export default function CronPage() {
         {
             header: "Coverage",
             accessorKey: "cover",
-            accessorFn: row => {
-                switch (row.cover) {
-                    case 0: {
-                        return "Ignore All"
-                    }
-                    case 1: {
-                        return "Cover All"
-                    }
-                    case 2: {
-                        return "On alert"
-                    }
-                }
-            },
+            accessorFn: row => row.cover,
+            cell: ({ row }) => {
+                const s = row.original;
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        {(() => {
+                            switch (s.cover) {
+                                case 0: {
+                                    return <span>Ignore All</span>
+                                }
+                                case 1: {
+                                    return <span>Cover All</span>
+                                }
+                                case 2: {
+                                    return <span>On alert</span>
+                                }
+                            }
+                        })()}
+                    </div>
+                )
+            }
         },
         {
             header: "Specific Servers",
@@ -121,7 +129,15 @@ export default function CronPage() {
         {
             header: "Last Execution",
             accessorKey: "lastExecution",
-            accessorFn: row => row.last_executed_at
+            accessorFn: row => row.last_executed_at,
+            cell: ({ row }) => {
+                const s = row.original;
+                return (
+                    <div className="max-w-24 whitespace-normal break-words">
+                        {s.last_executed_at}
+                    </div>
+                )
+            }
         },
         {
             header: "Last Result",

@@ -1,8 +1,13 @@
-import { ModelNotification, ModelNotificationGroupResponseItem } from "@/types";
+import { ModelNotificationGroupResponseItem } from "@/types";
+
+export interface NotificationIdentifierType {
+    id: number;
+    name: string;
+}
 
 export interface NotificationStore {
-    notifiers?: ModelNotification[];
+    notifiers?: NotificationIdentifierType[];
     notifierGroup?: ModelNotificationGroupResponseItem[];
-    setNotifier: (notifiers?: ModelNotification[]) => void;
+    setNotifier: (notifiers?: NotificationIdentifierType[]) => void;
     setNotifierGroup: (notifierGroup?: ModelNotificationGroupResponseItem[]) => void;
 }

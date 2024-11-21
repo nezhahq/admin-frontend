@@ -33,7 +33,8 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children, withSe
             (async () => {
                 try {
                     const s = await getServers();
-                    setServer(s);
+                    const serverData = s.map(({ id, name }) => ({ id, name }));
+                    setServer(serverData);
                 } catch (error) {
                     setServer(undefined);
                 }

@@ -54,6 +54,7 @@ export default function ServicePage() {
         },
         {
             header: "Name",
+            accessorFn: row => row.service.name,
             accessorKey: "service.name",
             cell: ({ row }) => {
                 const s = row.original;
@@ -66,6 +67,7 @@ export default function ServicePage() {
         },
         {
             header: "Target",
+            accessorFn: row => row.service.target,
             accessorKey: "service.target",
             cell: ({ row }) => {
                 const s = row.original;
@@ -79,15 +81,23 @@ export default function ServicePage() {
         {
             header: "Coverage",
             accessorKey: "service.cover",
-            accessorFn: row => {
-                switch (row.service.cover) {
-                    case 0: {
-                        return "Cover All"
-                    }
-                    case 1: {
-                        return "Ignore All"
-                    }
-                }
+            accessorFn: row => row.service.cover,
+            cell: ({ row }) => {
+                const s = row.original.service;
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        {(() => {
+                            switch (s.cover) {
+                                case 0: {
+                                    return <span>Cover All</span>
+                                }
+                                case 1: {
+                                    return <span>Ignore All</span>
+                                }
+                            }
+                        })()}
+                    </div>
+                )
             }
         },
         {
@@ -98,7 +108,8 @@ export default function ServicePage() {
         {
             header: "Type",
             accessorKey: "service.type",
-            accessorFn: row => serviceTypes[row.service.type] || '',
+            accessorFn: row => row.service.type,
+            cell: ({ row }) => serviceTypes[row.original.service.type] || '',
         },
         {
             header: "Interval",

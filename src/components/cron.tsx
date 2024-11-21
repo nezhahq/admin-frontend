@@ -37,7 +37,10 @@ import { createCron, updateCron } from "@/api/cron"
 import { asOptionalField } from "@/lib/utils"
 import { cronTypes, cronCoverageTypes } from "@/types"
 import { Textarea } from "./ui/textarea"
-import { conv } from "@/lib/utils"
+import { useServer } from "@/hooks/useServer"
+import { useNotification } from "@/hooks/useNotfication"
+import { MultiSelect } from "./xui/multi-select"
+import { Combobox } from "./ui/combobox"
 
 interface CronCardProps {
     data?: ModelCron;
@@ -81,6 +84,18 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
         await mutate();
         form.reset();
     }
+
+    const { servers } = useServer();
+    const serverList = servers?.map(s => ({
+        value: `${s.id}`,
+        label: s.name,
+    })) || [{ value: "", label: "" }];
+
+    const { notifierGroup } = useNotification();
+    const ngroupList = notifierGroup?.map(ng => ({
+        value: `${ng.group.id}`,
+        label: ng.group.name,
+    })) || [{ value: "", label: "" }];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -200,14 +215,10 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>Specific Servers (Separate with comma)</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
-                                                        field.onChange(arr);
-                                                    }}
+                                                <MultiSelect
+                                                    options={serverList}
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value?.map(String)}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -221,10 +232,11 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>Notifier Group ID</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="0"
-                                                    {...field}
+                                                <Combobox
+                                                    placeholder="Search..."
+                                                    options={ngroupList}
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value.toString()}
                                                 />
                                             </FormControl>
                                             <FormMessage />

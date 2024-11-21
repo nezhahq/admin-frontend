@@ -53,6 +53,7 @@ export default function NATPage() {
         {
             header: "Name",
             accessorKey: "name",
+            accessorFn: row => row.name,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -70,6 +71,7 @@ export default function NATPage() {
         {
             header: "Local service",
             accessorKey: "host",
+            accessorFn: row => row.host,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -82,6 +84,7 @@ export default function NATPage() {
         {
             header: "Bind hostname",
             accessorKey: "domain",
+            accessorFn: row => row.domain,
             cell: ({ row }) => {
                 const s = row.original;
                 return (

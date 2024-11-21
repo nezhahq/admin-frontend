@@ -1,6 +1,6 @@
-import { ModelNotification, ModelNotificationGroupResponseItem } from "@/types";
+import { NotificationIdentifierType, ModelNotificationGroupResponseItem } from "@/types";
 
 export interface NotificationContextProps {
-    notifiers?: ModelNotification[];
+    notifiers?: NotificationIdentifierType[];
     notifierGroup?: ModelNotificationGroupResponseItem[];
 }

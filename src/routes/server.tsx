@@ -59,6 +59,7 @@ export default function ServerPage() {
         {
             header: "Name",
             accessorKey: "name",
+            accessorFn: row => row.name,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -81,6 +82,7 @@ export default function ServerPage() {
             id: "ip",
             header: "IP",
             accessorKey: "host.ip",
+            accessorFn: row => row.host?.ip,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
