@@ -55,7 +55,7 @@ export default function Header() {
                     <NavigationMenuList>
                         <Card className="mr-1">
                             <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + ' !text-foreground'}>
-                                <Link to="/dashboard"><img className="h-7 mr-1" src='/dashboard/logo.svg' /> 哪吒监控</Link>
+                                <Link to="/dashboard"><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
                             </NavigationMenuLink>
                         </Card>
 
@@ -171,7 +171,7 @@ export default function Header() {
                         }
                     </div>
                     <Card className="mx-2 my-2 flex justify-center items-center hover:bg-accent transition duration-200">
-                        <Link className="inline-flex w-full items-center px-4 py-2" to="/dashboard"><img className="h-7 mr-1" src='/dashboard/logo.svg' /> 哪吒监控</Link>
+                        <Link className="inline-flex w-full items-center px-4 py-2" to="/dashboard"><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
                     </Card>
                     <div className="ml-auto flex items-center gap-1">
                         <ModeToggle />

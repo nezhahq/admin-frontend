@@ -14,7 +14,7 @@ export default function Root() {
                     <Outlet />
                 </div>
                 <footer className="mx-5 pb-5 text-foreground/60 font-thin text-center">
-                    &copy; 2019-2024 哪吒监控
+                    &copy; 2019-2024 哪吒监控 Nezha Monitoring
                 </footer>
             </Card>
             <Toaster />
