@@ -180,6 +180,8 @@ export interface ModelConfig {
   listen_port: number;
   /** 时区，默认为 Asia/Shanghai */
   location: string;
+  /** 真实IP */
+  real_ip_header: string;
   site_name: string;
   tls: boolean;
 }
@@ -291,14 +293,17 @@ export interface ModelForceUpdateResponse {
   success?: number[];
 }
 
+export interface ModelGeoIP {
+  country_code: string;
+  ip: ModelIP;
+}
+
 export interface ModelHost {
   arch: string;
   boot_time: number;
-  country_code: string;
   cpu: string[];
   disk_total: number;
   gpu: string[];
-  ip: string;
   mem_total: number;
   platform: string;
   platform_version: string;
@@ -325,6 +330,11 @@ export interface ModelHostState {
   temperatures: ModelSensorTemperature[];
   udp_conn_count: number;
   uptime: number;
+}
+
+export interface ModelIP {
+  ipv4_addr: string;
+  ipv6_addr: string;
 }
 
 export interface ModelLoginRequest {
@@ -439,6 +449,7 @@ export interface ModelServer {
   display_index: number;
   /** 启用DDNS */
   enable_ddns: boolean;
+  geoip: ModelGeoIP;
   /** 对游客隐藏 */
   hide_for_guest: boolean;
   host: ModelHost;

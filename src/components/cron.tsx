@@ -213,7 +213,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="servers"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Specific Servers (Separate with comma)</FormLabel>
+                                            <FormLabel>Specific Servers</FormLabel>
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}

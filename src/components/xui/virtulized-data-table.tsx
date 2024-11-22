@@ -16,6 +16,7 @@ import { HTMLAttributes, forwardRef, useState, useRef, useEffect } from "react";
 import { TableVirtuoso } from "react-virtuoso";
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 // Original Table is wrapped with a <div> (see https://ui.shadcn.com/docs/components/table#radix-:r24:-content-manual),
 // but here we don't want it, so let's use a new component with only <table> tag
@@ -99,6 +100,8 @@ export function DataTable<TData, TValue>({
 
     const [heightState, setHeight] = useState(0)
     const ref = useRef(null);
+    const isDesktop = useMediaQuery("(min-width: 640px)");
+
     useEffect(() => {
         const calculateHeight = () => {
             if (ref.current) {
@@ -118,11 +121,14 @@ export function DataTable<TData, TValue>({
                 setHeight(calculatedHeight);
             }
         };
-        window.addEventListener('resize', calculateHeight);
         calculateHeight(); // Initial calculation
 
-        return () => window.removeEventListener('resize', calculateHeight);
-    }, []);
+        if (isDesktop) {
+            window.addEventListener('resize', calculateHeight);
+        }
+
+        return () => { if (isDesktop) window.removeEventListener('resize', calculateHeight); }
+    }, [isDesktop]);
 
     return (
         <div className="rounded-md border" ref={ref} style={{ height: heightState }}>

@@ -37,6 +37,14 @@ import { TableRow, TableCell } from "./ui/table"
 import { DataTable } from "./xui/virtulized-data-table"
 import { Input } from "@/components/ui/input"
 import { Filepath } from "./xui/filepath"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
+import {
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
 
 interface FMProps {
     wsUrl: string;
@@ -346,6 +354,8 @@ export const FMCard = ({ id }: { id?: string }) => {
     const [fm, setFM] = useState<ModelCreateFMResponse | null>(null);
     const [init, setInit] = useState(false);
 
+    const isDesktop = useMediaQuery("(min-width: 640px)");
+
     const fetchFM = async () => {
         if (id) {
             try {
@@ -363,25 +373,55 @@ export const FMCard = ({ id }: { id?: string }) => {
         }
     }
 
-    return (
-        <Sheet modal={false} open={open} onOpenChange={(isOpen) => { if (isOpen) setOpen(true); }}>
-            <SheetTrigger asChild>
-                <IconButton icon="folder-closed" onClick={fetchFM} />
-            </SheetTrigger>
-            <SheetContent setOpen={setOpen} className="sm:min-w-[35%]">
-                <div className="overflow-auto">
-                    <SheetTitle />
-                    <SheetHeader className="pb-2">
-                        <SheetDescription />
-                    </SheetHeader>
-                    {fm?.session_id && init
-                        ?
-                        <FMComponent className="p-1 space-y-5" wsUrl={`/api/v1/ws/file/${fm.session_id}`} />
-                        :
-                        <p>The server does not exist, or have not been connected yet.</p>
-                    }
-                </div>
-            </SheetContent>
-        </Sheet>
+    return (isDesktop ?
+        (
+            <Sheet
+                modal={false}
+                open={open}
+                onOpenChange={(isOpen) => { if (isOpen) setOpen(true); }}
+            >
+                <SheetTrigger asChild>
+                    <IconButton icon="folder-closed" onClick={fetchFM} />
+                </SheetTrigger>
+                <SheetContent
+                    setOpen={setOpen}
+                    className="min-w-[35%]"
+                >
+                    <div className="overflow-auto">
+                        <SheetTitle />
+                        <SheetHeader className="pb-2">
+                            <SheetDescription />
+                        </SheetHeader>
+                        {fm?.session_id && init
+                            ?
+                            <FMComponent className="p-1 space-y-5" wsUrl={`/api/v1/ws/file/${fm.session_id}`} />
+                            :
+                            <p>The server does not exist, or have not been connected yet.</p>
+                        }
+                    </div>
+                </SheetContent>
+            </Sheet>
+        )
+        : (
+            <Drawer>
+                <DrawerTrigger asChild>
+                    <IconButton icon="folder-closed" onClick={fetchFM} />
+                </DrawerTrigger>
+                <DrawerContent className="min-h-[60%] p-4">
+                    <div className="overflow-auto">
+                        <DrawerTitle />
+                        <DrawerHeader className="pb-2">
+                            <SheetDescription />
+                        </DrawerHeader>
+                        {fm?.session_id && init
+                            ?
+                            <FMComponent className="p-1 space-y-5" wsUrl={`/api/v1/ws/file/${fm.session_id}`} />
+                            :
+                            <p>The server does not exist, or have not been connected yet.</p>
+                        }
+                    </div>
+                </DrawerContent>
+            </Drawer>
+        )
     )
 }

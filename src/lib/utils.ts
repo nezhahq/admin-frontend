@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { z } from "zod"
-import { FMEntry, FMOpcode } from "@/types"
+import { FMEntry, FMOpcode, ModelIP } from "@/types"
 import FMWorker from "./fm?worker"
 
 export function cn(...inputs: ClassValue[]) {
@@ -126,4 +126,16 @@ export const fmWorker = new FMWorker();
 
 export function formatPath(path: string) {
   return path.replace(/\/{2,}/g, '/');
+}
+
+export function joinIP(p?: ModelIP) {
+  if (p) {
+    if (p.ipv4_addr && p.ipv6_addr) {
+      return `${p.ipv4_addr}/${p.ipv6_addr}`;
+    } else if (p.ipv4_addr) {
+      return p.ipv4_addr;
+    }
+    return p.ipv6_addr;
+  }
+  return '';
 }

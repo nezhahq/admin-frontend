@@ -16,6 +16,7 @@ import { InstallCommandsMenu } from "@/components/install-commands"
 import { NoteMenu } from "@/components/note-menu"
 import { TerminalButton } from "@/components/terminal"
 import { useServer } from "@/hooks/useServer"
+import { joinIP } from "@/lib/utils"
 
 export default function ServerPage() {
     const { data, mutate, error, isLoading } = useSWR<Server[]>('/api/v1/server', swrFetcher);
@@ -81,13 +82,11 @@ export default function ServerPage() {
         {
             id: "ip",
             header: "IP",
-            accessorKey: "host.ip",
-            accessorFn: row => row.host?.ip,
             cell: ({ row }) => {
                 const s = row.original;
                 return (
                     <div className="max-w-24 whitespace-normal break-words">
-                        {s.host.ip}
+                        {joinIP(s.geoip?.ip)}
                     </div>
                 )
             }
