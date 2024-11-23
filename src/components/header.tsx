@@ -55,7 +55,7 @@ export default function Header() {
                     <NavigationMenuList>
                         <Card className="mr-1">
                             <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + ' !text-foreground'}>
-                                <Link to="/dashboard"><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
+                                <Link to={profile ? "/dashboard" : '#'}><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
                             </NavigationMenuLink>
                         </Card>
 

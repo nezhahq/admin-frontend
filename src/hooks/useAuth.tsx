@@ -42,6 +42,7 @@ export const AuthProvider = ({ children }: {
     };
 
     const logout = () => {
+        document.cookie.split(";").forEach(function (c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
         setProfile(undefined);
         navigate("/dashboard/login", { replace: true });
     };
