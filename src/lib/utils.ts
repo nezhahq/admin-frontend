@@ -139,3 +139,29 @@ export function joinIP(p?: ModelIP) {
   }
   return '';
 }
+
+export function ip16Str(p: number[]) {
+  const buf = new Uint8Array(p);
+  const ip4 = buf.slice(-6);
+  if (ip4[0] === 255 && ip4[1] === 255) {
+    return ip4.slice(2).join('.');
+  }
+  return ipv6BinaryToString(buf);
+}
+
+function ipv6BinaryToString(binary: Uint8Array) {
+  let parts: string[] = [];
+  for (let i = 0; i < binary.length; i += 2) {
+    let hex = (binary[i] << 8 | binary[i + 1]).toString(16);
+    parts.push(hex);
+  }
+
+  let ipv6 = parts.join(':');
+
+  ipv6 = ipv6.replace(/(:0)+$/, '');
+  if (ipv6.indexOf('::') === -1 && parts.filter(p => p === '0').length > 1) {
+    ipv6 = ipv6.replace(/(:0)+/, '::');
+  }
+
+  return ipv6;
+}

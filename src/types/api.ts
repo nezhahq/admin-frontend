@@ -75,6 +75,12 @@ export interface GithubComNaibaNezhaModelCommonResponseArrayModelUser {
   success: boolean;
 }
 
+export interface GithubComNaibaNezhaModelCommonResponseArrayModelWAF {
+  data: ModelWAF[];
+  error: string;
+  success: boolean;
+}
+
 export interface GithubComNaibaNezhaModelCommonResponseArrayString {
   data: string[];
   error: string;
@@ -105,14 +111,14 @@ export interface GithubComNaibaNezhaModelCommonResponseModelLoginResponse {
   success: boolean;
 }
 
-export interface GithubComNaibaNezhaModelCommonResponseModelServiceResponse {
-  data: ModelServiceResponse;
+export interface GithubComNaibaNezhaModelCommonResponseModelProfile {
+  data: ModelProfile;
   error: string;
   success: boolean;
 }
 
-export interface GithubComNaibaNezhaModelCommonResponseModelUser {
-  data: ModelUser;
+export interface GithubComNaibaNezhaModelCommonResponseModelServiceResponse {
+  data: ModelServiceResponse;
   error: string;
   success: boolean;
 }
@@ -408,6 +414,15 @@ export interface ModelNotificationGroupResponseItem {
   notifications: number[];
 }
 
+export interface ModelProfile {
+  created_at: string;
+  id: number;
+  login_ip: string;
+  password: string;
+  updated_at: string;
+  username: string;
+}
+
 export interface ModelRule {
   /** 覆盖范围 RuleCoverAll/IgnoreAll */
   cover: number;
@@ -583,7 +598,11 @@ export interface ModelSettingForm {
   install_host?: string;
   /** IP变更提醒的通知组 */
   ip_change_notification_group_id: number;
+  /** @minLength 2 */
   language: string;
+  /** 真实IP */
+  real_ip_header?: string;
+  /** @minLength 1 */
   site_name: string;
 }
 
@@ -620,4 +639,11 @@ export interface ModelUser {
 export interface ModelUserForm {
   password: string;
   username: string;
+}
+
+export interface ModelWAF {
+  count: number;
+  ip: number[];
+  last_block_reason: number;
+  last_block_timestamp: number;
 }

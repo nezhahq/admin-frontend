@@ -1,6 +1,6 @@
-import { ModelUser } from "@/types";
+import { ModelProfile } from "@/types";
 
 export interface MainStore {
-    profile: ModelUser | undefined;
-    setProfile: (profile: ModelUser | undefined) => void;
+    profile: ModelProfile | undefined;
+    setProfile: (profile: ModelProfile | undefined) => void;
 }

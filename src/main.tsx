@@ -24,6 +24,9 @@ import { NotificationProvider } from './hooks/useNotfication';
 import CronPage from './routes/cron';
 import NotificationPage from './routes/notification';
 import AlertRulePage from './routes/alert-rule';
+import SettingsPage from './routes/settings';
+import UserPage from './routes/user';
+import WAFPage from './routes/waf';
 
 const router = createBrowserRouter([
   {
@@ -86,6 +89,18 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/terminal/:id",
         element: <TerminalPage />,
+      },
+      {
+        path: "/dashboard/settings",
+        element: <SettingsPage />,
+      },
+      {
+        path: "/dashboard/settings/user",
+        element: <UserPage />,
+      },
+      {
+        path: "/dashboard/settings/waf",
+        element: <WAFPage />,
       },
     ]
   },

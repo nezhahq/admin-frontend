@@ -3,6 +3,7 @@ import { useNotificationStore } from "./useNotificationStore"
 import { getNotificationGroups } from "@/api/notification-group"
 import { getNotification } from "@/api/notification"
 import { NotificationContextProps } from "@/types"
+import { useLocation } from "react-router-dom"
 
 const NotificationContext = createContext<NotificationContextProps>({});
 
@@ -18,6 +19,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
     const notifiers = useNotificationStore(store => store.notifiers);
     const setNotifier = useNotificationStore(store => store.setNotifier);
+
+    const location = useLocation();
 
     useEffect(() => {
         if (withNotifierGroup)
@@ -39,7 +42,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                     setNotifier(undefined);
                 }
             })();
-    }, [])
+    }, [location.pathname])
 
     const value: NotificationContextProps = useMemo(() => ({
         notifiers: notifiers,

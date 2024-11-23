@@ -10,8 +10,8 @@ import { Card } from "./ui/card";
 import { useMainStore } from "@/hooks/useMainStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { NzNavigationMenuLink } from "./xui/navigation-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -47,6 +47,7 @@ export default function Header() {
     const isDesktop = useMediaQuery("(min-width: 890px)")
 
     const [open, setOpen] = useState(false)
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     return (
         isDesktop ? (
@@ -105,7 +106,7 @@ export default function Header() {
                         <ModeToggle />
                         {
                             profile && <>
-                                <DropdownMenu>
+                                <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                                     <DropdownMenuTrigger asChild>
                                         <Avatar className="ml-1 h-8 w-8 cursor-pointer border-foreground border-[1px]">
                                             <AvatarImage src={'https://api.dicebear.com/7.x/notionists/svg?seed=' + profile.username} alt={profile.username} />
@@ -116,14 +117,16 @@ export default function Header() {
                                         <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                            <DropdownMenuItem>
-                                                <User />
-                                                <span>Profile</span>
-                                                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
+                                                <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
+                                                    <Settings />
+                                                    Settings
+                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={logout}>
+                                        <DropdownMenuItem onClick={logout} className="cursor-pointer">
                                             <LogOut />
                                             <span>Log out</span>
                                             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
@@ -171,13 +174,13 @@ export default function Header() {
                         }
                     </div>
                     <Card className="mx-2 my-2 flex justify-center items-center hover:bg-accent transition duration-200">
-                        <Link className="inline-flex w-full items-center px-4 py-2" to="/dashboard"><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
+                        <Link className="inline-flex w-full items-center px-4 py-2" to={profile ? "/dashboard" : '#'}><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
                     </Card>
                     <div className="ml-auto flex items-center gap-1">
                         <ModeToggle />
                         {
                             profile && <>
-                                <DropdownMenu>
+                                <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                                     <DropdownMenuTrigger asChild>
                                         <Avatar className="ml-1 h-8 w-8 cursor-pointer border-foreground border-[1px]">
                                             <AvatarImage src={'https://api.dicebear.com/7.x/notionists/svg?seed=' + profile.username} alt={profile.username} />
@@ -188,14 +191,16 @@ export default function Header() {
                                         <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                            <DropdownMenuItem>
-                                                <User />
-                                                <span>Profile</span>
-                                                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
+                                                <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
+                                                    <Settings />
+                                                    Settings
+                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={logout}>
+                                        <DropdownMenuItem onClick={logout} className="cursor-pointer">
                                             <LogOut />
                                             <span>Log out</span>
                                             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

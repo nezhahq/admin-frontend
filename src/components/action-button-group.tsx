@@ -13,13 +13,13 @@ import {
 import { KeyedMutator } from "swr";
 import { buttonVariants } from "@/components/ui/button"
 
-interface ButtonGroupProps<T> {
+interface ButtonGroupProps<E, U> {
     className?: string;
     children: React.ReactNode;
-    delete: { fn: (id: number[]) => Promise<void>, id: number, mutate: KeyedMutator<T> };
+    delete: { fn: (id: E[]) => Promise<void>, id: E, mutate: KeyedMutator<U> };
 }
 
-export function ActionButtonGroup<T>({ className, children, delete: { fn, id, mutate } }: ButtonGroupProps<T>) {
+export function ActionButtonGroup<E, U>({ className, children, delete: { fn, id, mutate } }: ButtonGroupProps<E, U>) {
     const handleDelete = async () => {
         await fn([id]);
         await mutate();

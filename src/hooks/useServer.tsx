@@ -3,6 +3,7 @@ import { useServerStore } from "./useServerStore"
 import { getServerGroups } from "@/api/server-group"
 import { getServers } from "@/api/server"
 import { ServerContextProps } from "@/types"
+import { useLocation } from "react-router-dom"
 
 const ServerContext = createContext<ServerContextProps>({});
 
@@ -18,6 +19,8 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children, withSe
 
     const server = useServerStore(store => store.server);
     const setServer = useServerStore(store => store.setServer);
+
+    const location = useLocation();
 
     useEffect(() => {
         if (withServerGroup)
@@ -39,7 +42,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children, withSe
                     setServer(undefined);
                 }
             })();
-    }, [])
+    }, [location.pathname])
 
     const value: ServerContextProps = useMemo(() => ({
         servers: server,

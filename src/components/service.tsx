@@ -77,7 +77,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
         resolver: zodResolver(serviceFormSchema),
         defaultValues: data ? {
             ...data,
-            skip_servers_raw: conv.recordToStrArr(data.skip_servers),
+            skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
         } : {
             type: 1,
             cover: 0,

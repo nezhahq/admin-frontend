@@ -11,3 +11,4 @@ export * from './alert-rule';
 export * from './notificationStore';
 export * from './notificationContext';
 export * from './fm';
+export * from './settings';
