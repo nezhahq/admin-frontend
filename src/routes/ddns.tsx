@@ -12,7 +12,7 @@ import {
 import { ModelDDNSProfile } from "@/types";
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import useSWR from "swr";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ActionButtonGroup } from "@/components/action-button-group";
 import { HeaderButtonGroup } from "@/components/header-button-group";
 import { toast } from "sonner";
@@ -120,8 +120,12 @@ export default function DDNSPage() {
         },
     ];
 
+    const dataCache = useMemo(() => {
+        return data ?? [];
+    }, [data]);
+
     const table = useReactTable({
-        data: data ?? [],
+        data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });

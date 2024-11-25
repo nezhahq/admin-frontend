@@ -15,7 +15,7 @@ import { HeaderButtonGroup } from "@/components/header-button-group";
 import { deleteServer, forceUpdateServer } from "@/api/server";
 import { ServerCard } from "@/components/server";
 import { ActionButtonGroup } from "@/components/action-button-group";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { IconButton } from "@/components/xui/icon-button";
 import { InstallCommandsMenu } from "@/components/install-commands";
@@ -137,8 +137,12 @@ export default function ServerPage() {
         },
     ];
 
+    const dataCache = useMemo(() => {
+        return data ?? [];
+    }, [data]);
+
     const table = useReactTable({
-        data: data ?? [],
+        data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
