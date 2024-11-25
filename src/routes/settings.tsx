@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { ModelConfig, settingCoverageTypes, nezhaLang } from "@/types"
-import { SettingsTab } from "@/components/settings-tab"
-import { z } from "zod"
-import { asOptionalField } from "@/lib/utils"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ModelConfig, settingCoverageTypes, nezhaLang } from "@/types";
+import { SettingsTab } from "@/components/settings-tab";
+import { z } from "zod";
+import { asOptionalField } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
     Form,
     FormControl,
@@ -13,24 +13,21 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { getSettings, updateSettings } from "@/api/settings"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-} from "@/components/ui/card"
+} from "@/components/ui/form";
+import { getSettings, updateSettings } from "@/api/settings";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 const settingFormSchema = z.object({
     custom_nameservers: asOptionalField(z.string()),
@@ -56,8 +53,8 @@ export default function SettingsPage() {
         if (error)
             toast("Error", {
                 description: `Error fetching resource: ${error.message}.`,
-            })
-    }, [error])
+            });
+    }, [error]);
 
     useEffect(() => {
         (async () => {
@@ -67,21 +64,23 @@ export default function SettingsPage() {
             } catch (e) {
                 if (e instanceof Error) setError(e);
             }
-        })()
-    }, [])
+        })();
+    }, []);
 
     const form = useForm<z.infer<typeof settingFormSchema>>({
         resolver: zodResolver(settingFormSchema),
-        defaultValues: config ? config : {
-            ip_change_notification_group_id: 0,
-            cover: 1,
-            site_name: "",
-            language: "",
-        },
+        defaultValues: config
+            ? config
+            : {
+                ip_change_notification_group_id: 0,
+                cover: 1,
+                site_name: "",
+                language: "",
+            },
         resetOptions: {
             keepDefaultValues: false,
-        }
-    })
+        },
+    });
 
     useEffect(() => {
         if (config) {
@@ -101,9 +100,9 @@ export default function SettingsPage() {
         } finally {
             toast("Success", {
                 description: "Config updated successfully.",
-            })
+            });
         }
-    }
+    };
 
     return (
         <div className="px-8">
@@ -118,9 +117,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Site Name</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            {...field}
-                                        />
+                                        <Input {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -141,7 +138,9 @@ export default function SettingsPage() {
                                             </FormControl>
                                             <SelectContent>
                                                 {Object.entries(nezhaLang).map(([k, v]) => (
-                                                    <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                    <SelectItem key={k} value={k}>
+                                                        {v}
+                                                    </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -157,10 +156,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Custom Codes (Style and Script)</FormLabel>
                                     <FormControl>
-                                        <Textarea
-                                            className="resize-y min-h-48"
-                                            {...field}
-                                        />
+                                        <Textarea className="resize-y min-h-48" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -173,10 +169,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Custom Codes for Dashboard</FormLabel>
                                     <FormControl>
-                                        <Textarea
-                                            className="resize-y min-h-48"
-                                            {...field}
-                                        />
+                                        <Textarea className="resize-y min-h-48" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -189,9 +182,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Dashboard Server Domain/IP without CDN</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            {...field}
-                                        />
+                                        <Input {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -202,11 +193,11 @@ export default function SettingsPage() {
                             name="custom_nameservers"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Custom Public DNS Nameservers for DDNS (separate with comma)</FormLabel>
+                                    <FormLabel>
+                    Custom Public DNS Nameservers for DDNS (separate with comma)
+                                    </FormLabel>
                                     <FormControl>
-                                        <Input
-                                            {...field}
-                                        />
+                                        <Input {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -219,10 +210,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Real IP Header</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="NZ::Use-Peer-IP"
-                                            {...field}
-                                        />
+                                        <Input placeholder="NZ::Use-Peer-IP" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -247,7 +235,9 @@ export default function SettingsPage() {
                                                         </FormControl>
                                                         <SelectContent>
                                                             {Object.entries(settingCoverageTypes).map(([k, v]) => (
-                                                                <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                                <SelectItem key={k} value={k}>
+                                                                    {v}
+                                                                </SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
@@ -262,10 +252,7 @@ export default function SettingsPage() {
                                                 <FormItem>
                                                     <FormLabel>Specific Servers (separate with comma)</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder="1,2,3"
-                                                            {...field}
-                                                        />
+                                                        <Input placeholder="1,2,3" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -278,10 +265,7 @@ export default function SettingsPage() {
                                                 <FormItem className="flex items-center space-x-2">
                                                     <FormControl>
                                                         <div className="flex items-center gap-2">
-                                                            <Checkbox
-                                                                checked={field.value}
-                                                                onCheckedChange={field.onChange}
-                                                            />
+                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                                             <Label className="text-sm">Enable</Label>
                                                         </div>
                                                     </FormControl>
@@ -300,11 +284,10 @@ export default function SettingsPage() {
                                 <FormItem className="flex items-center space-x-2">
                                     <FormControl>
                                         <div className="flex items-center gap-2">
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                            <Label className="text-sm">Show Full IP Address in Notification Messages</Label>
+                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                            <Label className="text-sm">
+                        Show Full IP Address in Notification Messages
+                                            </Label>
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -316,5 +299,5 @@ export default function SettingsPage() {
                 </Form>
             </div>
         </div>
-    )
+    );
 }
