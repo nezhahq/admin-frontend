@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
-  createBrowserRouter,
-  RouterProvider,
+    createBrowserRouter,
+    RouterProvider,
 } from "react-router-dom";
 
 import './index.css'
@@ -29,85 +29,85 @@ import UserPage from './routes/user';
 import WAFPage from './routes/waf';
 
 const router = createBrowserRouter([
-  {
-    path: "/dashboard",
-    element: <AuthProvider><ProtectedRoute><Root /></ProtectedRoute></AuthProvider>,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: "/dashboard/login",
-        element: <LoginPage />,
-      },
-      {
+    {
         path: "/dashboard",
-        element: <ServerProvider withServerGroup><ServerPage /></ServerProvider>,
-      },
-      {
-        path: "/dashboard/service",
-        element: (
-          <ServerProvider withServer>
-            <NotificationProvider withNotifierGroup>
-              <ServicePage />
-            </NotificationProvider>
-          </ServerProvider>
-        ),
-      },
-      {
-        path: "/dashboard/cron",
-        element: (
-          <ServerProvider withServer>
-            <NotificationProvider withNotifierGroup>
-              <CronPage />
-            </NotificationProvider>
-          </ServerProvider>
-        ),
-      },
-      {
-        path: "/dashboard/notification",
-        element: <NotificationProvider withNotifierGroup><NotificationPage /></NotificationProvider>,
-      },
-      {
-        path: "/dashboard/alert-rule",
-        element: <NotificationProvider withNotifierGroup><AlertRulePage /></NotificationProvider>,
-      },
-      {
-        path: "/dashboard/ddns",
-        element: <DDNSPage />,
-      },
-      {
-        path: "/dashboard/nat",
-        element: <NATPage />,
-      },
-      {
-        path: "/dashboard/server-group",
-        element: <ServerProvider withServer><ServerGroupPage /></ServerProvider>,
-      },
-      {
-        path: "/dashboard/notification-group",
-        element: <NotificationProvider withNotifier><NotificationGroupPage /></NotificationProvider>,
-      },
-      {
-        path: "/dashboard/terminal/:id",
-        element: <TerminalPage />,
-      },
-      {
-        path: "/dashboard/settings",
-        element: <SettingsPage />,
-      },
-      {
-        path: "/dashboard/settings/user",
-        element: <UserPage />,
-      },
-      {
-        path: "/dashboard/settings/waf",
-        element: <WAFPage />,
-      },
-    ]
-  },
+        element: <AuthProvider><ProtectedRoute><Root /></ProtectedRoute></AuthProvider>,
+        errorElement: <ErrorPage />,
+        children: [
+            {
+                path: "/dashboard/login",
+                element: <LoginPage />,
+            },
+            {
+                path: "/dashboard",
+                element: <ServerProvider withServerGroup><ServerPage /></ServerProvider>,
+            },
+            {
+                path: "/dashboard/service",
+                element: (
+                    <ServerProvider withServer>
+                        <NotificationProvider withNotifierGroup>
+                            <ServicePage />
+                        </NotificationProvider>
+                    </ServerProvider>
+                ),
+            },
+            {
+                path: "/dashboard/cron",
+                element: (
+                    <ServerProvider withServer>
+                        <NotificationProvider withNotifierGroup>
+                            <CronPage />
+                        </NotificationProvider>
+                    </ServerProvider>
+                ),
+            },
+            {
+                path: "/dashboard/notification",
+                element: <NotificationProvider withNotifierGroup><NotificationPage /></NotificationProvider>,
+            },
+            {
+                path: "/dashboard/alert-rule",
+                element: <NotificationProvider withNotifierGroup><AlertRulePage /></NotificationProvider>,
+            },
+            {
+                path: "/dashboard/ddns",
+                element: <DDNSPage />,
+            },
+            {
+                path: "/dashboard/nat",
+                element: <NATPage />,
+            },
+            {
+                path: "/dashboard/server-group",
+                element: <ServerProvider withServer><ServerGroupPage /></ServerProvider>,
+            },
+            {
+                path: "/dashboard/notification-group",
+                element: <NotificationProvider withNotifier><NotificationGroupPage /></NotificationProvider>,
+            },
+            {
+                path: "/dashboard/terminal/:id",
+                element: <TerminalPage />,
+            },
+            {
+                path: "/dashboard/settings",
+                element: <SettingsPage />,
+            },
+            {
+                path: "/dashboard/settings/user",
+                element: <UserPage />,
+            },
+            {
+                path: "/dashboard/settings/waf",
+                element: <WAFPage />,
+            },
+        ]
+    },
 ]);
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+    <StrictMode>
+        <RouterProvider router={router} />
+    </StrictMode>,
 )
