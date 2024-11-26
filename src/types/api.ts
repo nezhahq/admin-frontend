@@ -482,7 +482,7 @@ export interface ModelServer {
 
 export interface ModelServerForm {
   /** DDNS配置 */
-  ddns_profiles: number[];
+  ddns_profiles?: number[];
   /**
    * 展示排序，越大越靠前
    * @default 0
@@ -607,6 +607,7 @@ export interface ModelSettingForm {
 }
 
 export interface ModelStreamServer {
+  country_code: string;
   /** 展示排序，越大越靠前 */
   display_index: number;
   host: ModelHost;

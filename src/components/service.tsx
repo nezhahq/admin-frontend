@@ -54,18 +54,14 @@ const serviceFormSchema = z.object({
     duration: z.coerce.number().int().min(30),
     enable_show_in_service: asOptionalField(z.boolean()),
     enable_trigger_task: asOptionalField(z.boolean()),
-    fail_trigger_tasks: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    fail_trigger_tasks: z.array(z.number()),
     latency_notify: asOptionalField(z.boolean()),
     max_latency: z.coerce.number().int().min(0),
     min_latency: z.coerce.number().int().min(0),
     name: z.string().min(1),
     notification_group_id: z.coerce.number().int(),
     notify: asOptionalField(z.boolean()),
-    recover_trigger_tasks: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    recover_trigger_tasks: z.array(z.number()),
     skip_servers: z.record(z.boolean()),
     skip_servers_raw: z.array(z.string()),
     target: z.string().url(),
@@ -385,7 +381,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
                                                     onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
+                                                        const arr = conv.strToArr(e.target.value).map(Number);
                                                         field.onChange(arr);
                                                     }}
                                                 />
@@ -406,7 +402,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
                                                     onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
+                                                        const arr = conv.strToArr(e.target.value).map(Number);
                                                         field.onChange(arr);
                                                     }}
                                                 />

@@ -37,9 +37,7 @@ interface ServerGroupCardProps {
 
 const serverGroupFormSchema = z.object({
     name: z.string().min(1),
-    servers: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    servers: z.array(z.number()),
 });
 
 export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }) => {
@@ -116,7 +114,10 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}
-                                                    onValueChange={field.onChange}
+                                                    onValueChange={e => {
+                                                        const arr = e.map(Number);
+                                                        field.onChange(arr);
+                                                    }}
                                                     defaultValue={field.value?.map(String)}
                                                 />
                                             </FormControl>

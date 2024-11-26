@@ -37,9 +37,7 @@ interface NotificationGroupCardProps {
 
 const notificationGroupFormSchema = z.object({
     name: z.string().min(1),
-    notifications: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    notifications: z.array(z.number()),
 });
 
 export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ data, mutate }) => {
@@ -115,7 +113,10 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                             <FormLabel>Notifiers</FormLabel>
                                             <MultiSelect
                                                 options={notifierList}
-                                                onValueChange={field.onChange}
+                                                onValueChange={e => {
+                                                    const arr = e.map(Number);
+                                                    field.onChange(arr);
+                                                }}
                                                 defaultValue={field.value?.map(String)}
                                             />
                                             <FormMessage />
