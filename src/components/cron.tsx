@@ -52,9 +52,7 @@ const cronFormSchema = z.object({
     name: z.string().min(1),
     scheduler: z.string(),
     command: asOptionalField(z.string()),
-    servers: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    servers: z.array(z.number()),
     cover: z.coerce.number().int(),
     push_successful: asOptionalField(z.boolean()),
     notification_group_id: z.coerce.number().int(),
@@ -217,7 +215,10 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}
-                                                    onValueChange={field.onChange}
+                                                    onValueChange={e => {
+                                                        const arr = e.map(Number);
+                                                        field.onChange(arr);
+                                                    }}
                                                     defaultValue={field.value?.map(String)}
                                                 />
                                             </FormControl>

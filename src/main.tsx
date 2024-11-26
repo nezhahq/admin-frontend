@@ -27,6 +27,7 @@ import AlertRulePage from './routes/alert-rule';
 import SettingsPage from './routes/settings';
 import UserPage from './routes/user';
 import WAFPage from './routes/waf';
+import ProfilePage from './routes/profile';
 
 const router = createBrowserRouter([
     {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/terminal/:id",
                 element: <TerminalPage />,
+            },
+            {
+                path: "/dashboard/profile",
+                element: <ServerProvider withServer withServerGroup><ProfilePage /></ServerProvider>,
             },
             {
                 path: "/dashboard/settings",

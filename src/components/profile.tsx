@@ -22,82 +22,70 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelServerGroupResponseItem } from "@/types"
+import { getProfile, updateProfile } from "@/api/user"
 import { useState } from "react"
-import { KeyedMutator } from "swr"
-import { IconButton } from "@/components/xui/icon-button"
-import { createServerGroup, updateServerGroup } from "@/api/server-group"
-import { MultiSelect } from "@/components/xui/multi-select"
-import { useServer } from "@/hooks/useServer"
+import { useMainStore } from "@/hooks/useMainStore"
+import { toast } from "sonner"
 
-interface ServerGroupCardProps {
-    data?: ModelServerGroupResponseItem;
-    mutate: KeyedMutator<ModelServerGroupResponseItem[]>;
-}
-
-const serverGroupFormSchema = z.object({
-    name: z.string().min(1),
-    servers: z.array(z.number()),
+const profileFormSchema = z.object({
+    original_password: z.string().min(5).max(72),
+    new_password: z.string().min(8).max(72),
 });
 
-export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }) => {
-    const form = useForm<z.infer<typeof serverGroupFormSchema>>({
-        resolver: zodResolver(serverGroupFormSchema),
-        defaultValues: data ? {
-            name: data.group.name,
-            servers: data.servers,
-        } : {
-            name: "",
-            servers: [],
+export const ProfileCard = ({ className }: { className: string }) => {
+    const form = useForm<z.infer<typeof profileFormSchema>>({
+        resolver: zodResolver(profileFormSchema),
+        defaultValues: {
+            original_password: '',
+            new_password: '',
         },
         resetOptions: {
             keepDefaultValues: false,
         }
     })
 
+    const { setProfile } = useMainStore();
     const [open, setOpen] = useState(false);
 
-    const onSubmit = async (values: z.infer<typeof serverGroupFormSchema>) => {
-        data?.group.id ? await updateServerGroup(data.group.id, values) : await createServerGroup(values);
+    const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+        try {
+            await updateProfile(values);
+        } catch (e) {
+            toast("Update failed", {
+                description: `${e}`,
+            })
+            return;
+        }
+        const profile = await getProfile();
+        setProfile(profile);
         setOpen(false);
-        await mutate();
         form.reset();
     }
-
-    const { servers } = useServer();
-    const serverList = servers?.map(s => ({
-        value: `${s.id}`,
-        label: s.name,
-    })) || [{ value: "", label: "" }];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                <Button variant="outline" className={className}>
+                    Update Password
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Server Group</DialogTitle>
+                            <DialogTitle>Update Server</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                                 <FormField
                                     control={form.control}
-                                    name="name"
+                                    name="original_password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>Original Password</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="Group Name"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -107,24 +95,20 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="servers"
+                                    name="new_password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Servers</FormLabel>
+                                            <FormLabel>New Password</FormLabel>
                                             <FormControl>
-                                                <MultiSelect
-                                                    options={serverList}
-                                                    onValueChange={e => {
-                                                        const arr = e.map(Number);
-                                                        field.onChange(arr);
-                                                    }}
-                                                    defaultValue={field.value?.map(String)}
+                                                <Input
+                                                    {...field}
                                                 />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
+
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">

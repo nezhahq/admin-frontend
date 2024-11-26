@@ -45,9 +45,7 @@ const serverFormSchema = z.object({
     display_index: z.number().int(),
     hide_for_guest: asOptionalField(z.boolean()),
     enable_ddns: asOptionalField(z.boolean()),
-    ddns_profiles: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    ddns_profiles: asOptionalField(z.array(z.number())),
 });
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
@@ -77,7 +75,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Service</DialogTitle>
+                            <DialogTitle>Update Server</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -125,9 +123,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 <Input
                                                     placeholder="1,2,3"
                                                     {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
+                                                    value={conv.arrToStr(field.value || [])}
                                                     onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
+                                                        console.log(field.value)
+                                                        const arr = conv.strToArr(e.target.value).map(Number);
                                                         field.onChange(arr);
                                                     }}
                                                 />

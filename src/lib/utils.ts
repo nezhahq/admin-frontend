@@ -34,7 +34,7 @@ export const conv = {
     return arr.join(',');
   },
   strToArr: (str: string) => {
-    return str.split(',');
+    return str.split(',').filter(Boolean) || [];
   },
   recordToArr: <T>(rec: Record<string, T>) => {
     const arr: T[] = [];

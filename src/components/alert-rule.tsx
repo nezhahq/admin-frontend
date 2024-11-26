@@ -75,12 +75,8 @@ const alertRuleFormSchema = z.object({
         message: 'Invalid JSON string',
     }),
     rules: z.array(ruleSchema),
-    fail_trigger_tasks: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
-    recover_trigger_tasks: z.array(z.string()).transform((v => {
-        return v.filter(Boolean).map(Number);
-    })),
+    fail_trigger_tasks: z.array(z.number()),
+    recover_trigger_tasks: z.array(z.number()),
     notification_group_id: z.coerce.number().int(),
     trigger_mode: z.coerce.number().int().min(0),
     enable: asOptionalField(z.boolean()),
@@ -225,7 +221,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
                                                     onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
+                                                        const arr = conv.strToArr(e.target.value).map(Number);
                                                         field.onChange(arr);
                                                     }}
                                                 />
@@ -246,7 +242,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
                                                     onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
+                                                        const arr = conv.strToArr(e.target.value).map(Number);
                                                         field.onChange(arr);
                                                     }}
                                                 />
