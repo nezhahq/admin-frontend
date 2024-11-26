@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import useSWR from "swr";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { ActionButtonGroup } from "@/components/action-button-group";
 import { HeaderButtonGroup } from "@/components/header-button-group";
 import { toast } from "sonner";
@@ -83,8 +83,12 @@ export default function UserPage() {
         },
     ];
 
+    const dataCache = useMemo(() => {
+        return data ?? [];
+    }, [data]);
+
     const table = useReactTable({
-        data: data ?? [],
+        data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
