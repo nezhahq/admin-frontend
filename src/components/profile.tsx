@@ -25,10 +25,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getProfile, updateProfile } from "@/api/user"
 import { useState } from "react"
 import { useMainStore } from "@/hooks/useMainStore"
+import { toast } from "sonner"
 
 const profileFormSchema = z.object({
-    original_password: z.string().max(72),
-    new_password: z.string().max(72),
+    original_password: z.string().min(5).max(72),
+    new_password: z.string().min(8).max(72),
 });
 
 export const ProfileCard = ({ className }: { className: string }) => {
@@ -47,7 +48,14 @@ export const ProfileCard = ({ className }: { className: string }) => {
     const [open, setOpen] = useState(false);
 
     const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
-        await updateProfile(values);
+        try {
+            await updateProfile(values);
+        } catch (e) {
+            toast("Update failed", {
+                description: `${e}`,
+            })
+            return;
+        }
         const profile = await getProfile();
         setProfile(profile);
         setOpen(false);
