@@ -423,6 +423,11 @@ export interface ModelProfile {
   username: string;
 }
 
+export interface ModelProfileForm {
+  new_password: string;
+  original_password: string;
+}
+
 export interface ModelRule {
   /** 覆盖范围 RuleCoverAll/IgnoreAll */
   cover: number;

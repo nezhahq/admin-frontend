@@ -11,7 +11,7 @@ import { useMainStore } from "@/hooks/useMainStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { NzNavigationMenuLink } from "./xui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, Settings, User2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -118,10 +118,17 @@ export default function Header() {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
+                                                <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
+                                                    <User2 />
+                                                    Profile
+                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
                                                     <Settings />
                                                     Settings
-                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                    <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
@@ -192,10 +199,17 @@ export default function Header() {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
+                                                <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
+                                                    <User2 />
+                                                    Profile
+                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
                                                     <Settings />
                                                     Settings
-                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                    <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>

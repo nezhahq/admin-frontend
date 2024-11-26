@@ -64,7 +64,7 @@ const serviceFormSchema = z.object({
     recover_trigger_tasks: z.array(z.number()),
     skip_servers: z.record(z.boolean()),
     skip_servers_raw: z.array(z.string()),
-    target: z.string().url(),
+    target: z.string(),
     type: z.coerce.number().int().min(0),
 });
 
