@@ -32,6 +32,7 @@ import { KeyedMutator } from "swr"
 import { asOptionalField } from "@/lib/utils"
 import { IconButton } from "@/components/xui/icon-button"
 import { Textarea } from "@/components/ui/textarea"
+import { useTranslation } from "react-i18next"
 
 interface ServerCardProps {
     data: ModelServer;
@@ -49,6 +50,7 @@ const serverFormSchema = z.object({
 });
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof serverFormSchema>>({
         resolver: zodResolver(serverFormSchema),
         defaultValues: data,
@@ -75,7 +77,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>Update Server</DialogTitle>
+                            <DialogTitle>{t("EditServer") }</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -85,7 +87,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="My Server"
@@ -101,7 +103,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     name="display_index"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Display Index</FormLabel>
+                                            <FormLabel>{t("Weight")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -118,7 +120,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     name="ddns_profiles"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>DDNS Profile IDs (Separate with comma)</FormLabel>
+                                            <FormLabel>{t("DDNSProfiles") + t("SeparateWithComma")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
@@ -146,7 +148,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable DDNS</Label>
+                                                    <Label className="text-sm">{t("Enable") + t("DDNS") }</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -164,7 +166,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Hide from Guest</Label>
+                                                    <Label className="text-sm">{t("HideForGuest")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -176,7 +178,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     name="note"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Note</FormLabel>
+                                            <FormLabel>{t("Private") + t("Note")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-none"
@@ -192,7 +194,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     name="public_note"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Public Note</FormLabel>
+                                            <FormLabel>{t("Public") + t("Note")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
@@ -206,10 +208,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Submit")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

@@ -29,17 +29,21 @@ import { Button } from "./ui/button";
 import { IconButton } from "./xui/icon-button";
 import { useState } from "react";
 
+import { useTranslation } from "react-i18next";
+
+import i18next from "i18next";
 const pages = [
-    { href: "/dashboard", label: "Server" },
-    { href: "/dashboard/service", label: "Service" },
-    { href: "/dashboard/cron", label: "Task" },
-    { href: "/dashboard/notification", label: "Notification" },
-    { href: "/dashboard/ddns", label: "Dynamic DNS" },
-    { href: "/dashboard/nat", label: "NAT Traversal" },
-    { href: "/dashboard/server-group", label: "Group" },
+    { href: "/dashboard", label: i18next.t("Server") },
+    { href: "/dashboard/service", label: i18next.t("Service") },
+    { href: "/dashboard/cron", label: i18next.t("Task") },
+    { href: "/dashboard/notification", label: i18next.t("Notification") },
+    { href: "/dashboard/ddns", label: i18next.t("DDNS") },
+    { href: "/dashboard/nat", label: i18next.t("NATT") },
+    { href: "/dashboard/server-group", label: i18next.t("Group") },
 ]
 
 export default function Header() {
+    const { t } = useTranslation();
     const { logout } = useAuth();
     const profile = useMainStore(store => store.profile);
 
@@ -56,7 +60,7 @@ export default function Header() {
                     <NavigationMenuList>
                         <Card className="mr-1">
                             <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + ' !text-foreground'}>
-                                <Link to={profile ? "/dashboard" : '#'}><img className="h-7 mr-1" src='/dashboard/logo.svg' /> NEZHA</Link>
+                                <Link to={profile ? "/dashboard" : '#'}><img className="h-7 mr-1" src='/dashboard/logo.svg' /> {t("nezha")}</Link>
                             </NavigationMenuLink>
                         </Card>
 
@@ -65,37 +69,37 @@ export default function Header() {
                                 <>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard">Server</Link>
+                                            <Link to="/dashboard">{t("Server")}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/service"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard/service">Service</Link>
+                                            <Link to="/dashboard/service">{t("Service")}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/cron"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard/cron">Task</Link>
+                                            <Link to="/dashboard/cron">{t('Task')}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/notification" || location.pathname === "/dashboard/alert-rule"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard/notification">Notification</Link>
+                                            <Link to="/dashboard/notification">{t('Notification')}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/ddns"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard/ddns">Dynamic DNS</Link>
+                                            <Link to="/dashboard/ddns">{t('DDNS')}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/nat"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard/nat">NAT Traversal</Link>
+                                            <Link to="/dashboard/nat">{t('NATT')}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                     <NavigationMenuItem>
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard/server-group" || location.pathname === "/dashboard/notification-group"} className={navigationMenuTriggerStyle()}>
-                                            <Link to="/dashboard/server-group">Group</Link>
+                                            <Link to="/dashboard/server-group">{t('Group')}</Link>
                                         </NzNavigationMenuLink>
                                     </NavigationMenuItem>
                                 </>
@@ -120,14 +124,14 @@ export default function Header() {
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
                                                     <User2 />
-                                                    Profile
+                                                    {t('Profile')}
                                                     <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
                                                     <Settings />
-                                                    Settings
+                                                    {t('Settings')}
                                                     <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
@@ -135,7 +139,7 @@ export default function Header() {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer">
                                             <LogOut />
-                                            <span>Log out</span>
+                                            {t('Logout')}
                                             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -156,8 +160,8 @@ export default function Header() {
                                 </DrawerTrigger>
                                 <DrawerContent>
                                     <DrawerHeader className="text-left">
-                                        <DrawerTitle>Navigate to</DrawerTitle>
-                                        <DrawerDescription>Select a page to navigate to.</DrawerDescription>
+                                        <DrawerTitle>{t('NavigateTo')}</DrawerTitle>
+                                        <DrawerDescription>{t('SelectAPageToNavigateTo')}</DrawerDescription>
                                     </DrawerHeader>
                                     <div className="grid gap-1 px-4">
                                         {pages.slice(0).map((item, index) => (
@@ -173,7 +177,7 @@ export default function Header() {
                                     </div>
                                     <DrawerFooter>
                                         <DrawerClose asChild>
-                                            <Button variant="outline">Close</Button>
+                                            <Button variant="outline">{t('Close')}</Button>
                                         </DrawerClose>
                                     </DrawerFooter>
                                 </DrawerContent>
@@ -201,14 +205,14 @@ export default function Header() {
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
                                                     <User2 />
-                                                    Profile
+                                                    {t('Profile')}
                                                     <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
                                                     <Settings />
-                                                    Settings
+                                                    {t('Settings')}
                                                     <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
@@ -216,7 +220,7 @@ export default function Header() {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer">
                                             <LogOut />
-                                            <span>Log out</span>
+                                            {t('Logout')}
                                             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>

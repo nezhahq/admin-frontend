@@ -28,6 +28,8 @@ import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
 import { createNAT, updateNAT } from "@/api/nat"
 
+import { useTranslation } from "react-i18next";
+
 interface NATCardProps {
     data?: ModelNAT;
     mutate: KeyedMutator<ModelNAT[]>;
@@ -41,6 +43,7 @@ const natFormSchema = z.object({
 });
 
 export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof natFormSchema>>({
         resolver: zodResolver(natFormSchema),
         defaultValues: data ? data : {
@@ -77,7 +80,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New NAT Profile</DialogTitle>
+                            <DialogTitle>{data?t("EditNAT"):t("CreateNAT")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -87,7 +90,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="My NAT Profile"
@@ -103,7 +106,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                     name="server_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Server ID</FormLabel>
+                                            <FormLabel>{t("Server")} ID</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -120,7 +123,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                     name="host"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Local Service</FormLabel>
+                                            <FormLabel>{t("LocalService")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="192.168.1.1:80 (with port)"
@@ -136,7 +139,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                     name="domain"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Bind hostname</FormLabel>
+                                            <FormLabel>{t("BindHostname")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="router.app.yourdomain.com"
@@ -150,10 +153,10 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

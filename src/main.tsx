@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import './index.css'
+import './lib/i18n';
 
 import Root from "./routes/root";
 import ErrorPage from "./error-page";

@@ -30,6 +30,8 @@ import { createNotificationGroup, updateNotificationGroup } from "@/api/notifica
 import { MultiSelect } from "@/components/xui/multi-select"
 import { useNotification } from "@/hooks/useNotfication"
 
+import { useTranslation } from "react-i18next";
+
 interface NotificationGroupCardProps {
     data?: ModelNotificationGroupResponseItem;
     mutate: KeyedMutator<ModelNotificationGroupResponseItem[]>;
@@ -41,6 +43,7 @@ const notificationGroupFormSchema = z.object({
 });
 
 export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof notificationGroupFormSchema>>({
         resolver: zodResolver(notificationGroupFormSchema),
         defaultValues: data ? {
@@ -84,7 +87,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Notifier Group</DialogTitle>
+                            <DialogTitle>{data ? t("EditNotifierGroup") : t("CreateNotifierGroup")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -94,7 +97,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="Group Name"
@@ -110,7 +113,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                     name="notifications"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notifiers</FormLabel>
+                                            <FormLabel>{t("Notification")}</FormLabel>
                                             <MultiSelect
                                                 options={notifierList}
                                                 onValueChange={e => {
@@ -126,10 +129,10 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

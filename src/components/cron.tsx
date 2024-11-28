@@ -42,6 +42,8 @@ import { useNotification } from "@/hooks/useNotfication"
 import { MultiSelect } from "./xui/multi-select"
 import { Combobox } from "./ui/combobox"
 
+import { useTranslation } from "react-i18next";
+
 interface CronCardProps {
     data?: ModelCron;
     mutate: KeyedMutator<ModelCron[]>;
@@ -59,6 +61,7 @@ const cronFormSchema = z.object({
 });
 
 export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof cronFormSchema>>({
         resolver: zodResolver(cronFormSchema),
         defaultValues: data ? data : {
@@ -109,7 +112,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Task</DialogTitle>
+                            <DialogTitle>{data?t("EditTask"):t("CreateTask")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -119,7 +122,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="My Task"
@@ -135,7 +138,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="task_type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Task Type</FormLabel>
+                                            <FormLabel>{t("Type")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -157,7 +160,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="scheduler"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Cron expression</FormLabel>
+                                            <FormLabel>{t("CronExpression") }</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="0 0 0 3 * * (At 3 AM)"
@@ -173,7 +176,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="command"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Command</FormLabel>
+                                            <FormLabel>{t("Command")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
@@ -189,7 +192,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="cover"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Coverage</FormLabel>
+                                            <FormLabel>{t("Coverage")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -211,7 +214,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="servers"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Specific Servers</FormLabel>
+                                            <FormLabel>{t("SpecificServers")}</FormLabel>
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}
@@ -231,7 +234,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="notification_group_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notifier Group ID</FormLabel>
+                                            <FormLabel>{t("NotifierGroup")}</FormLabel>
                                             <FormControl>
                                                 <Combobox
                                                     placeholder="Search..."
@@ -247,10 +250,10 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

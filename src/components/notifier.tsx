@@ -40,6 +40,8 @@ import { nrequestTypes, nrequestMethods } from "@/types"
 import { createNotification, updateNotification } from "@/api/notification"
 import { Textarea } from "./ui/textarea"
 
+import { useTranslation } from "react-i18next";
+
 interface NotifierCardProps {
     data?: ModelNotification;
     mutate: KeyedMutator<ModelNotification[]>;
@@ -57,6 +59,7 @@ const notificationFormSchema = z.object({
 });
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof notificationFormSchema>>({
         resolver: zodResolver(notificationFormSchema),
         defaultValues: data ? data : {
@@ -95,7 +98,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Notifier</DialogTitle>
+                            <DialogTitle>{data?t("EditNotifier"):t("CreateNotifier")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -105,7 +108,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="My Notifier"
@@ -136,7 +139,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     name="request_method"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Request Method</FormLabel>
+                                            <FormLabel>{t("RequestMethod")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -158,7 +161,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     name="request_type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Request Type</FormLabel>
+                                            <FormLabel>{t("Type")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -180,7 +183,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     name="request_header"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Header</FormLabel>
+                                            <FormLabel>{t("RequestHeader")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
@@ -197,7 +200,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     name="request_body"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Body</FormLabel>
+                                            <FormLabel>{t("RequestBody")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y h-[240px]"
@@ -220,7 +223,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Verify TLS</Label>
+                                                    <Label className="text-sm">{t("VerifyTLS")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -238,7 +241,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Do Not Send Test Message</Label>
+                                                    <Label className="text-sm">{t("DoNotSendTestMessage")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -248,10 +251,10 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

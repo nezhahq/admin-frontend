@@ -19,7 +19,11 @@ import { deleteAlertRules } from "@/api/alert-rule";
 import { NotificationTab } from "@/components/notification-tab";
 import { AlertRuleCard } from "@/components/alert-rule";
 
+import { useTranslation } from "react-i18next";
+
 export default function AlertRulePage() {
+    const { t } = useTranslation();
+
     const { data, mutate, error, isLoading } = useSWR<ModelAlertRule[]>(
         "/api/v1/alert-rule",
         swrFetcher
@@ -27,9 +31,10 @@ export default function AlertRulePage() {
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelAlertRule>[] = [
@@ -61,7 +66,7 @@ export default function AlertRulePage() {
             accessorFn: (row) => row.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
@@ -70,38 +75,38 @@ export default function AlertRulePage() {
             },
         },
         {
-            header: "Notifier Group",
+            header: t("NotifierGroup"),
             accessorKey: "ngroup",
             accessorFn: (row) => row.notification_group_id,
         },
         {
-            header: "Trigger Mode",
+            header: t("TriggerMode"),
             accessorKey: "trigger Mode",
             accessorFn: (row) => triggerModes[row.trigger_mode] || "",
         },
         {
-            header: "Rules",
+            header: t("Rules"),
             accessorKey: "rules",
             accessorFn: (row) => JSON.stringify(row.rules),
         },
         {
-            header: "Tasks to trigger on alert",
+            header: t("TasksToTriggerOnAlert"),
             accessorKey: "failTriggerTasks",
             accessorFn: (row) => row.fail_trigger_tasks,
         },
         {
-            header: "Tasks to trigger after recovery",
+            header: t("TasksToTriggerAfterRecovery"),
             accessorKey: "recoverTriggerTasks",
             accessorFn: (row) => row.recover_trigger_tasks,
         },
         {
-            header: "Enable",
+            header: t("Enable"),
             accessorKey: "enable",
             accessorFn: (row) => row.enable,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -168,7 +173,7 @@ export default function AlertRulePage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -184,7 +189,7 @@ export default function AlertRulePage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

@@ -20,7 +20,10 @@ import { deleteService } from "@/api/service";
 import { HeaderButtonGroup } from "@/components/header-button-group";
 import { toast } from "sonner";
 
+import { useTranslation } from "react-i18next";
+
 export default function ServicePage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelServiceResponse>(
         "/api/v1/service",
         swrFetcher
@@ -28,9 +31,10 @@ export default function ServicePage() {
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<Service>[] = [
@@ -62,7 +66,7 @@ export default function ServicePage() {
             accessorFn: (row) => row.service.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorFn: (row) => row.service.name,
             accessorKey: "service.name",
             cell: ({ row }) => {
@@ -71,7 +75,7 @@ export default function ServicePage() {
             },
         },
         {
-            header: "Target",
+            header: t("Target"),
             accessorFn: (row) => row.service.target,
             accessorKey: "service.target",
             cell: ({ row }) => {
@@ -80,7 +84,7 @@ export default function ServicePage() {
             },
         },
         {
-            header: "Coverage",
+            header: t("Coverage"),
             accessorKey: "service.cover",
             accessorFn: (row) => row.service.cover,
             cell: ({ row }) => {
@@ -90,10 +94,10 @@ export default function ServicePage() {
                         {(() => {
                             switch (s.cover) {
                             case 0: {
-                                return <span>Cover All</span>;
+                                return <span>{t("CoverAll")}</span>;
                             }
                             case 1: {
-                                return <span>Ignore All</span>;
+                                return <span>{t("IgnoreAll")}</span>;
                             }
                             }
                         })()}
@@ -102,44 +106,44 @@ export default function ServicePage() {
             },
         },
         {
-            header: "Specific Servers",
+            header: t("SpecificServers"),
             accessorKey: "service.skipServers",
             accessorFn: (row) => Object.keys(row.service.skip_servers ?? {}),
         },
         {
-            header: "Type",
+            header: t("Type"),
             accessorKey: "service.type",
             accessorFn: (row) => row.service.type,
             cell: ({ row }) => serviceTypes[row.original.service.type] || "",
         },
         {
-            header: "Interval",
+            header: t("Interval"),
             accessorKey: "service.duration",
             accessorFn: (row) => row.service.duration,
         },
         {
-            header: "Notifier Group ID",
+            header: t("NotifierGroupID"),
             accessorKey: "service.ngroup",
             accessorFn: (row) => row.service.notification_group_id,
         },
         {
-            header: "On Trigger",
+            header: t("Trigger"),
             accessorKey: "service.triggerTask",
             accessorFn: (row) => row.service.enable_trigger_task ?? false,
         },
         {
-            header: "Tasks to trigger on alert",
+            header: t("TasksToTriggerOnAlert"),
             accessorKey: "service.failTriggerTasks",
             accessorFn: (row) => row.service.fail_trigger_tasks,
         },
         {
-            header: "Tasks to trigger after recovery",
+            header: t("TasksToTriggerAfterRecovery"),
             accessorKey: "service.recoverTriggerTasks",
             accessorFn: (row) => row.service.recover_trigger_tasks,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -169,7 +173,7 @@ export default function ServicePage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">Service</h1>
+                <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("Services")}</h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -202,7 +206,7 @@ export default function ServicePage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -218,7 +222,7 @@ export default function ServicePage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

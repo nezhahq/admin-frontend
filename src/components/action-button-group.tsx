@@ -13,6 +13,8 @@ import {
 import { KeyedMutator } from "swr";
 import { buttonVariants } from "@/components/ui/button"
 
+import { useTranslation } from "react-i18next";
+
 interface ButtonGroupProps<E, U> {
     className?: string;
     children: React.ReactNode;
@@ -20,6 +22,7 @@ interface ButtonGroupProps<E, U> {
 }
 
 export function ActionButtonGroup<E, U>({ className, children, delete: { fn, id, mutate } }: ButtonGroupProps<E, U>) {
+    const { t } = useTranslation();
     const handleDelete = async () => {
         await fn([id]);
         await mutate();
@@ -30,18 +33,18 @@ export function ActionButtonGroup<E, U>({ className, children, delete: { fn, id,
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="outline" icon="trash" />
+                    <IconButton variant="destructive" icon="trash" />
                 </AlertDialogTrigger>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Confirm Deletion?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("ConfirmDeletion")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This operation is unrecoverable!
+                            {t("Results.ThisOperationIsUnrecoverable")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>Confirm</AlertDialogAction>
+                        <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
+                        <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>{t("Confirm")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

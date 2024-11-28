@@ -46,6 +46,9 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 
+import { useTranslation } from "react-i18next";
+
+
 interface FMProps {
     wsUrl: string;
 }
@@ -59,6 +62,7 @@ const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
 }
 
 const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, ...props }) => {
+    const { t } = useTranslation();
     const fmRef = useRef<HTMLDivElement>(null);
 
     const [dOpen, setdOpen] = useState(false);
@@ -67,14 +71,14 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
     const columns: ColumnDef<FMEntry>[] = [
         {
             id: "type",
-            header: () => <span>Type</span>,
+            header: () => <span>{t("Type")}</span>,
             accessorFn: row => row.type,
             cell: ({ row }) => (
                 row.original.type == 0 ? <File size={24} /> : <Folder size={24} />
             ),
         },
         {
-            header: () => <span>Name</span>,
+            header: () => <span>{t("Name")}</span>,
             id: "name",
             accessorFn: row => row.name,
             cell: ({ row }) => (
@@ -85,7 +89,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
             size: 5000,
         },
         {
-            header: () => <span>Action</span>,
+            header: () => <span>{t("Actions")}</span>,
             id: "download",
             cell: ({ row }) => {
                 return (
@@ -143,30 +147,30 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
 
     worker.onmessage = async (event: MessageEvent<FMWorkerData>) => {
         switch (event.data.type) {
-            case FMWorkerOpcode.Error: {
-                console.error('Error from worker', event.data.error);
-                break;
-            }
-            case FMWorkerOpcode.Progress: {
-                handleReady.current = true;
-                break;
-            }
-            case FMWorkerOpcode.Result: {
-                handleReady.current = false;
+        case FMWorkerOpcode.Error: {
+            console.error('Error from worker', event.data.error);
+            break;
+        }
+        case FMWorkerOpcode.Progress: {
+            handleReady.current = true;
+            break;
+        }
+        case FMWorkerOpcode.Result: {
+            handleReady.current = false;
 
-                if (event.data.blob && event.data.fileName) {
-                    const url = URL.createObjectURL(event.data.blob);
-                    const anchor = document.createElement('a');
-                    anchor.href = url;
-                    anchor.download = event.data.fileName;
-                    anchor.click();
-                    URL.revokeObjectURL(url);
-                }
-
-                firstChunk.current = true;
-                if (dOpen) setdOpen(false);
-                break;
+            if (event.data.blob && event.data.fileName) {
+                const url = URL.createObjectURL(event.data.blob);
+                const anchor = document.createElement('a');
+                anchor.href = url;
+                anchor.download = event.data.fileName;
+                anchor.click();
+                URL.revokeObjectURL(url);
             }
+
+            firstChunk.current = true;
+            if (dOpen) setdOpen(false);
+            break;
+        }
         }
     }
 
@@ -180,8 +184,8 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
         },
         onError: (e) => {
             console.error(e);
-            toast("Websocket error", {
-                description: "View console for details.",
+            toast("Websocket" + " " + t("Error"), {
+                description: t("Results.UnExpectedError"),
             })
         },
         onMessage: async (e) => {
@@ -214,8 +218,8 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                 }
             } catch (error) {
                 console.error('Error processing received data:', error);
-                toast("FM error", {
-                    description: "View console for details.",
+                toast("FM" + " " + t("Error"), {
+                    description: t("Results.UnExpectedError"),
                 })
                 if (dOpen) setdOpen(false);
                 if (uOpen) setuOpen(false);
@@ -286,30 +290,30 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                             <IconButton variant="ghost" icon="menu" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem onClick={listFile}>Refresh</DropdownMenuItem>
+                            <DropdownMenuItem onClick={listFile}>{t('Refresh')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={
                                 async () => {
                                     await navigator.clipboard.writeText(formatPath(currentPath));
                                 }
-                            }>Copy path</DropdownMenuItem>
+                            }>{t("CopyPath")}</DropdownMenuItem>
                             <AlertDialogTrigger asChild>
-                                <DropdownMenuItem>Goto</DropdownMenuItem>
+                                <DropdownMenuItem>{t('Goto')}</DropdownMenuItem>
                             </AlertDialogTrigger>
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Goto</AlertDialogTitle>
+                            <AlertDialogTitle>{t('Goto')}</AlertDialogTitle>
                             <AlertDialogDescription />
                         </AlertDialogHeader>
                         <Input className="mb-1" placeholder="Path" value={gotoPath} onChange={(e) => { setGotoPath(e.target.value) }} />
                         <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => { setPath(gotoPath) }}>Confirm</AlertDialogAction>
+                            <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => { setPath(gotoPath) }}>{t("Confirm")}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
-                <h1 className="text-base">Pseudo File Manager</h1>
+                <h1 className="text-base">{t("FileManager")}</h1>
                 <div className="ml-auto">
                     <input ref={fileInputRef} type="file" className="hidden" onChange={
                         async (e) => {
@@ -331,7 +335,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
             <AlertDialog open={dOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Downloading...</AlertDialogTitle>
+                        <AlertDialogTitle>{t("Downloading")}...</AlertDialogTitle>
                         <AlertDialogDescription />
                     </AlertDialogHeader>
                 </AlertDialogContent>
@@ -339,7 +343,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
             <AlertDialog open={uOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Uploading...</AlertDialogTitle>
+                        <AlertDialogTitle>{t("Uploading")}...</AlertDialogTitle>
                         <AlertDialogDescription />
                     </AlertDialogHeader>
                 </AlertDialogContent>
@@ -350,6 +354,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
 }
 
 export const FMCard = ({ id }: { id?: string }) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [fm, setFM] = useState<ModelCreateFMResponse | null>(null);
     const [init, setInit] = useState(false);
@@ -363,8 +368,8 @@ export const FMCard = ({ id }: { id?: string }) => {
                 const createdFM = await createFM(id);
                 setFM(createdFM);
             } catch (e) {
-                toast("FM API Error", {
-                    description: "View console for details.",
+                toast(t("Error"), {
+                    description: t("Results.UnExpectedError"),
                 })
                 console.error("fetch error", e);
                 return;
@@ -396,7 +401,7 @@ export const FMCard = ({ id }: { id?: string }) => {
                             ?
                             <FMComponent className="p-1 space-y-5" wsUrl={`/api/v1/ws/file/${fm.session_id}`} />
                             :
-                            <p>The server does not exist, or have not been connected yet.</p>
+                            <p>{t("Results.TheServerDoesNotOnline")}</p>
                         }
                     </div>
                 </SheetContent>
@@ -417,7 +422,7 @@ export const FMCard = ({ id }: { id?: string }) => {
                             ?
                             <FMComponent className="p-1 space-y-5" wsUrl={`/api/v1/ws/file/${fm.session_id}`} />
                             :
-                            <p>The server does not exist, or have not been connected yet.</p>
+                            <p>{t("Results.TheServerDoesNotOnline")}</p>
                         }
                     </div>
                 </DrawerContent>

@@ -19,7 +19,10 @@ import { deleteNotificationGroups } from "@/api/notification-group";
 import { GroupTab } from "@/components/group-tab";
 import { NotificationGroupCard } from "@/components/notification-group";
 
+import { useTranslation } from "react-i18next";
+
 export default function NotificationGroupPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelNotificationGroupResponseItem[]>(
         "/api/v1/notification-group",
         swrFetcher
@@ -27,9 +30,10 @@ export default function NotificationGroupPage() {
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelNotificationGroupResponseItem>[] = [
@@ -61,7 +65,7 @@ export default function NotificationGroupPage() {
             accessorFn: (row) => row.group.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.group.name,
             cell: ({ row }) => {
@@ -70,13 +74,13 @@ export default function NotificationGroupPage() {
             },
         },
         {
-            header: "Notifiers (ID)",
+            header: t("Notifier")+"(ID)",
             accessorKey: "notifications",
             accessorFn: (row) => row.notifications,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -143,7 +147,7 @@ export default function NotificationGroupPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -159,7 +163,7 @@ export default function NotificationGroupPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

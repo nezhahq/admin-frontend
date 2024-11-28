@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -15,16 +14,20 @@ import {
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/useAuth"
 
+import { useTranslation } from "react-i18next"
+import i18next from "i18next";
+
 const formSchema = z.object({
     username: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
+        message: i18next.t("Results.UsernameMin", { number: 2 }),
     }),
     password: z.string().min(1, {
-        message: "Password cannot be empty.",
+        message: i18next.t("Results.PasswordRequired"),
     })
 })
 
-export default () => {
+
+function Login() {
     const { login } = useAuth()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -39,6 +42,8 @@ export default () => {
         login(values.username, values.password)
     }
 
+    const { t } = useTranslation();
+
     return (
         <div className="my-8 max-w-xl m-auto">
             <Form {...form}>
@@ -48,13 +53,10 @@ export default () => {
                         name="username"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Username</FormLabel>
+                                <FormLabel>{t("Username")}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="shadcn" autoComplete="username" {...field} />
+                                    <Input placeholder="admin" autoComplete="username" {...field} />
                                 </FormControl>
-                                <FormDescription>
-                                    This is your public display name.
-                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -64,20 +66,19 @@ export default () => {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>{t("Password")}</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder="shadcn" autoComplete="current-password" {...field} />
+                                    <Input type="password" placeholder="admin" autoComplete="current-password" {...field} />
                                 </FormControl>
-                                <FormDescription>
-                                    This is your public display name.
-                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Login</Button>
+                    <Button type="submit">{t("Login")}</Button>
                 </form>
             </Form>
         </div>
     )
 }
+
+export default Login;

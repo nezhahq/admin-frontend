@@ -24,15 +24,19 @@ import { TerminalButton } from "@/components/terminal";
 import { useServer } from "@/hooks/useServer";
 import { joinIP } from "@/lib/utils";
 
+import { useTranslation } from "react-i18next";
+
 export default function ServerPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher);
     const { serverGroups } = useServer();
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<Server>[] = [
@@ -64,7 +68,7 @@ export default function ServerPage() {
             accessorFn: (row) => `${row.id}(${row.display_index})`,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
@@ -73,7 +77,7 @@ export default function ServerPage() {
             },
         },
         {
-            header: "Groups",
+            header: t("Group"),
             accessorKey: "groups",
             accessorFn: (row) => {
                 return (
@@ -90,28 +94,28 @@ export default function ServerPage() {
             },
         },
         {
-            header: "Version",
+            header: t("Version"),
             accessorKey: "host.version",
-            accessorFn: (row) => row.host.version || "Unknown",
+            accessorFn: (row) => row.host.version || t("Unknown"),
         },
         {
-            header: "Enable DDNS",
+            header: t("Enable") + t("DDNS"),
             accessorKey: "enableDDNS",
             accessorFn: (row) => row.enable_ddns ?? false,
         },
         {
-            header: "Hide from Guest",
+            header: t("HideForGuest"),
             accessorKey: "hideForGuest",
             accessorFn: (row) => row.hide_for_guest ?? false,
         },
         {
             id: "installCommands",
-            header: "Install commands",
+            header: t("InstallCommands"),
             cell: () => <InstallCommandsMenu />,
         },
         {
             id: "note",
-            header: "Note",
+            header: t("Note"),
             cell: ({ row }) => {
                 const s = row.original;
                 return <NoteMenu note={{ private: s.note, public: s.public_note }} />;
@@ -119,7 +123,7 @@ export default function ServerPage() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -152,7 +156,7 @@ export default function ServerPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <h1 className="text-3xl font-bold tracking-tight">Server</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t("Server")}</h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -166,8 +170,8 @@ export default function ServerPage() {
                         onClick={async () => {
                             const id = selectedRows.map((r) => r.original.id);
                             if (id.length < 1) {
-                                toast("Error", {
-                                    description: "No rows are selected.",
+                                toast(t("Error"), {
+                                    description: t("Results.SelectAtLeastOneServer"),
                                 });
                                 return;
                             }
@@ -177,23 +181,21 @@ export default function ServerPage() {
                                 resp = await forceUpdateServer(id);
                             } catch (e) {
                                 console.error(e);
-                                toast("Error executing task", {
-                                    description: "Please see the console for details.",
+                                toast(t("Error"), {
+                                    description: t("Results.UnExpectedError"),
                                 });
                                 return;
                             }
-                            toast("Task executed successfully", {
-                                description: `Result (Server ID):
-                                    ${resp.success?.length ? `Success: ${resp.success.join(",")}, ` : ""}
-                                    ${resp.failure?.length ? `Failure: ${resp.failure.join(",")}, ` : ""}
-                                    ${resp.offline?.length ? `Offline: ${resp.offline.join(",")}` : ""}
-                                    `,
+                            toast(t("Done"), {
+                                description:  t("Results.ForceUpdate")
+                                + (resp.success?.length ? t(`Success`) + ` [${resp.success.join(",")}]` : "")
+                                + (resp.failure?.length ? t(`Failure`) + ` [${resp.failure.join(",")}]` : "")
+                                + (resp.offline?.length ? t(`Offline`) + ` [${resp.offline.join(",")}]` : "")
                             });
                         }}
                     />
                 </HeaderButtonGroup>
             </div>
-
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -214,7 +216,7 @@ export default function ServerPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -230,7 +232,7 @@ export default function ServerPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

@@ -20,7 +20,11 @@ import { NotificationTab } from "@/components/notification-tab";
 import { NotifierCard } from "@/components/notifier";
 import { useNotification } from "@/hooks/useNotfication";
 
+import { useTranslation } from "react-i18next";
+
+
 export default function NotificationPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelNotification[]>(
         "/api/v1/notification",
         swrFetcher
@@ -29,9 +33,10 @@ export default function NotificationPage() {
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelNotification>[] = [
@@ -63,7 +68,7 @@ export default function NotificationPage() {
             accessorFn: (row) => row.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
@@ -72,7 +77,7 @@ export default function NotificationPage() {
             },
         },
         {
-            header: "Groups",
+            header: t("Group"),
             accessorKey: "groups",
             accessorFn: (row) => {
                 return (
@@ -92,13 +97,13 @@ export default function NotificationPage() {
             },
         },
         {
-            header: "Verify TLS",
+            header: t("VerifyTLS"),
             accessorKey: "verify_tls",
             accessorFn: (row) => row.verify_tls,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -165,7 +170,7 @@ export default function NotificationPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -181,7 +186,7 @@ export default function NotificationPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}
