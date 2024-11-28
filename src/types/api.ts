@@ -464,7 +464,7 @@ export interface ModelSensorTemperature {
 export interface ModelServer {
   created_at: string;
   /** DDNS配置 */
-  ddns_profiles: number[];
+  ddns_profiles?: number[];
   /** 展示排序，越大越靠前 */
   display_index: number;
   /** 启用DDNS */
