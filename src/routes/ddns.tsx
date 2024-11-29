@@ -18,7 +18,10 @@ import { HeaderButtonGroup } from "@/components/header-button-group";
 import { toast } from "sonner";
 import { deleteDDNSProfiles, getDDNSProviders } from "@/api/ddns";
 
+import { useTranslation } from "react-i18next";
+
 export default function DDNSPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelDDNSProfile[]>("/api/v1/ddns", swrFetcher);
     const [providers, setProviders] = useState<string[]>([]);
 
@@ -32,9 +35,10 @@ export default function DDNSPage() {
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelDDNSProfile>[] = [
@@ -66,7 +70,7 @@ export default function DDNSPage() {
             accessorFn: (row) => row.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
@@ -75,22 +79,22 @@ export default function DDNSPage() {
             },
         },
         {
-            header: "IPv4 Enabled",
+            header: "IPv4",
             accessorKey: "enableIPv4",
             accessorFn: (row) => row.enable_ipv4 ?? false,
         },
         {
-            header: "IPv6 Enabled",
+            header: "IPv6",
             accessorKey: "enableIPv6",
             accessorFn: (row) => row.enable_ipv6 ?? false,
         },
         {
-            header: "DDNS Provider",
+            header: t("Provider"),
             accessorKey: "provider",
             accessorFn: (row) => row.provider,
         },
         {
-            header: "Domains",
+            header: t('Domains'),
             accessorKey: "domains",
             accessorFn: (row) => row.domains,
             cell: ({ row }) => {
@@ -99,13 +103,13 @@ export default function DDNSPage() {
             },
         },
         {
-            header: "Maximum retry attempts",
+            header: t("MaximumRetryAttempts"),
             accessorKey: "maxRetries",
             accessorFn: (row) => row.max_retries,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -135,7 +139,7 @@ export default function DDNSPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">Dynamic DNS</h1>
+                <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("DDNS")}</h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -168,7 +172,7 @@ export default function DDNSPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -184,7 +188,7 @@ export default function DDNSPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

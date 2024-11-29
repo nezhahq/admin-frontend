@@ -19,14 +19,18 @@ import { deleteUser } from "@/api/user";
 import { SettingsTab } from "@/components/settings-tab";
 import { UserCard } from "@/components/user";
 
+import { useTranslation } from "react-i18next";
+
 export default function UserPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelUser[]>("/api/v1/user", swrFetcher);
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.UnExpectedError", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelUser>[] = [
@@ -58,13 +62,13 @@ export default function UserPage() {
             accessorFn: (row) => row.id,
         },
         {
-            header: "Username",
+            header: t("Username"),
             accessorKey: "username",
             accessorFn: (row) => row.username,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -131,7 +135,7 @@ export default function UserPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -147,7 +151,7 @@ export default function UserPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

@@ -29,6 +29,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+import { useTranslation } from "react-i18next";
+
 const settingFormSchema = z.object({
     custom_nameservers: asOptionalField(z.string()),
     ignored_ip_notification: asOptionalField(z.string()),
@@ -46,14 +48,16 @@ const settingFormSchema = z.object({
 });
 
 export default function SettingsPage() {
+    const { t } = useTranslation();
     const [config, setConfig] = useState<ModelConfig>();
     const [error, setError] = useState<Error>();
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     useEffect(() => {
@@ -98,9 +102,7 @@ export default function SettingsPage() {
             if (e instanceof Error) setError(e);
             return;
         } finally {
-            toast("Success", {
-                description: "Config updated successfully.",
-            });
+            toast(t("Success"));
         }
     };
 
@@ -115,7 +117,7 @@ export default function SettingsPage() {
                             name="site_name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Site Name</FormLabel>
+                                    <FormLabel>{t("SiteName")}</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -128,7 +130,7 @@ export default function SettingsPage() {
                             name="language"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Language</FormLabel>
+                                    <FormLabel>{t("Language")}</FormLabel>
                                     <FormControl>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
@@ -154,7 +156,7 @@ export default function SettingsPage() {
                             name="custom_code"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Custom Codes (Style and Script)</FormLabel>
+                                    <FormLabel>{t("CustomCodes")}</FormLabel>
                                     <FormControl>
                                         <Textarea className="resize-y min-h-48" {...field} />
                                     </FormControl>
@@ -167,7 +169,7 @@ export default function SettingsPage() {
                             name="custom_code_dashboard"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Custom Codes for Dashboard</FormLabel>
+                                    <FormLabel>{t("CustomCodesDashboard")}</FormLabel>
                                     <FormControl>
                                         <Textarea className="resize-y min-h-48" {...field} />
                                     </FormControl>
@@ -180,7 +182,7 @@ export default function SettingsPage() {
                             name="install_host"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Dashboard Server Domain/IP without CDN</FormLabel>
+                                    <FormLabel>{t("DashboardOriginalHost")}</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -194,7 +196,7 @@ export default function SettingsPage() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                    Custom Public DNS Nameservers for DDNS (separate with comma)
+                                        {t("CustomPublicDNSNameserversforDDNS")+" " + t("SeparateWithComma")}
                                     </FormLabel>
                                     <FormControl>
                                         <Input {...field} />
@@ -208,7 +210,7 @@ export default function SettingsPage() {
                             name="real_ip_header"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Real IP Header</FormLabel>
+                                    <FormLabel>{t("RealIPHeader")}</FormLabel>
                                     <FormControl>
                                         <Input placeholder="NZ::Use-Peer-IP" {...field} />
                                     </FormControl>
@@ -217,7 +219,7 @@ export default function SettingsPage() {
                             )}
                         />
                         <FormItem>
-                            <FormLabel>IP Change Notification</FormLabel>
+                            <FormLabel>{t("IPChangeNotification")}</FormLabel>
                             <Card className="w-full">
                                 <CardContent>
                                     <div className="flex flex-col space-y-4 mt-4">
@@ -226,7 +228,7 @@ export default function SettingsPage() {
                                             name="cover"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Coverage</FormLabel>
+                                                    <FormLabel>{t("Coverage")}</FormLabel>
                                                     <Select onValueChange={field.onChange} value={`${field.value}`}>
                                                         <FormControl>
                                                             <SelectTrigger>
@@ -250,7 +252,7 @@ export default function SettingsPage() {
                                             name="ignored_ip_notification"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Specific Servers (separate with comma)</FormLabel>
+                                                    <FormLabel>{t("SpecificServers")+" " + t("SeparateWithComma")}</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="1,2,3" {...field} />
                                                     </FormControl>
@@ -266,7 +268,7 @@ export default function SettingsPage() {
                                                     <FormControl>
                                                         <div className="flex items-center gap-2">
                                                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                            <Label className="text-sm">Enable</Label>
+                                                            <Label className="text-sm">{t("Enable")}</Label>
                                                         </div>
                                                     </FormControl>
                                                     <FormMessage />
@@ -286,7 +288,7 @@ export default function SettingsPage() {
                                         <div className="flex items-center gap-2">
                                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                             <Label className="text-sm">
-                        Show Full IP Address in Notification Messages
+                                                {t("FullIPNotification")}
                                             </Label>
                                         </div>
                                     </FormControl>
@@ -294,7 +296,7 @@ export default function SettingsPage() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">Save</Button>
+                        <Button type="submit">{t("Confirm")}</Button>
                     </form>
                 </Form>
             </div>

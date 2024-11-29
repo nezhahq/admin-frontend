@@ -1,3 +1,4 @@
+import i18next from "i18next";
 export const serviceTypes: Record<number, string> = {
     1: "HTTP GET",
     2: "ICMP Ping",
@@ -5,6 +6,6 @@ export const serviceTypes: Record<number, string> = {
 }
 
 export const serviceCoverageTypes: Record<number, string> = {
-    0: "All excludes specific servers",
-    1: "Only specific servers",
+    0: i18next.t("Coverages.Excludes"),
+    1: i18next.t("Coverages.Only"),
 }

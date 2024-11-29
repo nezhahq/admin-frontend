@@ -43,6 +43,8 @@ import { Textarea } from "./ui/textarea"
 import { useNotification } from "@/hooks/useNotfication"
 import { Combobox } from "./ui/combobox"
 
+import { useTranslation } from "react-i18next";
+
 interface AlertRuleCardProps {
     data?: ModelAlertRule;
     mutate: KeyedMutator<ModelAlertRule[]>;
@@ -83,6 +85,7 @@ const alertRuleFormSchema = z.object({
 });
 
 export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof alertRuleFormSchema>>({
         resolver: zodResolver(alertRuleFormSchema),
         defaultValues: data ? {
@@ -133,7 +136,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Alert Rule</DialogTitle>
+                            <DialogTitle>{data ? t("EditAlertRule") : t("CreateAlertRule")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -143,7 +146,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
@@ -158,7 +161,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="rules_raw"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Rules</FormLabel>
+                                            <FormLabel>{t("Rules")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
@@ -174,7 +177,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="notification_group_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notifier Group</FormLabel>
+                                            <FormLabel>{t("NotifierGroup")}</FormLabel>
                                             <FormControl>
                                                 <Combobox
                                                     placeholder="Search..."
@@ -192,7 +195,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="trigger_mode"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Trigger Mode</FormLabel>
+                                            <FormLabel>{t("TriggerMode")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -214,7 +217,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="fail_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Tasks to trigger on an alarm (Separate with comma)</FormLabel>
+                                            <FormLabel>{t("TasksToTriggerOnAlert") + t("SeparateWithComma")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
@@ -235,7 +238,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="recover_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Tasks to trigger after recovery (Separate with comma)</FormLabel>
+                                            <FormLabel>{t("TasksToTriggerAfterRecovery") + t("SeparateWithComma")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
@@ -262,7 +265,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable</Label>
+                                                    <Label className="text-sm">{t("Enable")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -272,10 +275,10 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

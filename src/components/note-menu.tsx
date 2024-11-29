@@ -9,11 +9,14 @@ import { forwardRef, useState } from "react"
 import { IconButton } from "./xui/icon-button"
 import { toast } from "sonner";
 
+import { useTranslation } from "react-i18next";
+
 interface NoteMenuProps extends ButtonProps {
     note: { private?: string, public?: string };
 }
 
 export const NoteMenu = forwardRef<HTMLButtonElement, NoteMenuProps>((props, ref) => {
+    const { t } = useTranslation();
     const [copy, setCopy] = useState(false);
 
     const switchState = async (text?: string) => {
@@ -41,8 +44,8 @@ export const NoteMenu = forwardRef<HTMLButtonElement, NoteMenuProps>((props, ref
                 } />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => { switchState(props.note.private) }}>Private</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { switchState(props.note.public) }}>Public</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { switchState(props.note.private) }}>{t("Private")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { switchState(props.note.public) }}>{t("Public")}</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

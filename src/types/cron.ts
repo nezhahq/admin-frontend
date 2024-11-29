@@ -1,10 +1,12 @@
+import i18next from "i18next";
 export const cronTypes: Record<number, string> = {
-    0: "Scheduled",
-    1: "Trigger",
+    0: i18next.t("Scheduled"),
+    1: i18next.t("Trigger"),
 }
 
 export const cronCoverageTypes: Record<number, string> = {
-    0: "Only specific servers",
-    1: "All excludes specific servers",
-    2: "The alarmed servers"
+    0: i18next.t("Coverages.Only"),
+    1: i18next.t("Coverages.Excludes"),
+    2: i18next.t("Coverages.Alarmed"),
 }
+

@@ -20,14 +20,18 @@ import { CronCard } from "@/components/cron";
 import { cronTypes } from "@/types";
 import { IconButton } from "@/components/xui/icon-button";
 
+import { useTranslation } from "react-i18next";
+
 export default function CronPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelCron[]>("/api/v1/cron", swrFetcher);
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelCron>[] = [
@@ -59,7 +63,7 @@ export default function CronPage() {
             accessorFn: (row) => row.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             cell: ({ row }) => {
                 const s = row.original;
@@ -67,17 +71,17 @@ export default function CronPage() {
             },
         },
         {
-            header: "Task Type",
+            header: t("Type"),
             accessorKey: "taskType",
             accessorFn: (row) => cronTypes[row.task_type] || "",
         },
         {
-            header: "Cron Expression",
+            header: t("CronExpression"),
             accessorKey: "scheduler",
             accessorFn: (row) => row.scheduler,
         },
         {
-            header: "Command",
+            header: t("Command"),
             accessorKey: "command",
             cell: ({ row }) => {
                 const s = row.original;
@@ -85,17 +89,17 @@ export default function CronPage() {
             },
         },
         {
-            header: "Notifier Group",
+            header: t("NotifierGroup"),
             accessorKey: "ngroup",
             accessorFn: (row) => row.notification_group_id,
         },
         {
-            header: "Send Success Notification",
+            header: t("SendSuccessNotification"),
             accessorKey: "pushSuccessful",
             accessorFn: (row) => row.push_successful ?? false,
         },
         {
-            header: "Coverage",
+            header: t("Coverage"),
             accessorKey: "cover",
             accessorFn: (row) => row.cover,
             cell: ({ row }) => {
@@ -120,12 +124,12 @@ export default function CronPage() {
             },
         },
         {
-            header: "Specific Servers",
+            header: t("SpecificServers"),
             accessorKey: "servers",
             accessorFn: (row) => row.servers,
         },
         {
-            header: "Last Execution",
+            header: t("LastExecution"),
             accessorKey: "lastExecution",
             accessorFn: (row) => row.last_executed_at,
             cell: ({ row }) => {
@@ -134,13 +138,13 @@ export default function CronPage() {
             },
         },
         {
-            header: "Last Result",
+            header: t("Result"),
             accessorKey: "lastResult",
             accessorFn: (row) => row.last_result ?? false,
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -157,14 +161,14 @@ export default function CronPage() {
                                         await runCron(s.id);
                                     } catch (e) {
                                         console.error(e);
-                                        toast("Error executing task", {
-                                            description: "Please see the console for details.",
+                                        toast(t("Error"), {
+                                            description: t("Results.UnExpectedError"),
                                         });
                                         await mutate();
                                         return;
                                     }
-                                    toast("Success", {
-                                        description: "The task triggered successfully.",
+                                    toast(t("Success"), {
+                                        description: t("Results.TaskTriggeredSuccessfully"),
                                     });
                                     await mutate();
                                 }}
@@ -192,7 +196,7 @@ export default function CronPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">Task</h1>
+                <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("Task")}</h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -225,7 +229,7 @@ export default function CronPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -241,7 +245,7 @@ export default function CronPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

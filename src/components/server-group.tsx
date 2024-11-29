@@ -30,6 +30,8 @@ import { createServerGroup, updateServerGroup } from "@/api/server-group"
 import { MultiSelect } from "@/components/xui/multi-select"
 import { useServer } from "@/hooks/useServer"
 
+import { useTranslation } from "react-i18next";
+
 interface ServerGroupCardProps {
     data?: ModelServerGroupResponseItem;
     mutate: KeyedMutator<ModelServerGroupResponseItem[]>;
@@ -41,6 +43,7 @@ const serverGroupFormSchema = z.object({
 });
 
 export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof serverGroupFormSchema>>({
         resolver: zodResolver(serverGroupFormSchema),
         defaultValues: data ? {
@@ -84,7 +87,7 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Server Group</DialogTitle>
+                            <DialogTitle>{data? t("EditServerGroup"):t("CreateServerGroup")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -94,7 +97,7 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="Group Name"
@@ -110,7 +113,7 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
                                     name="servers"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Servers</FormLabel>
+                                            <FormLabel>{t("Server")}</FormLabel>
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}
@@ -128,10 +131,10 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

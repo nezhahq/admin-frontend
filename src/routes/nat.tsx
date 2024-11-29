@@ -18,14 +18,18 @@ import { HeaderButtonGroup } from "@/components/header-button-group";
 import { toast } from "sonner";
 import { deleteNAT } from "@/api/nat";
 
+import { useTranslation } from "react-i18next";
+
 export default function NATPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelNAT[]>("/api/v1/nat", swrFetcher);
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelNAT>[] = [
@@ -57,7 +61,7 @@ export default function NATPage() {
             accessorFn: (row) => row.id,
         },
         {
-            header: "Name",
+            header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
@@ -66,12 +70,12 @@ export default function NATPage() {
             },
         },
         {
-            header: "Server ID",
+            header: t("Server")+" ID",
             accessorKey: "serverID",
             accessorFn: (row) => row.server_id,
         },
         {
-            header: "Local service",
+            header: t("LocalService"),
             accessorKey: "host",
             accessorFn: (row) => row.host,
             cell: ({ row }) => {
@@ -80,7 +84,7 @@ export default function NATPage() {
             },
         },
         {
-            header: "Bind hostname",
+            header: t("BindHostname"),
             accessorKey: "domain",
             accessorFn: (row) => row.domain,
             cell: ({ row }) => {
@@ -90,7 +94,7 @@ export default function NATPage() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original;
                 return (
@@ -120,7 +124,7 @@ export default function NATPage() {
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">NAT Traversal</h1>
+                <h1 className="flex-1 text-3xl font-bold tracking-tight"> {t("NATT")}</h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -153,7 +157,7 @@ export default function NATPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -169,7 +173,7 @@ export default function NATPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

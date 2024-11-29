@@ -28,6 +28,8 @@ import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
 import { createUser } from "@/api/user"
 
+import { useTranslation } from "react-i18next";
+
 interface UserCardProps {
     mutate: KeyedMutator<ModelUser[]>;
 }
@@ -38,6 +40,7 @@ const userFormSchema = z.object({
 });
 
 export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof userFormSchema>>({
         resolver: zodResolver(userFormSchema),
         defaultValues: {
@@ -67,7 +70,7 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New User</DialogTitle>
+                            <DialogTitle>{t("NewUser")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -77,7 +80,7 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                     name="username"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Username</FormLabel>
+                                            <FormLabel>{t("Username")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
@@ -92,7 +95,7 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Password</FormLabel>
+                                            <FormLabel>{t("Password")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
@@ -105,10 +108,10 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

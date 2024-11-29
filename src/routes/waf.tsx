@@ -19,14 +19,18 @@ import { deleteWAF } from "@/api/waf";
 import { ip16Str } from "@/lib/utils";
 import { SettingsTab } from "@/components/settings-tab";
 
+import { useTranslation } from "react-i18next";
+
 export default function WAFPage() {
+    const { t } = useTranslation();
     const { data, mutate, error, isLoading } = useSWR<ModelWAF[]>("/api/v1/waf", swrFetcher);
 
     useEffect(() => {
         if (error)
-            toast("Error", {
-                description: `Error fetching resource: ${error.message}.`,
+            toast(t("Error"), {
+                description: t(`Error fetching resource: ${error.message}.`),
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelWAF>[] = [
@@ -58,18 +62,18 @@ export default function WAFPage() {
             accessorFn: (row) => ip16Str(row.ip ?? []),
         },
         {
-            header: "Count",
+            header: t("Count"),
             accessorKey: "count",
             accessorFn: (row) => row.count,
         },
         {
-            header: "Last Block Reason",
+            header: t("LastBlockReason"),
             accessorKey: "lastBlockReason",
             accessorFn: (row) => row.last_block_reason,
             cell: ({ row }) => <span>{wafBlockReasons[row.original.last_block_reason] || ""}</span>,
         },
         {
-            header: "Last Block Time",
+            header: t("LastBlockTime"),
             accessorKey: "lastBlockTime",
             accessorFn: (row) => row.last_block_timestamp,
             cell: ({ row }) => {
@@ -146,7 +150,7 @@ export default function WAFPage() {
                     {isLoading ? (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                Loading ...
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
@@ -162,7 +166,7 @@ export default function WAFPage() {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

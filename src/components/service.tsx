@@ -44,6 +44,8 @@ import { Combobox } from "./ui/combobox"
 import { useServer } from "@/hooks/useServer"
 import { useNotification } from "@/hooks/useNotfication"
 
+import { useTranslation } from "react-i18next";
+
 interface ServiceCardProps {
     data?: ModelService;
     mutate: KeyedMutator<ModelServiceResponse>;
@@ -69,6 +71,7 @@ const serviceFormSchema = z.object({
 });
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof serviceFormSchema>>({
         resolver: zodResolver(serviceFormSchema),
         defaultValues: data ? {
@@ -130,7 +133,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>New Service</DialogTitle>
+                            <DialogTitle>{data?t("EditService"):t("CreateService")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -140,7 +143,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Service Name</FormLabel>
+                                            <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="My Service Monitor"
@@ -156,7 +159,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="target"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Target</FormLabel>
+                                            <FormLabel>{t("Target")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="HTTP (https://t.tt)｜Ping (t.tt)｜TCP (t.tt:80)"
@@ -172,7 +175,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Type</FormLabel>
+                                            <FormLabel>{t("Type")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -200,7 +203,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Show in Service</Label>
+                                                    <Label className="text-sm">{t("ShowInService")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -212,7 +215,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="duration"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Interval (s)</FormLabel>
+                                            <FormLabel>{t("Interval")} (s)</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -229,7 +232,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="cover"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Coverage</FormLabel>
+                                            <FormLabel>{t("Coverage")}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -251,7 +254,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="skip_servers_raw"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Specific Servers</FormLabel>
+                                            <FormLabel>{t("SpecificServers")}</FormLabel>
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}
@@ -268,7 +271,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="notification_group_id"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notifier Group</FormLabel>
+                                            <FormLabel>{t("NotifierGroupID")}</FormLabel>
                                             <FormControl>
                                                 <Combobox
                                                     placeholder="Search..."
@@ -292,7 +295,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable Failure Notification</Label>
+                                                    <Label className="text-sm">{t("EnableFailureNotification")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -304,7 +307,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="max_latency"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Maximum Latency Time (ms)</FormLabel>
+                                            <FormLabel>{t("MaximumLatency")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -321,7 +324,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="min_latency"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Minimum Latency Time (ms)</FormLabel>
+                                            <FormLabel>{t("MinimumLatency")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -344,7 +347,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable Latency Notification</Label>
+                                                    <Label className="text-sm">{t("EnableLatencyNotification")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -362,7 +365,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">Enable Trigger Task</Label>
+                                                    <Label className="text-sm">{t("EnableTriggerTask")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -374,7 +377,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="fail_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Tasks to trigger on an alarm (Separate with comma)</FormLabel>
+                                            <FormLabel>{t("TasksToTriggerOnAlert") + t("SeparateWithComma")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
@@ -395,7 +398,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="recover_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Tasks to trigger after recovery (Separate with comma)</FormLabel>
+                                            <FormLabel>{t("TasksToTriggerAfterRecovery") + t("SeparateWithComma")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
@@ -414,10 +417,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Submit")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

@@ -27,12 +27,15 @@ import { useState } from "react"
 import { useMainStore } from "@/hooks/useMainStore"
 import { toast } from "sonner"
 
+import { useTranslation } from "react-i18next";
+
 const profileFormSchema = z.object({
     original_password: z.string().min(5).max(72),
     new_password: z.string().min(8).max(72),
 });
 
 export const ProfileCard = ({ className }: { className: string }) => {
+    const { t } = useTranslation();
     const form = useForm<z.infer<typeof profileFormSchema>>({
         resolver: zodResolver(profileFormSchema),
         defaultValues: {
@@ -51,7 +54,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
         try {
             await updateProfile(values);
         } catch (e) {
-            toast("Update failed", {
+            toast(t("Error"), {
                 description: `${e}`,
             })
             return;
@@ -66,14 +69,14 @@ export const ProfileCard = ({ className }: { className: string }) => {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" className={className}>
-                    Update Password
+                    {t("UpdatePassword")}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>Update Server</DialogTitle>
+                            <DialogTitle>{t("UpdatePassword")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -83,7 +86,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                     name="original_password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Original Password</FormLabel>
+                                            <FormLabel>{t("OriginalPassword")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
@@ -98,7 +101,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                     name="new_password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>New Password</FormLabel>
+                                            <FormLabel>{t("NewPassword")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
@@ -112,10 +115,10 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">
-                                            Close
+                                            {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">Submit</Button>
+                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>
