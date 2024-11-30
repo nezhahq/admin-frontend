@@ -134,6 +134,7 @@
   "CustomCodesDashboard": "Custom Codes for Dashboard",
   "CustomPublicDNSNameserversforDDNS": "Custom Public DNS Nameservers for DDNS",
   "RealIPHeader": "Real IP request header",
+  "UseDirectConnectingIP": "Use direct connection IP",
   "IPChangeNotification": "IP Change notification",
   "FullIPNotification": "Show Full IP Address in Notification Messages",
   "EditService": "Editing services",

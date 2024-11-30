@@ -141,8 +141,18 @@ export function joinIP(p?: ModelIP) {
   return '';
 }
 
-export function ip16Str(p: number[]) {
-  const buf = new Uint8Array(p);
+function base64toUint8Array(base64str: string) {
+  const binary = atob(base64str);
+  const len = binary.length;
+  const buf = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    buf[i] = binary.charCodeAt(i);
+  }
+  return buf;
+}
+
+export function ip16Str(base64str: string) {
+  const buf = base64toUint8Array(base64str);
   const ip4 = buf.slice(-6);
   if (ip4[0] === 255 && ip4[1] === 255) {
     return ip4.slice(2).join('.');

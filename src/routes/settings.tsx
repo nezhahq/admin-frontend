@@ -48,7 +48,7 @@ const settingFormSchema = z.object({
 });
 
 export default function SettingsPage() {
-    const { t , i18n} = useTranslation();
+    const { t, i18n } = useTranslation();
     const [config, setConfig] = useState<ModelConfig>();
     const [error, setError] = useState<Error>();
 
@@ -57,7 +57,7 @@ export default function SettingsPage() {
             toast(t("Error"), {
                 description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     useEffect(() => {
@@ -106,9 +106,9 @@ export default function SettingsPage() {
             return;
         } finally {
             toast(t("Success"));
-            if (values.language!= "auto"){
+            if (values.language != "auto") {
                 i18n.changeLanguage(values.language)
-            }else{
+            } else {
                 i18n.changeLanguage(i18n.services.languageDetector.detect());
             }
         }
@@ -204,7 +204,7 @@ export default function SettingsPage() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        {t("CustomPublicDNSNameserversforDDNS")+" " + t("SeparateWithComma")}
+                                        {t("CustomPublicDNSNameserversforDDNS") + " " + t("SeparateWithComma")}
                                     </FormLabel>
                                     <FormControl>
                                         <Input {...field} />
@@ -220,7 +220,21 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>{t("RealIPHeader")}</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="NZ::Use-Peer-IP" {...field} />
+                                        <div className="flex items-center">
+                                            <Input disabled={field.value == 'NZ::Use-Peer-IP'} className="w-1/2" placeholder="CF-Connecting-IP" {...field} />
+                                            <Checkbox checked={field.value == 'NZ::Use-Peer-IP'} className="ml-2" onCheckedChange={(checked) => {
+                                                if (checked) {
+                                                    field.disabled = true;
+                                                    form.setValue("real_ip_header", "NZ::Use-Peer-IP");
+                                                } else {
+                                                    field.disabled = false;
+                                                    form.setValue("real_ip_header", "");
+                                                }
+                                            }} />
+                                            <FormLabel className="font-normal ml-2">
+                                                {t("UseDirectConnectingIP")}
+                                            </FormLabel>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -260,7 +274,7 @@ export default function SettingsPage() {
                                             name="ignored_ip_notification"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>{t("SpecificServers")+" " + t("SeparateWithComma")}</FormLabel>
+                                                    <FormLabel>{t("SpecificServers") + " " + t("SeparateWithComma")}</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="1,2,3" {...field} />
                                                     </FormControl>

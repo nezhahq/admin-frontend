@@ -141,6 +141,7 @@
   "DashboardOriginalHost": "Nome di dominio/IP del server Dashboard (no CDN)",
   "CustomPublicDNSNameserversforDDNS": "Server dei nomi DNS pubblici personalizzati per DDNS",
   "RealIPHeader": "Intestazione della richiesta IP reale",
+  "UseDirectConnectingIP": "Utilizzare l'IP di connessione diretta",
   "IPChangeNotification": "Notifica di modifica IP",
   "FullIPNotification": "Mostra l'indirizzo IP completo nei messaggi di notifica",
   "LoginFailed": "Accesso non riuscito",

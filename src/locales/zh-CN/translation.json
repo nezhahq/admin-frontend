@@ -140,6 +140,7 @@
   "DashboardOriginalHost": "仪表板服务器域名/IP（无 CDN）",
   "CustomPublicDNSNameserversforDDNS": "DDNS 的自定义公共 DNS 名称服务器",
   "RealIPHeader": "真实IP请求头",
+  "UseDirectConnectingIP": "使用直连 IP",
   "IPChangeNotification": "IP变更通知",
   "FullIPNotification": "在通知消息中显示完整的 IP 地址",
   "LoginFailed": "登录失败",

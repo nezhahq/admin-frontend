@@ -75,8 +75,8 @@ export interface GithubComNezhahqNezhaModelCommonResponseArrayModelUser {
   success?: boolean;
 }
 
-export interface GithubComNezhahqNezhaModelCommonResponseArrayModelWAF {
-  data?: ModelWAF[];
+export interface GithubComNezhahqNezhaModelCommonResponseArrayModelWAFApiMock {
+  data?: ModelWAFApiMock[];
   error?: string;
   success?: boolean;
 }
@@ -425,6 +425,7 @@ export interface ModelProfile {
 
 export interface ModelProfileForm {
   new_password?: string;
+  new_username?: string;
   original_password?: string;
 }
 
@@ -647,9 +648,9 @@ export interface ModelUserForm {
   username?: string;
 }
 
-export interface ModelWAF {
+export interface ModelWAFApiMock {
   count?: number;
-  ip?: number[];
+  ip?: string;
   last_block_reason?: number;
   last_block_timestamp?: number;
 }
