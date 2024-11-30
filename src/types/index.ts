@@ -12,5 +12,3 @@ export * from './notificationStore';
 export * from './notificationContext';
 export * from './fm';
 export * from './settings';
-export * from './configStore';
-export * from './configContext';
