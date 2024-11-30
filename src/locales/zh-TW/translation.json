@@ -68,7 +68,6 @@
   "TasksToTriggerAfterRecovery": "恢復後要觸發的任務",
   "Confirm": "確認",
   "ConfirmDeletion": "確認刪除？",
-  "NewService": "新服務",
   "Services": "服務",
   "ShowInService": "服務中顯示",
   "Coverages": {
@@ -149,5 +148,6 @@
   "NewUser": "新用戶",
   "Count": "計數",
   "LastBlockReason": "最後封鎖原因",
-  "LastBlockTime": "最後封鎖時間"
+  "LastBlockTime": "最後封鎖時間",
+  "Auto": "自動"
 }

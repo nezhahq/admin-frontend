@@ -68,7 +68,6 @@
   "TasksToTriggerAfterRecovery": "Attività da attivare dopo il ripristino",
   "Confirm": "Confermo",
   "ConfirmDeletion": "Confermi l'eliminazione?",
-  "NewService": "Nuovo servizio",
   "Services": "Servizi",
   "ShowInService": "Mostra in servizio",
   "Coverages": {
@@ -126,6 +125,7 @@
   "CreateService": "Crea servizio",
   "EditTask": "Modifica attività",
   "CreateTask": "Crea attività",
+  "Auto": "automatico",
   "CreateNotifier": "Crea notifica",
   "EditNotifier": "Modifica notifica",
   "EditAlertRule": "Modifica le regole degli allarmi",

@@ -48,7 +48,7 @@ const settingFormSchema = z.object({
 });
 
 export default function SettingsPage() {
-    const { t } = useTranslation();
+    const { t , i18n} = useTranslation();
     const [config, setConfig] = useState<ModelConfig>();
     const [error, setError] = useState<Error>();
 
@@ -106,6 +106,11 @@ export default function SettingsPage() {
             return;
         } finally {
             toast(t("Success"));
+            if (values.language!= "auto"){
+                i18n.changeLanguage(values.language)
+            }else{
+                i18n.changeLanguage(i18n.services.languageDetector.detect());
+            }
         }
     };
 
