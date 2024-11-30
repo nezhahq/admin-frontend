@@ -36,7 +36,7 @@ export default function ServerPage() {
             toast(t("Error"), {
                 description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<Server>[] = [
@@ -46,7 +46,7 @@ export default function ServerPage() {
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
@@ -107,11 +107,6 @@ export default function ServerPage() {
             header: t("HideForGuest"),
             accessorKey: "hideForGuest",
             accessorFn: (row) => row.hide_for_guest ?? false,
-        },
-        {
-            id: "installCommands",
-            header: t("InstallCommands"),
-            cell: () => <InstallCommandsMenu />,
         },
         {
             id: "note",
@@ -187,13 +182,14 @@ export default function ServerPage() {
                                 return;
                             }
                             toast(t("Done"), {
-                                description:  t("Results.ForceUpdate")
-                                + (resp.success?.length ? t(`Success`) + ` [${resp.success.join(",")}]` : "")
-                                + (resp.failure?.length ? t(`Failure`) + ` [${resp.failure.join(",")}]` : "")
-                                + (resp.offline?.length ? t(`Offline`) + ` [${resp.offline.join(",")}]` : "")
+                                description: t("Results.ForceUpdate")
+                                    + (resp.success?.length ? t(`Success`) + ` [${resp.success.join(",")}]` : "")
+                                    + (resp.failure?.length ? t(`Failure`) + ` [${resp.failure.join(",")}]` : "")
+                                    + (resp.offline?.length ? t(`Offline`) + ` [${resp.offline.join(",")}]` : "")
                             });
                         }}
                     />
+                    <InstallCommandsMenu className="bg-blue-700" />
                 </HeaderButtonGroup>
             </div>
             <Table>

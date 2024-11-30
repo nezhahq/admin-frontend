@@ -74,7 +74,10 @@ export default function SettingsPage() {
     const form = useForm<z.infer<typeof settingFormSchema>>({
         resolver: zodResolver(settingFormSchema),
         defaultValues: config
-            ? config
+            ? {
+                ...config,
+                site_name: config.site_name || "",
+            }
             : {
                 ip_change_notification_group_id: 0,
                 cover: 1,

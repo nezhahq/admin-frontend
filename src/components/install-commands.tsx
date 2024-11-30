@@ -4,11 +4,11 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ButtonProps } from "@/components/ui/button"
+import { Button, ButtonProps } from "@/components/ui/button"
 import { forwardRef, useState } from "react"
-import { IconButton } from "./xui/icon-button"
 import { useConfig } from "@/hooks/useConfig"
 import { ConfigEssential } from "@/types"
+import { Check, Clipboard } from "lucide-react"
 import { toast } from "sonner"
 
 import { useTranslation } from "react-i18next"
@@ -31,6 +31,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
                 if (config)
                     await navigator.clipboard.writeText(generateCommand(type, config));
             } catch (e) {
+                console.error(e);
                 toast(t("Error"), {
                     description: t("Results.UnExpectedError"),
                 })
@@ -45,9 +46,10 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <IconButton {...props} ref={ref} variant="outline" size="icon" icon={
-                    copy ? "check" : "clipboard"
-                } />
+                <Button {...props} ref={ref}>
+                    {copy ? <Check /> : <Clipboard />}
+                    {t("InstallCommands")}
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem onClick={async () => { switchState(OSTypes.Linux) }}>Linux</DropdownMenuItem>
@@ -65,14 +67,15 @@ const generateCommand = (type: number, { agent_secret_key, install_host, listen_
     const env = `NZ_SERVER=${install_host}:${listen_port} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
 
     switch (type) {
-        case OSTypes.Linux, OSTypes.macOS: {
+        case OSTypes.Linux:
+        case OSTypes.macOS: {
             return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o nezha.sh && chmod +x nezha.sh && env ${env} ./nezha.sh`
         }
         case OSTypes.Windows: {
             return `${env} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
         }
         default: {
-            throw new Error("Unknown OS");
+            throw new Error(`Unknown OS: ${type}`);
         }
     }
 }
