@@ -28,7 +28,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
         if (!copy) {
             try {
                 setCopy(true);
-                if (config)
+                if (settings)
                     await navigator.clipboard.writeText(generateCommand(type, settings) || '');
             } catch (e) {
                 console.error(e);
