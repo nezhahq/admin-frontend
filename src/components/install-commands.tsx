@@ -12,6 +12,7 @@ import { Check, Clipboard } from "lucide-react"
 import { toast } from "sonner"
 
 import { useTranslation } from "react-i18next"
+import { copyToClipboard } from "@/lib/utils"
 
 enum OSTypes {
     Linux = 1,
@@ -29,7 +30,8 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
             try {
                 setCopy(true);
                 if (settings)
-                    await navigator.clipboard.writeText(generateCommand(type, settings) || '');
+                    await copyToClipboard(generateCommand(type, settings) || '');
+
             } catch (e) {
                 console.error(e);
                 toast(t("Error"), {
@@ -52,9 +54,9 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem onClick={async () => { switchState(OSTypes.Linux) }}>Linux</DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => { switchState(OSTypes.macOS) }}>macOS</DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => { switchState(OSTypes.Windows) }}>Windows</DropdownMenuItem>
+                <DropdownMenuItem className="nezha-copy" onClick={async () => { switchState(OSTypes.Linux) }}>Linux</DropdownMenuItem>
+                <DropdownMenuItem className="nezha-copy" onClick={async () => { switchState(OSTypes.macOS) }}>macOS</DropdownMenuItem>
+                <DropdownMenuItem className="nezha-copy" onClick={async () => { switchState(OSTypes.Windows) }}>Windows</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

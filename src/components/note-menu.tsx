@@ -10,6 +10,7 @@ import { IconButton } from "./xui/icon-button"
 import { toast } from "sonner";
 
 import { useTranslation } from "react-i18next";
+import { copyToClipboard } from "@/lib/utils";
 
 interface NoteMenuProps extends ButtonProps {
     note: { private?: string, public?: string };
@@ -29,7 +30,7 @@ export const NoteMenu = forwardRef<HTMLButtonElement, NoteMenuProps>((props, ref
 
         if (!copy) {
             setCopy(true);
-            await navigator.clipboard.writeText(text);
+            await copyToClipboard(text);
             setTimeout(() => {
                 setCopy(false);
             }, 2 * 1000);

@@ -14,7 +14,7 @@ import useWebSocket from "react-use-websocket"
 import { toast } from "sonner"
 import { ColumnDef } from "@tanstack/react-table"
 import { Folder, File } from "lucide-react"
-import { fm, formatPath, fmWorker as worker } from "@/lib/utils"
+import { copyToClipboard, fm, formatPath, fmWorker as worker } from "@/lib/utils"
 import {
     AlertDialog,
     AlertDialogContent,
@@ -293,7 +293,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                             <DropdownMenuItem onClick={listFile}>{t('Refresh')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={
                                 async () => {
-                                    await navigator.clipboard.writeText(formatPath(currentPath));
+                                    await copyToClipboard(formatPath(currentPath));
                                 }
                             }>{t("CopyPath")}</DropdownMenuItem>
                             <AlertDialogTrigger asChild>

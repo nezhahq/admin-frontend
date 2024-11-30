@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge"
 import { z } from "zod"
 import { FMEntry, FMOpcode, ModelIP } from "@/types"
 import FMWorker from "./fm?worker"
+import copy from "copy-to-clipboard"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -164,4 +165,18 @@ function ipv6BinaryToString(binary: Uint8Array) {
   }
 
   return ipv6;
+}
+
+export async function copyToClipboard(text: string) {
+  try {
+    return await navigator.clipboard.writeText(text);
+  } catch (error) {
+    console.error('navigator', error);
+  }
+  try {
+    return copy(text)
+  } catch (error) {
+    console.error('copy', error);
+  }
+  throw new Error('Failed to copy text to clipboard');
 }
