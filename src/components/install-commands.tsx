@@ -4,9 +4,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ButtonProps } from "@/components/ui/button"
+import { Button, ButtonProps } from "@/components/ui/button"
 import { forwardRef, useState } from "react"
-import { IconButton } from "./xui/icon-button"
+import { Check, Clipboard } from "lucide-react"
+import { t } from "i18next"
 
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [copy, setCopy] = useState(false);
@@ -17,16 +18,17 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
             await navigator.clipboard.writeText("stub");
             setTimeout(() => {
                 setCopy(false);
-            }, 2 * 1000);
+            }, 1000);
         }
     }
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <IconButton {...props} ref={ref} variant="outline" size="icon" icon={
-                    copy ? "check" : "clipboard"
-                } />
+                <Button {...props} ref={ref}>
+                    {copy ? <Check /> : <Clipboard />}
+                    {t("InstallCommands")}
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem onClick={switchState}>Linux</DropdownMenuItem>
