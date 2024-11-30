@@ -105,12 +105,12 @@ export default function SettingsPage() {
             if (e instanceof Error) setError(e);
             return;
         } finally {
-            toast(t("Success"));
             if (values.language != "auto") {
-                i18n.changeLanguage(values.language)
+                i18n.changeLanguage(values.language);
             } else {
                 i18n.changeLanguage(i18n.services.languageDetector.detect());
             }
+            toast(t("Success"));
         }
     };
 
