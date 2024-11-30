@@ -28,8 +28,8 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
         if (!copy) {
             try {
                 setCopy(true);
-                if (settings)
-                    await navigator.clipboard.writeText(generateCommand(type, settings));
+                if (config)
+                    await navigator.clipboard.writeText(generateCommand(type, settings) || '');
             } catch (e) {
                 console.error(e);
                 toast(t("Error"), {
