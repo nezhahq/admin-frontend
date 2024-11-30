@@ -1,3 +1,5 @@
+import { useMainStore } from "@/hooks/useMainStore";
+
 interface CommonResponse<T> {
     success: boolean;
     error: string;
@@ -48,7 +50,7 @@ export async function fetcher<T>(method: FetcherMethod, path: string, data?: any
     }
 
     // auto refresh token
-    if (!lastestRefreshTokenAt || Date.now() - lastestRefreshTokenAt > 1000 * 60 * 60) {
+    if (document.cookie && (!lastestRefreshTokenAt || Date.now() - lastestRefreshTokenAt > 1000 * 60 * 60)) {
         lastestRefreshTokenAt = Date.now();
         fetch("/api/v1/refresh-token")
     }

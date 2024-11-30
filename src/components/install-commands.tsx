@@ -6,8 +6,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button, ButtonProps } from "@/components/ui/button"
 import { forwardRef, useState } from "react"
-import { useConfig } from "@/hooks/useConfig"
-import { ConfigEssential } from "@/types"
+import useSettings from "@/hooks/useSetting"
+import { ModelConfig } from "@/types"
 import { Check, Clipboard } from "lucide-react"
 import { toast } from "sonner"
 
@@ -21,7 +21,7 @@ enum OSTypes {
 
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [copy, setCopy] = useState(false);
-    const { config } = useConfig();
+    const settings = useSettings();
     const { t } = useTranslation();
 
     const switchState = async (type: number) => {
@@ -29,7 +29,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
             try {
                 setCopy(true);
                 if (config)
-                    await navigator.clipboard.writeText(generateCommand(type, config) || '');
+                    await navigator.clipboard.writeText(generateCommand(type, settings) || '');
             } catch (e) {
                 console.error(e);
                 toast(t("Error"), {
@@ -60,7 +60,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
     );
 })
 
-const generateCommand = (type: number, { agent_secret_key, install_host, listen_port, tls }: ConfigEssential) => {
+const generateCommand = (type: number, { agent_secret_key, install_host, listen_port, tls }: ModelConfig) => {
     if (!install_host)
         throw new Error("You have not specify the installed host.");
 

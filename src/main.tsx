@@ -22,7 +22,6 @@ import ServerGroupPage from './routes/server-group';
 import NotificationGroupPage from './routes/notification-group';
 import { ServerProvider } from './hooks/useServer';
 import { NotificationProvider } from './hooks/useNotfication';
-import { ConfigProvider } from './hooks/useConfig';
 import CronPage from './routes/cron';
 import NotificationPage from './routes/notification';
 import AlertRulePage from './routes/alert-rule';
@@ -37,9 +36,7 @@ const router = createBrowserRouter([
         element: (
             <AuthProvider>
                 <ProtectedRoute>
-                    <ConfigProvider>
-                        <Root />
-                    </ConfigProvider>
+                    <Root />
                 </ProtectedRoute>
             </AuthProvider>
         ),
