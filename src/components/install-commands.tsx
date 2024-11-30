@@ -29,13 +29,12 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
         if (!copy) {
             try {
                 setCopy(true);
-                if (settings)
-                    await copyToClipboard(generateCommand(type, settings) || '');
-
-            } catch (e) {
+                if (!settings) throw new Error("Settings is not found.");
+                await copyToClipboard(generateCommand(type, settings) || '');
+            } catch (e: Error | any) {
                 console.error(e);
                 toast(t("Error"), {
-                    description: t("Results.UnExpectedError"),
+                    description: e.message,
                 })
             } finally {
                 setTimeout(() => {
@@ -64,7 +63,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
 
 const generateCommand = (type: number, { agent_secret_key, install_host, listen_port, tls }: ModelConfig) => {
     if (!install_host)
-        throw new Error("You have not specify the installed host.");
+        throw new Error("You have not specify the installed host.")
 
     const env = `NZ_SERVER=${install_host}:${listen_port} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
 
