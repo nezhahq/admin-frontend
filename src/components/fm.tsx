@@ -10,7 +10,6 @@ import {
 import { IconButton } from "./xui/icon-button"
 import { createFM } from "@/api/fm"
 import { ModelCreateFMResponse, FMEntry, FMOpcode, FMIdentifier, FMWorkerData, FMWorkerOpcode } from "@/types"
-import useWebSocket from "react-use-websocket"
 import { toast } from "sonner"
 import { ColumnDef } from "@tanstack/react-table"
 import { Folder, File } from "lucide-react"
@@ -174,69 +173,62 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
         }
     }
 
-    const { sendMessage, getWebSocket } = useWebSocket(wsUrl, {
-        share: false,
-        onOpen: () => {
-            listFile();
-        },
-        onClose: (e) => {
-            console.log('WebSocket connection closed:', e);
-        },
-        onError: (e) => {
-            console.error(e);
-            toast("Websocket" + " " + t("Error"), {
-                description: t("Results.UnExpectedError"),
-            })
-        },
-        onMessage: async (e) => {
-            try {
-                const buf: ArrayBufferLike = e.data;
-
-                if (firstChunk.current) {
-                    const identifier = new Uint8Array(buf, 0, 4);
-                    if (arraysEqual(identifier, FMIdentifier.file)) {
-                        worker.postMessage({ operation: 1, arrayBuffer: buf, fileName: currentBasename.current });
-                        firstChunk.current = false;
-                    } else if (arraysEqual(identifier, FMIdentifier.fileName)) {
-                        const { path, fmList } = await fm.parseFMList(buf);
-                        setPath(path);
-                        setFMEntries(fmList);
-                    } else if (arraysEqual(identifier, FMIdentifier.error)) {
-                        const errBytes = buf.slice(4);
-                        const errMsg = new TextDecoder('utf-8').decode(errBytes);
-                        throw new Error(errMsg);
-                    } else if (arraysEqual(identifier, FMIdentifier.complete)) {
-                        // Upload completed
-                        if (uOpen) setuOpen(false);
-                        listFile();
-                    } else {
-                        throw new Error(t("Results.UnknownIdentifier"));
-                    }
-                } else {
-                    await waitForHandleReady();
-                    worker.postMessage({ operation: 2, arrayBuffer: buf, fileName: currentBasename.current });
-                }
-            } catch (error) {
-                console.error('Error processing received data:', error);
-                toast("FM" + " " + t("Error"), {
-                    description: t("Results.UnExpectedError"),
-                })
-                if (dOpen) setdOpen(false);
-                if (uOpen) setuOpen(false);
-            }
-        }
-    });
-
-    const socket = getWebSocket();
-    useEffect(() => {
-        if (socket && 'binaryType' in socket)
-            socket.binaryType = 'arraybuffer';
-    }, [socket])
-
     const [currentPath, setPath] = useState('');
     useEffect(() => {
         listFile();
     }, [currentPath])
+
+    const ws = new WebSocket(wsUrl);
+    ws.binaryType = 'arraybuffer';
+    ws.onopen = () => {
+        listFile();
+    }
+    ws.onclose = (e) => {
+        console.log('WebSocket connection closed:', e);
+    }
+    ws.onerror = (e) => {
+        console.error(e);
+        toast("Websocket" + " " + t("Error"), {
+            description: t("Results.UnExpectedError"),
+        })
+    }
+    ws.onmessage = async (e) => {
+        try {
+            const buf: ArrayBufferLike = e.data;
+
+            if (firstChunk.current) {
+                const identifier = new Uint8Array(buf, 0, 4);
+                if (arraysEqual(identifier, FMIdentifier.file)) {
+                    worker.postMessage({ operation: 1, arrayBuffer: buf, fileName: currentBasename.current });
+                    firstChunk.current = false;
+                } else if (arraysEqual(identifier, FMIdentifier.fileName)) {
+                    const { path, fmList } = await fm.parseFMList(buf);
+                    setPath(path);
+                    setFMEntries(fmList);
+                } else if (arraysEqual(identifier, FMIdentifier.error)) {
+                    const errBytes = buf.slice(4);
+                    const errMsg = new TextDecoder('utf-8').decode(errBytes);
+                    throw new Error(errMsg);
+                } else if (arraysEqual(identifier, FMIdentifier.complete)) {
+                    // Upload completed
+                    if (uOpen) setuOpen(false);
+                    listFile();
+                } else {
+                    throw new Error(t("Results.UnknownIdentifier"));
+                }
+            } else {
+                await waitForHandleReady();
+                worker.postMessage({ operation: 2, arrayBuffer: buf, fileName: currentBasename.current });
+            }
+        } catch (error) {
+            console.error('Error processing received data:', error);
+            toast("FM" + " " + t("Error"), {
+                description: t("Results.UnExpectedError"),
+            })
+            if (dOpen) setdOpen(false);
+            if (uOpen) setuOpen(false);
+        }
+    }
 
     const listFile = () => {
         const prefix = new Int8Array([FMOpcode.List]);
@@ -246,7 +238,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
         msg.set(prefix);
         msg.set(pathMsg, prefix.length);
 
-        sendMessage(msg);
+        ws.send(msg);
     }
 
     const downloadFile = (basename: string) => {
@@ -258,7 +250,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
         msg.set(prefix);
         msg.set(filePathMessage, prefix.length);
 
-        sendMessage(msg);
+        ws.send(msg);
     }
 
     const uploadFile = async (file: File) => {
@@ -267,13 +259,13 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
 
         // Send header
         const header = fm.buildUploadHeader({ path: currentPath, file: file });
-        sendMessage(header);
+        ws.send(header);
 
         // Send data chunks
         while (offset < file.size) {
             const chunk = file.slice(offset, offset + chunkSize);
             const arrayBuffer = await fm.readFileAsArrayBuffer(chunk);
-            if (arrayBuffer) sendMessage(arrayBuffer);
+            if (arrayBuffer) ws.send(arrayBuffer);
             offset += chunkSize;
         }
     }

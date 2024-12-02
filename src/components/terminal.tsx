@@ -12,7 +12,6 @@ import { AttachAddon } from "@xterm/addon-attach";
 import { FitAddon } from '@xterm/addon-fit';
 import { useRef, useEffect, useState } from "react";
 import { sleep } from "@/lib/utils";
-import useWebSocket from "react-use-websocket";
 import { IconButton } from "./xui/icon-button";
 import "@xterm/xterm/css/xterm.css";
 import { createTerminal } from "@/api/terminal";
@@ -30,24 +29,22 @@ interface XtermProps {
 const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, setClose, ...props }) => {
     const terminalRef = useRef<HTMLDivElement>(null);
 
-    const { sendMessage, getWebSocket } = useWebSocket(wsUrl, {
-        share: false,
-        onOpen: () => {
-            onResize();
-        },
-        onClose: () => {
-            terminal.dispose();
-            setClose(true);
-        },
-        onError: (e) => {
-            console.error(e);
-            toast("Websocket error", {
-                description: "View console for details.",
-            })
-        },
-    });
+    const ws = new WebSocket(wsUrl);
+    ws.binaryType = "arraybuffer";
+    ws.onopen = () => {
+        onResize();
+    }
+    ws.onclose = () => {
+        terminal.dispose();
+        setClose(true);
+    }
+    ws.onerror = (e) => {
+        console.error(e);
+        toast("Websocket error", {
+            description: "View console for details.",
+        })
+    }
 
-    const socket = getWebSocket();
     const terminal = useRef(
         new Terminal({
             cursorBlink: true,
@@ -76,7 +73,7 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
             msg.set(prefix);
             msg.set(resizeMessage, prefix.length);
 
-            sendMessage(msg);
+            ws.send(msg);
         }
     };
 
@@ -95,25 +92,20 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
     };
 
     useEffect(() => {
-        if (socket && "binaryType" in socket && terminalRef.current) {
-            socket.binaryType = "arraybuffer";
-            const attachAddon = new AttachAddon(socket);
+        if (!ws || !terminalRef.current) return;
 
-            terminal.loadAddon(attachAddon);
-            terminal.loadAddon(fitAddon);
-
-            terminal.open(terminalRef.current);
-        }
-
+        const attachAddon = new AttachAddon(ws);
+        terminal.loadAddon(attachAddon);
+        terminal.loadAddon(fitAddon);
+        terminal.open(terminalRef.current);
         window.addEventListener('resize', onResize);
-
         return () => {
             window.removeEventListener('resize', onResize);
-            if (socket) {
-                socket.close();
+            if (ws) {
+                ws.close();
             }
         };
-    }, [socket, terminal]);
+    }, [ws, terminal]);
 
     return <div ref={terminalRef} {...props} />;
 };
