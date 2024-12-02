@@ -13,6 +13,7 @@ import { toast } from "sonner"
 import { copyToClipboard } from "@/lib/utils"
 
 import { useTranslation } from "react-i18next"
+import i18next from "i18next"
 
 enum OSTypes {
     Linux = 1,
@@ -62,22 +63,22 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
 })
 
 const generateCommand = (type: number, { agent_secret_key, install_host, tls }: ModelConfig) => {
-    const { t } = useTranslation();
+    
     if (!install_host)
-        throw new Error(t("Results.InstallHostRequired"));
+        throw new Error(i18next.t("Results.InstallHostRequired"));
 
     const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
 
     switch (type) {
-        case OSTypes.Linux:
-        case OSTypes.macOS: {
-            return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o nezha.sh && chmod +x nezha.sh && env ${env} ./nezha.sh`
-        }
-        case OSTypes.Windows: {
-            return `${env} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
-        }
-        default: {
-            throw new Error(`Unknown OS: ${type}`);
-        }
+    case OSTypes.Linux:
+    case OSTypes.macOS: {
+        return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o nezha.sh && chmod +x nezha.sh && env ${env} ./nezha.sh`
+    }
+    case OSTypes.Windows: {
+        return `${env} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
+    }
+    default: {
+        throw new Error(`Unknown OS: ${type}`);
+    }
     }
 }
