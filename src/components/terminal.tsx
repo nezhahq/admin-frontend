@@ -28,22 +28,34 @@ interface XtermProps {
 
 const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, setClose, ...props }) => {
     const terminalRef = useRef<HTMLDivElement>(null);
+    const wsRef = useRef<WebSocket | null>(null);
 
-    const ws = new WebSocket(wsUrl);
-    ws.binaryType = "arraybuffer";
-    ws.onopen = () => {
-        onResize();
-    }
-    ws.onclose = () => {
-        terminal.dispose();
-        setClose(true);
-    }
-    ws.onerror = (e) => {
-        console.error(e);
-        toast("Websocket error", {
-            description: "View console for details.",
-        })
-    }
+    useEffect(() => {
+        return () => {
+            if (wsRef.current) {
+                wsRef.current.close();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        const ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
+        ws.binaryType = "arraybuffer";
+        ws.onopen = () => {
+            onResize();
+        }
+        ws.onclose = () => {
+            terminal.dispose();
+            setClose(true);
+        }
+        ws.onerror = (e) => {
+            console.error(e);
+            toast("Websocket error", {
+                description: "View console for details.",
+            })
+        }
+    }, [wsUrl]);
 
     const terminal = useRef(
         new Terminal({
@@ -73,7 +85,7 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
             msg.set(prefix);
             msg.set(resizeMessage, prefix.length);
 
-            ws.send(msg);
+            wsRef.current?.send(msg);
         }
     };
 
@@ -92,20 +104,19 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
     };
 
     useEffect(() => {
-        if (!ws || !terminalRef.current) return;
-
-        const attachAddon = new AttachAddon(ws);
+        if (!wsRef.current || !terminalRef.current) return;
+        const attachAddon = new AttachAddon(wsRef.current);
         terminal.loadAddon(attachAddon);
         terminal.loadAddon(fitAddon);
         terminal.open(terminalRef.current);
         window.addEventListener('resize', onResize);
         return () => {
             window.removeEventListener('resize', onResize);
-            if (ws) {
-                ws.close();
+            if (wsRef.current) {
+                wsRef.current.close();
             }
         };
-    }, [ws, terminal]);
+    }, [wsRef.current, terminal]);
 
     return <div ref={terminalRef} {...props} />;
 };
@@ -116,21 +127,22 @@ export const TerminalPage = () => {
 
     const { id } = useParams<{ id: string }>();
 
-    useEffect(() => {
-        const fetchTerminal = async () => {
-            if (id && !terminal) {
-                try {
-                    const createdTerminal = await createTerminal(Number(id));
-                    setTerminal(createdTerminal);
-                } catch (e) {
-                    toast("Terminal API Error", {
-                        description: "View console for details.",
-                    })
-                    console.error("fetch error", e);
-                    return;
-                }
+    const fetchTerminal = async () => {
+        if (id && !terminal) {
+            try {
+                const createdTerminal = await createTerminal(Number(id));
+                setTerminal(createdTerminal);
+            } catch (e) {
+                toast("Terminal API Error", {
+                    description: "View console for details.",
+                })
+                console.error("fetch error", e);
+                return;
             }
-        };
+        }
+    }
+
+    useEffect(() => {
         fetchTerminal();
     }, [id]);
 
