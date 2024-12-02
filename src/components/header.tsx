@@ -117,7 +117,7 @@ export default function Header() {
                                             <AvatarFallback>{profile.username}</AvatarFallback>
                                         </Avatar>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56">
+                                    <DropdownMenuContent className="w-32">
                                         <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
@@ -125,14 +125,12 @@ export default function Header() {
                                                 <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
                                                     <User2 />
                                                     {t('Profile')}
-                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
                                                 <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
                                                     <Settings />
                                                     {t('Settings')}
-                                                    <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
                                                 </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
@@ -140,7 +138,6 @@ export default function Header() {
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer">
                                             <LogOut />
                                             {t('Logout')}
-                                            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

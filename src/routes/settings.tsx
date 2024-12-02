@@ -105,11 +105,9 @@ export default function SettingsPage() {
             if (e instanceof Error) setError(e);
             return;
         } finally {
-            if (values.language != "auto") {
+            if (values.language != i18n.language) {
                 i18n.changeLanguage(values.language);
-            } else {
-                i18n.changeLanguage(i18n.services.languageDetector.detect());
-            }
+            } 
             toast(t("Success"));
         }
     };
