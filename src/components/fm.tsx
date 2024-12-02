@@ -210,7 +210,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                         if (uOpen) setuOpen(false);
                         listFile();
                     } else {
-                        throw new Error("Unknown identifier");
+                        throw new Error(t("Results.UnknownIdentifier"));
                     }
                 } else {
                     await waitForHandleReady();

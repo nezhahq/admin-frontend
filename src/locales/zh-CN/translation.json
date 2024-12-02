@@ -17,7 +17,9 @@
     "NoRowsAreSelected": "未选择任何行",
     "ThisOperationIsUnrecoverable": "这个操作将无法恢复！",
     "TaskTriggeredSuccessfully": "任务触发成功",
-    "TheServerDoesNotOnline": "服务器不存在或者还未连接"
+    "TheServerDoesNotOnline": "服务器不存在或者还未连接",
+    "InstallHostRequired": "设置中尚未填写Agent对接地址",
+    "UnknownIdentifier": "未知标识符"
   },
   "Login": "登录",
   "Server": "服务器",
@@ -137,7 +139,7 @@
   "Language": "语言",
   "CustomCodes": "自定义代码（样式和脚本）",
   "CustomCodesDashboard": "仪表板的自定义代码",
-  "DashboardOriginalHost": "仪表板服务器域名/IP（无 CDN）",
+  "DashboardOriginalHost": "Agent对接地址【域名/IP:端口】",
   "CustomPublicDNSNameserversforDDNS": "DDNS 的自定义公共 DNS 名称服务器",
   "RealIPHeader": "真实IP请求头",
   "UseDirectConnectingIP": "使用直连 IP",

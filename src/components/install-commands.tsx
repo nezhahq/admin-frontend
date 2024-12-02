@@ -10,9 +10,9 @@ import useSettings from "@/hooks/useSetting"
 import { ModelConfig } from "@/types"
 import { Check, Clipboard } from "lucide-react"
 import { toast } from "sonner"
+import { copyToClipboard } from "@/lib/utils"
 
 import { useTranslation } from "react-i18next"
-import { copyToClipboard } from "@/lib/utils"
 
 enum OSTypes {
     Linux = 1,
@@ -61,11 +61,12 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
     );
 })
 
-const generateCommand = (type: number, { agent_secret_key, install_host, listen_port, tls }: ModelConfig) => {
+const generateCommand = (type: number, { agent_secret_key, install_host, tls }: ModelConfig) => {
+    const { t } = useTranslation();
     if (!install_host)
-        throw new Error("You have not specify the installed host.")
+        throw new Error(t("Results.InstallHostRequired"));
 
-    const env = `NZ_SERVER=${install_host}:${listen_port} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
+    const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
 
     switch (type) {
         case OSTypes.Linux:

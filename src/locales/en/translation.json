@@ -17,7 +17,9 @@
     "NoRowsAreSelected": "No rows are selected",
     "ThisOperationIsUnrecoverable": "This operation cannot be undone!",
     "TaskTriggeredSuccessfully": "The task triggered successfully",
-    "TheServerDoesNotOnline": "The server does not exist or has not been connected yet"
+    "TheServerDoesNotOnline": "The server does not exist or has not been connected yet",
+    "InstallHostRequired": "The Agent docking address has not been filled in in the settings.",
+    "UnknownIdentifier": "Unknown identifier"
   },
   "Login": "Log in",
   "Server": "Server",
@@ -124,7 +126,7 @@
   "User": "User",
   "WAF": "Web application firewall",
   "SiteName": "Site name",
-  "DashboardOriginalHost": "Dashboard Server Domain/IP without CDN",
+  "DashboardOriginalHost": "Agent docking address [domain name/IP:port]",
   "LoginFailed": "Login failed",
   "BruteForceAttackingToken": "Brute Force Attacking Token",
   "BruteForceAttackingAgentSecret": "Brute Force Attacking Agent Secret",

@@ -17,7 +17,9 @@
     "NoRowsAreSelected": "未選擇任何行",
     "ThisOperationIsUnrecoverable": "這個操作將無法恢復！",
     "TaskTriggeredSuccessfully": "任務觸發成功",
-    "TheServerDoesNotOnline": "伺服器不存在或尚未連接"
+    "TheServerDoesNotOnline": "伺服器不存在或尚未連接",
+    "InstallHostRequired": "設定中尚未填寫Agent對接位址",
+    "UnknownIdentifier": "未知標識符"
   },
   "Login": "登入",
   "Server": "伺服器",
@@ -137,7 +139,7 @@
   "Language": "語言",
   "CustomCodes": "自訂程式碼（樣式和腳本）",
   "CustomCodesDashboard": "儀表板的自訂程式碼",
-  "DashboardOriginalHost": "儀表板伺服器網域/IP（無 CDN）",
+  "DashboardOriginalHost": "Agent對接位址【網域名稱/IP:連接埠】",
   "CustomPublicDNSNameserversforDDNS": "DDNS 的自訂公共 DNS 名稱伺服器",
   "RealIPHeader": "真實IP請求頭",
   "UseDirectConnectingIP": "使用直連 IP",

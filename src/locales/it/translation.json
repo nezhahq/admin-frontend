@@ -17,7 +17,9 @@
     "NoRowsAreSelected": "Nessuna riga selezionata",
     "ThisOperationIsUnrecoverable": "Questa operazione non può essere annullata!",
     "TaskTriggeredSuccessfully": "Attività avviata correttamente",
-    "TheServerDoesNotOnline": "Il server non esiste o non è stato ancora connesso"
+    "TheServerDoesNotOnline": "Il server non esiste o non è stato ancora connesso",
+    "InstallHostRequired": "L'indirizzo di aggancio dell'Agent non è stato inserito nelle impostazioni.",
+    "UnknownIdentifier": "identificatore sconosciuto"
   },
   "Login": "Accedi",
   "Server": "Server",
@@ -137,7 +139,7 @@
   "Language": "Lingua",
   "CustomCodes": "Codice personalizzato (stili e script)",
   "CustomCodesDashboard": "Codice personalizzato per dashboard",
-  "DashboardOriginalHost": "Nome di dominio/IP del server Dashboard (no CDN)",
+  "DashboardOriginalHost": "Indirizzo di ancoraggio dell'agente [nome dominio/IP:porta]",
   "CustomPublicDNSNameserversforDDNS": "Server dei nomi DNS pubblici personalizzati per DDNS",
   "RealIPHeader": "Intestazione della richiesta IP reale",
   "UseDirectConnectingIP": "Utilizzare l'IP di connessione diretta",
