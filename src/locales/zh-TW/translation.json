@@ -149,6 +149,5 @@
   "NewUser": "新用戶",
   "Count": "計數",
   "LastBlockReason": "最後封鎖原因",
-  "LastBlockTime": "最後封鎖時間",
-  "Auto": "自動"
+  "LastBlockTime": "最後封鎖時間"
 }

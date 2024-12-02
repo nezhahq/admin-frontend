@@ -5,7 +5,6 @@ export const settingCoverageTypes: Record<number, string> = {
 }
 
 export const nezhaLang: Record<string, string> = {
-    "auto": i18next.t("Auto"),
     "zh-CN": "简体中文（中国大陆）",
     "zh-TW": "正體中文（台灣）",
     "en-US": "English",

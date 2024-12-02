@@ -149,6 +149,5 @@
   "NewUser": "新用户",
   "Count": "计数",
   "LastBlockReason": "最后封禁原因",
-  "LastBlockTime": "最后封禁时间",
-  "Auto": "自动"
+  "LastBlockTime": "最后封禁时间"
 }
