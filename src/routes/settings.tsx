@@ -282,6 +282,19 @@ export default function SettingsPage() {
                                         />
                                         <FormField
                                             control={form.control}
+                                            name="ip_change_notification_group_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("NotifierGroupID")}</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="0" type="number" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
                                             name="enable_ip_change_notification"
                                             render={({ field }) => (
                                                 <FormItem className="flex items-center space-x-2">
