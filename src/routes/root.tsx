@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
 
 import { Card } from "@/components/ui/card";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -11,6 +12,11 @@ import useSetting from "@/hooks/useSetting";
 export default function Root() {
     const { t } = useTranslation();
     const settings = useSetting();
+
+    useEffect(() => {
+        document.title = settings?.site_name || "哪吒监控 Nezha Monitoring";
+    }, [settings]);
+
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Card className="text-sm max-w-7xl mx-auto mt-5 min-h-[90%] flex flex-col justify-between">
