@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ModelConfig, settingCoverageTypes, nezhaLang } from "@/types";
+import { ModelSettingResponse, settingCoverageTypes, nezhaLang } from "@/types";
 import { SettingsTab } from "@/components/settings-tab";
 import { z } from "zod";
 import { asOptionalField } from "@/lib/utils";
@@ -43,13 +43,14 @@ const settingFormSchema = z.object({
     custom_code_dashboard: asOptionalField(z.string()),
     real_ip_header: asOptionalField(z.string()),
 
+    tls: asOptionalField(z.boolean()),
     enable_ip_change_notification: asOptionalField(z.boolean()),
     enable_plain_ip_in_notification: asOptionalField(z.boolean()),
 });
 
 export default function SettingsPage() {
     const { t, i18n } = useTranslation();
-    const [config, setConfig] = useState<ModelConfig>();
+    const [config, setConfig] = useState<ModelSettingResponse>();
     const [error, setError] = useState<Error>();
 
     useEffect(() => {
@@ -191,6 +192,23 @@ export default function SettingsPage() {
                                     <FormLabel>{t("DashboardOriginalHost")}</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="tls"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center space-x-2">
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                            <Label className="text-sm">
+                                                {t("ConfigTLS")}
+                                            </Label>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

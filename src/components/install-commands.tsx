@@ -7,7 +7,7 @@ import {
 import { Button, ButtonProps } from "@/components/ui/button"
 import { forwardRef, useState } from "react"
 import useSettings from "@/hooks/useSetting"
-import { ModelConfig } from "@/types"
+import { ModelSettingResponse } from "@/types"
 import { Check, Clipboard } from "lucide-react"
 import { toast } from "sonner"
 import { copyToClipboard } from "@/lib/utils"
@@ -62,7 +62,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
     );
 })
 
-const generateCommand = (type: number, { agent_secret_key, install_host, tls }: ModelConfig) => {
+const generateCommand = (type: number, { agent_secret_key, install_host, tls }: ModelSettingResponse) => {
     
     if (!install_host)
         throw new Error(i18next.t("Results.InstallHostRequired"));

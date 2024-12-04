@@ -140,6 +140,7 @@
   "CustomCodes": "自訂程式碼（樣式和腳本）",
   "CustomCodesDashboard": "儀表板的自訂程式碼",
   "DashboardOriginalHost": "Agent對接位址【網域名稱/IP:連接埠】",
+  "ConfigTLS": "Agent 使用 TLS 連線",
   "CustomPublicDNSNameserversforDDNS": "DDNS 的自訂公共 DNS 名稱伺服器",
   "RealIPHeader": "真實IP請求頭",
   "UseDirectConnectingIP": "使用直連 IP",

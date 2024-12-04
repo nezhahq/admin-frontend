@@ -127,6 +127,7 @@
   "WAF": "Web application firewall",
   "SiteName": "Site name",
   "DashboardOriginalHost": "Agent docking address [domain name/IP:port]",
+  "ConfigTLS": "Use TLS to connect Agent",
   "LoginFailed": "Login failed",
   "BruteForceAttackingToken": "Brute Force Attacking Token",
   "BruteForceAttackingAgentSecret": "Brute Force Attacking Agent Secret",
