@@ -68,6 +68,7 @@ const generateCommand = (type: number, { agent_secret_key, install_host, tls }: 
         throw new Error(i18next.t("Results.InstallHostRequired"));
 
     const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
+    const env_win = `$env:NZ_SERVER=\"${install_host}\";$env:NZ_TLS=\"${tls || false}\";$env:NZ_CLIENT_SECRET=\"${agent_secret_key}\;"`;
 
     switch (type) {
     case OSTypes.Linux:
@@ -75,7 +76,7 @@ const generateCommand = (type: number, { agent_secret_key, install_host, tls }: 
         return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env ${env} ./agent.sh`
     }
     case OSTypes.Windows: {
-        return `${env} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
+        return `${env_win} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
     }
     default: {
         throw new Error(`Unknown OS: ${type}`);
