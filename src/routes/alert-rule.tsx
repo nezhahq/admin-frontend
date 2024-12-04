@@ -34,7 +34,7 @@ export default function AlertRulePage() {
             toast(t("Error"), {
                 description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<ModelAlertRule>[] = [
@@ -44,7 +44,7 @@ export default function AlertRulePage() {
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
@@ -86,8 +86,10 @@ export default function AlertRulePage() {
         },
         {
             header: t("Rules"),
-            accessorKey: "rules",
-            accessorFn: (row) => JSON.stringify(row.rules),
+            cell: ({ row }) => {
+                const s = row.original;
+                return <div className="max-w-48 whitespace-normal break-words">{JSON.stringify(s.rules)}</div>;
+            },
         },
         {
             header: t("TasksToTriggerOnAlert"),

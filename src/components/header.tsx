@@ -13,7 +13,7 @@ import { NzNavigationMenuLink } from "./xui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { LogOut, Settings, User2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
     Drawer,
@@ -52,6 +52,8 @@ export default function Header() {
 
     const [open, setOpen] = useState(false)
     const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const navigate = useNavigate();
 
     return (
         isDesktop ? (
@@ -121,17 +123,27 @@ export default function Header() {
                                         <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
-                                                <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
+                                            <DropdownMenuItem onClick={() => {
+                                                setDropdownOpen(false)
+                                                navigate("/dashboard/profile")
+                                            }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
                                                     <User2 />
                                                     {t('Profile')}
-                                                </Link>
+                                                </div>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
-                                                <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
+                                            <DropdownMenuItem onClick={() => {
+                                                setDropdownOpen(false)
+                                                navigate("/dashboard/settings")
+                                            }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
                                                     <Settings />
                                                     {t('Settings')}
-                                                </Link>
+                                                </div>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
                                         <DropdownMenuSeparator />
@@ -199,19 +211,27 @@ export default function Header() {
                                         <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
-                                                <Link to="/dashboard/profile" className="flex items-center gap-2 w-full">
+                                            <DropdownMenuItem onClick={() => {
+                                                setDropdownOpen(false)
+                                                navigate("/dashboard/profile")
+                                            }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
                                                     <User2 />
                                                     {t('Profile')}
-                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                                                </Link>
+                                                </div>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => { setDropdownOpen(false) }}>
-                                                <Link to="/dashboard/settings" className="flex items-center gap-2 w-full">
+                                            <DropdownMenuItem onClick={() => {
+                                                setDropdownOpen(false)
+                                                navigate("/dashboard/settings")
+                                            }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
                                                     <Settings />
                                                     {t('Settings')}
-                                                    <DropdownMenuShortcut>⇧⌘S</DropdownMenuShortcut>
-                                                </Link>
+                                                </div>
                                             </DropdownMenuItem>
                                         </DropdownMenuGroup>
                                         <DropdownMenuSeparator />

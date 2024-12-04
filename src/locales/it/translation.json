@@ -140,6 +140,7 @@
   "CustomCodes": "Codice personalizzato (stili e script)",
   "CustomCodesDashboard": "Codice personalizzato per dashboard",
   "DashboardOriginalHost": "Indirizzo di ancoraggio dell'agente [nome dominio/IP:porta]",
+  "ConfigTLS": "Usa TLS per connettere Agent",
   "CustomPublicDNSNameserversforDDNS": "Server dei nomi DNS pubblici personalizzati per DDNS",
   "RealIPHeader": "Intestazione della richiesta IP reale",
   "UseDirectConnectingIP": "Utilizzare l'IP di connessione diretta",

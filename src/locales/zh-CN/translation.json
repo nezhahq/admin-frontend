@@ -140,6 +140,7 @@
   "CustomCodes": "自定义代码（样式和脚本）",
   "CustomCodesDashboard": "仪表板的自定义代码",
   "DashboardOriginalHost": "Agent对接地址【域名/IP:端口】",
+  "ConfigTLS": "Agent 使用 TLS 连接",
   "CustomPublicDNSNameserversforDDNS": "DDNS 的自定义公共 DNS 名称服务器",
   "RealIPHeader": "真实IP请求头",
   "UseDirectConnectingIP": "使用直连 IP",

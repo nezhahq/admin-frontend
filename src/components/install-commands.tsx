@@ -7,7 +7,7 @@ import {
 import { Button, ButtonProps } from "@/components/ui/button"
 import { forwardRef, useState } from "react"
 import useSettings from "@/hooks/useSetting"
-import { ModelConfig } from "@/types"
+import { ModelSettingResponse } from "@/types"
 import { Check, Clipboard } from "lucide-react"
 import { toast } from "sonner"
 import { copyToClipboard } from "@/lib/utils"
@@ -62,7 +62,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
     );
 })
 
-const generateCommand = (type: number, { agent_secret_key, install_host, tls }: ModelConfig) => {
+const generateCommand = (type: number, { agent_secret_key, install_host, tls }: ModelSettingResponse) => {
     
     if (!install_host)
         throw new Error(i18next.t("Results.InstallHostRequired"));
@@ -72,7 +72,7 @@ const generateCommand = (type: number, { agent_secret_key, install_host, tls }: 
     switch (type) {
     case OSTypes.Linux:
     case OSTypes.macOS: {
-        return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o nezha.sh && chmod +x nezha.sh && env ${env} ./nezha.sh`
+        return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env ${env} ./agent.sh`
     }
     case OSTypes.Windows: {
         return `${env} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
