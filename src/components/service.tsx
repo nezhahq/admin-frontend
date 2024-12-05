@@ -29,7 +29,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelService, ModelServiceResponse } from "@/types"
+import { ModelService } from "@/types"
 import { createService, updateService } from "@/api/service"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -48,7 +48,7 @@ import { useTranslation } from "react-i18next";
 
 interface ServiceCardProps {
     data?: ModelService;
-    mutate: KeyedMutator<ModelServiceResponse>;
+    mutate: KeyedMutator<ModelService[]>;
 }
 
 const serviceFormSchema = z.object({

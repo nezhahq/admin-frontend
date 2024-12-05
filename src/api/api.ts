@@ -1,5 +1,3 @@
-import { useMainStore } from "@/hooks/useMainStore";
-
 interface CommonResponse<T> {
     success: boolean;
     error: string;
