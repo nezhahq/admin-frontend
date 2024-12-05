@@ -68,7 +68,7 @@ const generateCommand = (type: number, { agent_secret_key, install_host, tls }: 
         throw new Error(i18next.t("Results.InstallHostRequired"));
 
     const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`;
-    const env_win = `$env:NZ_SERVER=\"${install_host}\";$env:NZ_TLS=\"${tls || false}\";$env:NZ_CLIENT_SECRET=\"${agent_secret_key}\;"`;
+    const env_win = `$env:NZ_SERVER=\"${install_host}\";$env:NZ_TLS=\"${tls || false}\";$env:NZ_CLIENT_SECRET=\"${agent_secret_key}\";`;
 
     switch (type) {
     case OSTypes.Linux:
