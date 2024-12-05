@@ -9,10 +9,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { ModelServiceResponse, ModelServiceResponseItem as Service } from "@/types";
+import { ModelService as Service } from "@/types";
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import useSWR from "swr";
-import { conv } from "@/lib/utils";
 import { useEffect, useMemo } from "react";
 import { serviceTypes } from "@/types";
 import { ActionButtonGroup } from "@/components/action-button-group";
@@ -24,8 +23,8 @@ import { useTranslation } from "react-i18next";
 
 export default function ServicePage() {
     const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<ModelServiceResponse>(
-        "/api/v1/service",
+    const { data, mutate, error, isLoading } = useSWR<Service[]>(
+        "/api/v1/service/list",
         swrFetcher
     );
 
@@ -62,33 +61,33 @@ export default function ServicePage() {
         },
         {
             header: "ID",
-            accessorKey: "service.id",
-            accessorFn: (row) => row.service.id,
+            accessorKey: "id",
+            accessorFn: (row) => row.id,
         },
         {
             header: t("Name"),
-            accessorFn: (row) => row.service.name,
-            accessorKey: "service.name",
+            accessorFn: (row) => row.name,
+            accessorKey: "name",
             cell: ({ row }) => {
                 const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{s.service.name}</div>;
+                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>;
             },
         },
         {
             header: t("Target"),
-            accessorFn: (row) => row.service.target,
-            accessorKey: "service.target",
+            accessorFn: (row) => row.target,
+            accessorKey: "target",
             cell: ({ row }) => {
                 const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{s.service.target}</div>;
+                return <div className="max-w-24 whitespace-normal break-words">{s.target}</div>;
             },
         },
         {
             header: t("Coverage"),
-            accessorKey: "service.cover",
-            accessorFn: (row) => row.service.cover,
+            accessorKey: "cover",
+            accessorFn: (row) => row.cover,
             cell: ({ row }) => {
-                const s = row.original.service;
+                const s = row.original;
                 return (
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
@@ -107,39 +106,39 @@ export default function ServicePage() {
         },
         {
             header: t("SpecificServers"),
-            accessorKey: "service.skipServers",
-            accessorFn: (row) => Object.keys(row.service.skip_servers ?? {}),
+            accessorKey: "skipServers",
+            accessorFn: (row) => Object.keys(row.skip_servers ?? {}),
         },
         {
             header: t("Type"),
-            accessorKey: "service.type",
-            accessorFn: (row) => row.service.type,
-            cell: ({ row }) => serviceTypes[row.original.service.type] || "",
+            accessorKey: "type",
+            accessorFn: (row) => row.type,
+            cell: ({ row }) => serviceTypes[row.original.type] || "",
         },
         {
             header: t("Interval"),
-            accessorKey: "service.duration",
-            accessorFn: (row) => row.service.duration,
+            accessorKey: "duration",
+            accessorFn: (row) => row.duration,
         },
         {
             header: t("NotifierGroupID"),
-            accessorKey: "service.ngroup",
-            accessorFn: (row) => row.service.notification_group_id,
+            accessorKey: "ngroup",
+            accessorFn: (row) => row.notification_group_id,
         },
         {
             header: t("Trigger"),
-            accessorKey: "service.triggerTask",
-            accessorFn: (row) => row.service.enable_trigger_task ?? false,
+            accessorKey: "triggerTask",
+            accessorFn: (row) => row.enable_trigger_task ?? false,
         },
         {
             header: t("TasksToTriggerOnAlert"),
-            accessorKey: "service.failTriggerTasks",
-            accessorFn: (row) => row.service.fail_trigger_tasks,
+            accessorKey: "failTriggerTasks",
+            accessorFn: (row) => row.fail_trigger_tasks,
         },
         {
             header: t("TasksToTriggerAfterRecovery"),
-            accessorKey: "service.recoverTriggerTasks",
-            accessorFn: (row) => row.service.recover_trigger_tasks,
+            accessorKey: "recoverTriggerTasks",
+            accessorFn: (row) => row.recover_trigger_tasks,
         },
         {
             id: "actions",
@@ -149,21 +148,21 @@ export default function ServicePage() {
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
-                        delete={{ fn: deleteService, id: s.service.id, mutate: mutate }}
+                        delete={{ fn: deleteService, id: s.id, mutate: mutate }}
                     >
-                        <ServiceCard mutate={mutate} data={s.service} />
+                        <ServiceCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
                 );
             },
         },
     ];
 
-    const dataArr = useMemo(() => {
-        return conv.recordToArr(data?.services ?? {});
-    }, [data?.services]);
+    const dataCache = useMemo(() => {
+        return data ?? [];
+    }, [data]);
 
     const table = useReactTable({
-        data: dataArr,
+        data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
@@ -178,7 +177,7 @@ export default function ServicePage() {
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
                         fn: deleteService,
-                        id: selectedRows.map((r) => r.original.service.id),
+                        id: selectedRows.map((r) => r.original.id),
                         mutate: mutate,
                     }}
                 >

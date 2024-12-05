@@ -63,6 +63,12 @@ export interface GithubComNezhahqNezhaModelCommonResponseArrayModelServerGroupRe
   success: boolean;
 }
 
+export interface GithubComNezhahqNezhaModelCommonResponseArrayModelService {
+  data: ModelService[];
+  error: string;
+  success: boolean;
+}
+
 export interface GithubComNezhahqNezhaModelCommonResponseArrayModelServiceInfos {
   data: ModelServiceInfos[];
   error: string;
@@ -604,6 +610,7 @@ export interface ModelSettingResponse {
   jwt_secret_key: string;
   /** 系统语言，默认 zh_CN */
   language: string;
+  listen_host: string;
   listen_port: number;
   /** 时区，默认为 Asia/Shanghai */
   location: string;
