@@ -561,7 +561,7 @@ export interface ModelServiceResponseItem {
   current_up: number;
   delay: number[];
   down: number[];
-  service: ModelService;
+  service_name: string;
   total_down: number;
   total_up: number;
   up: number[];
