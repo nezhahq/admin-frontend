@@ -150,7 +150,7 @@ export const TerminalPage = () => {
         <div className="px-8">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">
-                    Terminal
+                    {`Terminal (${id})`}
                 </h1>
                 <div className="flex-2 flex ml-auto gap-2">
                     <FMCard id={id} />

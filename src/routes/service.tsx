@@ -33,7 +33,7 @@ export default function ServicePage() {
             toast(t("Error"), {
                 description: t("Results.ErrorFetchingResource", { error: error.message }),
             });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     const columns: ColumnDef<Service>[] = [
@@ -43,7 +43,7 @@ export default function ServicePage() {
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
@@ -92,12 +92,12 @@ export default function ServicePage() {
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
                             switch (s.cover) {
-                            case 0: {
-                                return <span>{t("CoverAll")}</span>;
-                            }
-                            case 1: {
-                                return <span>{t("IgnoreAll")}</span>;
-                            }
+                                case 0: {
+                                    return <span>{t("CoverAll")}</span>;
+                                }
+                                case 1: {
+                                    return <span>{t("IgnoreAll")}</span>;
+                                }
                             }
                         })()}
                     </div>
@@ -106,8 +106,10 @@ export default function ServicePage() {
         },
         {
             header: t("SpecificServers"),
-            accessorKey: "skipServers",
-            accessorFn: (row) => Object.keys(row.skip_servers ?? {}),
+            cell: ({ row }) => {
+                const s = row.original;
+                return <div className="max-w-32 whitespace-normal break-words">{Object.keys(s.skip_servers ?? {}).join(',')}</div>;
+            }
         },
         {
             header: t("Type"),
