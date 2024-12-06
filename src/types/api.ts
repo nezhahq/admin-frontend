@@ -587,6 +587,14 @@ export interface ModelSettingForm {
   tls?: boolean;
 }
 
+export interface ModelUserTemplateItem {
+  path: string;
+  name: string;
+  repository: string;
+  author: string;
+  community: boolean;
+}
+
 export interface ModelSettingResponse {
   agent_secret_key: string;
   avg_ping_count: number;
@@ -619,6 +627,9 @@ export interface ModelSettingResponse {
   site_name: string;
   tls: boolean;
   version: string;
+  /** 前台主题 */
+  user_templates: ModelUserTemplateItem[];
+  user_template: string;
 }
 
 export interface ModelStreamServer {

@@ -152,5 +152,13 @@
   "NewUser": "New user",
   "Count": "Count",
   "LastBlockReason": "Last Block Reason",
-  "LastBlockTime": "Last ban time"
+  "LastBlockTime": "Last ban time",
+  "Theme": "Theme",
+  "Author": "Author",
+  "Repository": "Repository",
+  "Community": "Community",
+  "Official": "Official",
+  "CommunityThemeWarning": "You are using a community theme",
+  "CommunityThemeDescription": "This theme is provided by the community, use it at your own risk",
+  "Cancel": "Cancel"
 }
