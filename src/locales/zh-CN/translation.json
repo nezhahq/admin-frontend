@@ -152,5 +152,13 @@
   "NewUser": "新用户",
   "Count": "计数",
   "LastBlockReason": "最后封禁原因",
-  "LastBlockTime": "最后封禁时间"
+  "LastBlockTime": "最后封禁时间",
+  "Theme": "主题",
+  "Author": "作者",
+  "Repository": "仓库",
+  "Community": "社区",
+  "Official": "官方",
+  "CommunityThemeWarning": "正在使用社区主题",
+  "CommunityThemeDescription": "社区主题未经官方审计，需自行甄别风险。",
+  "Cancel": "取消"
 }

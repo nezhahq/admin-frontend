@@ -152,5 +152,13 @@
   "NewUser": "Nuovo utente",
   "Count": "Contare",
   "LastBlockReason": "Motivo dell'ultimo divieto",
-  "LastBlockTime": "L'ultima volta che è stato vietato"
+  "LastBlockTime": "L'ultima volta che è stato vietato",
+  "Theme": "Tema",
+  "Author": "Autore",
+  "Repository": "Repository",
+  "Community": "Comunità",
+  "Official": "Ufficiale",
+  "CommunityThemeWarning": "Questo tema appartiene alla comunità",
+  "CommunityThemeDescription": "Questo tema viene fornito dalla comunità, utilizzalo a tuo rischio e pericolo",
+  "Cancel": "Annulla"
 }
