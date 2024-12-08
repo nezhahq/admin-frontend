@@ -212,6 +212,14 @@ export const MultiSelect = React.forwardRef<
       }
     };
 
+    const stopWheelEventPropagation: React.WheelEventHandler = (e) => {
+      e.stopPropagation();
+    };
+
+    const stopTouchMoveEventPropagation: React.TouchEventHandler = (e) => {
+      e.stopPropagation();
+    };
+
     return (
       <Popover
         open={isPopoverOpen}
@@ -306,6 +314,8 @@ export const MultiSelect = React.forwardRef<
           className="w-auto p-0"
           align="start"
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
+          onWheel={stopWheelEventPropagation}
+          onTouchMove={stopTouchMoveEventPropagation}
         >
           <Command>
             <CommandInput
