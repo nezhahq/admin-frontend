@@ -67,9 +67,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
 
     useEffect(() => {
         return () => {
-            if (wsRef.current) {
-                wsRef.current.close();
-            }
+            wsRef.current?.close();
         };
     }, []);
 
