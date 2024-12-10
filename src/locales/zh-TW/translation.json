@@ -8,7 +8,7 @@
   "Username": "用戶名",
   "Password": "密碼",
   "Results": {
-    "UsernameMin": "使用者名稱必須至少有 2 個字元。",
+    "UsernameMin": "使用者名稱必須至少有 {{number}} 個字元。",
     "PasswordRequired": "密碼不能為空。",
     "ErrorFetchingResource": "取得資源時發生錯誤：{{error}}",
     "SelectAtLeastOneServer": "請至少選擇一台伺服器。",
@@ -18,7 +18,7 @@
     "ThisOperationIsUnrecoverable": "這個操作將無法恢復！",
     "TaskTriggeredSuccessfully": "任務觸發成功",
     "TheServerDoesNotOnline": "伺服器不存在或尚未連接",
-    "InstallHostRequired": "設定中尚未填寫Agent對接位址",
+    "InstallHostRequired": "設定中尚未填寫Agent對接位址。",
     "UnknownIdentifier": "未知標識符"
   },
   "Login": "登入",
@@ -114,7 +114,7 @@
   "Credential": "憑證",
   "RequestType": "請求類型",
   "RequestBody": "請求主體",
-  "FileManager": "文件管理器",
+  "FileManager": "檔案列表",
   "Downloading": "下載中",
   "Uploading": "上傳中",
   "EditNAT": "編輯內網穿透",
@@ -156,9 +156,9 @@
   "Theme": "主題",
   "Author": "作者",
   "Repository": "仓库",
-  "Community": "社区",
+  "Community": "社群",
   "Official": "官方",
   "CommunityThemeWarning": "正在使用社區主題",
-  "CommunityThemeDescription": "社區主題未經官方審計，需自行甄別風險。",
+  "CommunityThemeDescription": "社群主題未經官方審計，需自行甄別風險",
   "Cancel": "取消"
 }
