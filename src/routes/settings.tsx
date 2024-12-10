@@ -79,7 +79,7 @@ export default function SettingsPage() {
             ? {
                 ...config,
                 site_name: config.site_name || "",
-                user_template: config.user_template || Object.keys(config.user_templates || {})[0] || "user-dist",
+                user_template: config.user_template || Object.keys(config.frontend_templates || {})[0] || "user-dist",
             }
             : {
                 ip_change_notification_group_id: 0,
@@ -111,7 +111,7 @@ export default function SettingsPage() {
         } finally {
             if (values.language != i18n.language) {
                 i18n.changeLanguage(values.language);
-            } 
+            }
             toast(t("Success"));
         }
     };
@@ -168,12 +168,12 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>{t("Theme")}</FormLabel>
                                     <FormControl>
-                                        <Select 
+                                        <Select
                                             value={field.value}
                                             onValueChange={(value) => {
-                                                const template = config?.user_templates?.find(t => t.path === value);
+                                                const template = config?.frontend_templates?.find(t => t.path === value);
                                                 if (template) {
-                                                    form.setValue("user_template", template.path);
+                                                    form.setValue("user_template", template.path ?? '');
                                                 }
                                             }}
                                         >
@@ -183,18 +183,18 @@ export default function SettingsPage() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {(config?.user_templates || []).map((template) => (
+                                                {(config?.frontend_templates?.filter(t => !t.is_admin) || []).map((template) => (
                                                     <div key={template.path}>
-                                                        <SelectItem value={template.path}>
+                                                        <SelectItem value={template.path!}>
                                                             <div className="flex flex-col items-start gap-1">
                                                                 <div className="font-medium">{template.name}</div>
                                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                                     <span>{t("Author")}: {template.author}</span>
-                                                                    {template.community ? (
+                                                                    {!template.is_official ? (
                                                                         <span className="px-1.5 py-0.5 rounded-md bg-red-100 text-red-800 text-xs">
                                                                             {t("Community")}
                                                                         </span>
-                                                                    ): (
+                                                                    ) : (
                                                                         <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-xs">
                                                                             {t("Official")}
                                                                         </span>
@@ -203,7 +203,7 @@ export default function SettingsPage() {
                                                             </div>
                                                         </SelectItem>
                                                         <div className="px-8 py-1">
-                                                            <a 
+                                                            <a
                                                                 href={template.repository}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
@@ -218,7 +218,7 @@ export default function SettingsPage() {
                                         </Select>
                                     </FormControl>
                                     <FormMessage />
-                                    {config?.user_templates?.find(t => t.path === field.value)?.community && (
+                                    {!config?.frontend_templates?.find(t => t.path === field.value)?.is_official && (
                                         <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
                                             <div className="font-medium text-lg mb-1">{t("CommunityThemeWarning")}</div>
                                             <div className="text-yellow-700 dark:text-yellow-200">{t("CommunityThemeDescription")}</div>
