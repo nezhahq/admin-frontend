@@ -32,7 +32,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 const settingFormSchema = z.object({
-    custom_nameservers: asOptionalField(z.string()),
+    dns_servers: asOptionalField(z.string()),
     ignored_ip_notification: asOptionalField(z.string()),
     ip_change_notification_group_id: z.coerce.number().int().min(0),
     cover: z.coerce.number().int().min(1),
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                         />
                         <FormField
                             control={form.control}
-                            name="custom_nameservers"
+                            name="dns_servers"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
