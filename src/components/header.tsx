@@ -57,19 +57,72 @@ export default function Header() {
 
     return (
         isDesktop ? (
-            <header className="h-16 flex items-center border-b-2 px-4 overflow-x-auto">
-                <NavigationMenu className="sm:max-w-full">
-                    <NavigationMenuList>
-                        <Card className="mr-1">
+            <header className="flex pt-8 px-4 overflow-x-auto dark:bg-black/40 bg-muted border-b-[1px]">
+                <NavigationMenu className="flex flex-col items-start max-w-7xl mx-auto">
+                    <section className="w-full flex items-center  justify-between">
+                        <div className="flex justify-between items-center w-full">
                             <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + ' !text-foreground'}>
-                                <Link to={profile ? "/dashboard" : '#'}><img className="h-7 mr-1" src='/dashboard/logo.svg' /> {t("nezha")}</Link>
+                                <Link to={profile ? "/dashboard" : '#'}>
+                                    <img className="h-7 mr-1" src='/dashboard/logo.svg' />
+                                    {t("nezha")}
+                                </Link>
                             </NavigationMenuLink>
-                        </Card>
 
+                            <div className="flex items-center gap-1">
+                                <ModeToggle />
+                                {
+                                    profile && <>
+                                        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                                            <DropdownMenuTrigger asChild>
+                                                <Avatar className="ml-1 h-8 w-8 cursor-pointer border-foreground border-[1px]">
+                                                    <AvatarImage src={'https://api.dicebear.com/7.x/notionists/svg?seed=' + profile.username} alt={profile.username} />
+                                                    <AvatarFallback>{profile.username}</AvatarFallback>
+                                                </Avatar>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-32">
+                                                <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuGroup>
+                                                    <DropdownMenuItem onClick={() => {
+                                                        setDropdownOpen(false)
+                                                        navigate("/dashboard/profile")
+                                                    }}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <div className="flex items-center gap-2 w-full">
+                                                            <User2 />
+                                                            {t('Profile')}
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => {
+                                                        setDropdownOpen(false)
+                                                        navigate("/dashboard/settings")
+                                                    }}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <div className="flex items-center gap-2 w-full">
+                                                            <Settings />
+                                                            {t('Settings')}
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuGroup>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                                                    <LogOut />
+                                                    {t('Logout')}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </>
+                                }
+                            </div>
+                        </div>
+                    </section>
+                    <div className="flex mt-4 list-none">
                         {
                             profile && (
                                 <>
-                                    <NavigationMenuItem>
+                                    <NavigationMenuItem >
                                         <NzNavigationMenuLink asChild active={location.pathname === "/dashboard"} className={navigationMenuTriggerStyle()}>
                                             <Link to="/dashboard">{t("Server")}</Link>
                                         </NzNavigationMenuLink>
@@ -106,54 +159,6 @@ export default function Header() {
                                     </NavigationMenuItem>
                                 </>
                             )
-                        }
-                    </NavigationMenuList>
-                    <div className="ml-auto flex items-center gap-1">
-                        <ModeToggle />
-                        {
-                            profile && <>
-                                <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                                    <DropdownMenuTrigger asChild>
-                                        <Avatar className="ml-1 h-8 w-8 cursor-pointer border-foreground border-[1px]">
-                                            <AvatarImage src={'https://api.dicebear.com/7.x/notionists/svg?seed=' + profile.username} alt={profile.username} />
-                                            <AvatarFallback>{profile.username}</AvatarFallback>
-                                        </Avatar>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-32">
-                                        <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuGroup>
-                                            <DropdownMenuItem onClick={() => {
-                                                setDropdownOpen(false)
-                                                navigate("/dashboard/profile")
-                                            }}
-                                                className="cursor-pointer"
-                                            >
-                                                <div className="flex items-center gap-2 w-full">
-                                                    <User2 />
-                                                    {t('Profile')}
-                                                </div>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => {
-                                                setDropdownOpen(false)
-                                                navigate("/dashboard/settings")
-                                            }}
-                                                className="cursor-pointer"
-                                            >
-                                                <div className="flex items-center gap-2 w-full">
-                                                    <Settings />
-                                                    {t('Settings')}
-                                                </div>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuGroup>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={logout} className="cursor-pointer">
-                                            <LogOut />
-                                            {t('Logout')}
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </>
                         }
                     </div>
                 </NavigationMenu>
