@@ -7,6 +7,8 @@
   },
   "Username": "用戶名",
   "Password": "密碼",
+  "LoginFirst": "請先登錄",
+  "CurrentTime": "當前時間",
   "Results": {
     "UsernameMin": "使用者名稱必須至少有 2 個字元。",
     "PasswordRequired": "密碼不能為空。",

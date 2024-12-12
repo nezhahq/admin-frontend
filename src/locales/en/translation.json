@@ -7,6 +7,8 @@
   },
   "Username": "Username",
   "Password": "Password",
+  "LoginFirst": "Please log in first",
+  "CurrentTime": "Current time",
   "Results": {
     "UsernameMin": "Username must be at least {{number}} characters.",
     "PasswordRequired": "Password cannot be empty.",

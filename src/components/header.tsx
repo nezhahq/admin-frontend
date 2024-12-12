@@ -400,6 +400,7 @@ const useInterval = (callback: () => void, delay?: number | null) => {
 }
 
 function Overview() {
+    const { t } = useTranslation()
     const profile = useMainStore((store) => store.profile)
     const timeOption = DateTime.TIME_SIMPLE
     timeOption.hour12 = true
@@ -420,9 +421,11 @@ function Overview() {
                     </p>
                 </div>
             )}
-            {!profile && <p className="text-sm font-semibold">请先登录</p>}
+            {!profile && <p className="text-sm font-semibold">{t("LoginFirst")}</p>}
             <div className="flex items-center gap-1.5">
-                <p className="text-[13px] font-medium opacity-50">当前时间</p>
+                <p className="text-[13px] font-medium opacity-50">
+                    {t("CurrentTime")}
+                </p>
                 <p className="opacity-1 text-[13px] font-medium">
                     {timeString}
                 </p>
