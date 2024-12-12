@@ -1,6 +1,6 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
-import { NATCard } from "@/components/nat";
+import { swrFetcher } from '@/api/api'
+import { Checkbox } from '@/components/ui/checkbox'
+import { NATCard } from '@/components/nat'
 import {
     Table,
     TableBody,
@@ -8,40 +8,52 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ModelNAT } from "@/types";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-import { deleteNAT } from "@/api/nat";
+} from '@/components/ui/table'
+import { ModelNAT } from '@/types'
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from '@tanstack/react-table'
+import useSWR from 'swr'
+import { useEffect, useMemo } from 'react'
+import { ActionButtonGroup } from '@/components/action-button-group'
+import { HeaderButtonGroup } from '@/components/header-button-group'
+import { toast } from 'sonner'
+import { deleteNAT } from '@/api/nat'
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next'
 
 export default function NATPage() {
-    const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<ModelNAT[]>("/api/v1/nat", swrFetcher);
+    const { t } = useTranslation()
+    const { data, mutate, error, isLoading } = useSWR<ModelNAT[]>(
+        '/api/v1/nat',
+        swrFetcher,
+    )
 
     useEffect(() => {
         if (error)
-            toast(t("Error"), {
-                description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+            toast(t('Error'), {
+                description: t('Results.ErrorFetchingResource', {
+                    error: error.message,
+                }),
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [error])
 
     const columns: ColumnDef<ModelNAT>[] = [
         {
-            id: "select",
+            id: 'select',
             header: ({ table }) => (
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && 'indeterminate')
                     }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    onCheckedChange={(value) =>
+                        table.toggleAllPageRowsSelected(!!value)
+                    }
                     aria-label="Select all"
                 />
             ),
@@ -56,47 +68,59 @@ export default function NATPage() {
             enableHiding: false,
         },
         {
-            header: "ID",
-            accessorKey: "id",
+            header: 'ID',
+            accessorKey: 'id',
             accessorFn: (row) => row.id,
         },
         {
-            header: t("Name"),
-            accessorKey: "name",
+            header: t('Name'),
+            accessorKey: 'name',
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.name}
+                    </div>
+                )
             },
         },
         {
-            header: t("Server")+" ID",
-            accessorKey: "serverID",
+            header: t('Server') + ' ID',
+            accessorKey: 'serverID',
             accessorFn: (row) => row.server_id,
         },
         {
-            header: t("LocalService"),
-            accessorKey: "host",
+            header: t('LocalService'),
+            accessorKey: 'host',
             accessorFn: (row) => row.host,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.host}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.host}
+                    </div>
+                )
             },
         },
         {
-            header: t("BindHostname"),
-            accessorKey: "domain",
+            header: t('BindHostname'),
+            accessorKey: 'domain',
             accessorFn: (row) => row.domain,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.domain}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.domain}
+                    </div>
+                )
             },
         },
         {
-            id: "actions",
-            header: t("Actions"),
+            id: 'actions',
+            header: t('Actions'),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -104,27 +128,30 @@ export default function NATPage() {
                     >
                         <NATCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
         <div className="px-3">
             <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight"> {t("NATT")}</h1>
+                <h1 className="flex-1 text-3xl font-bold tracking-tight">
+                    {' '}
+                    {t('NATT')}
+                </h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -143,12 +170,19 @@ export default function NATPage() {
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <TableHead key={header.id} className="text-sm">
+                                    <TableHead
+                                        key={header.id}
+                                        className="text-sm"
+                                    >
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -156,29 +190,44 @@ export default function NATPage() {
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center"
+                            >
+                                {t('Loading')}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                            <TableRow
+                                key={row.id}
+                                data-state={row.getIsSelected() && 'selected'}
+                            >
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    <TableCell
+                                        key={cell.id}
+                                        className="text-xsm"
+                                    >
+                                        {flexRender(
+                                            cell.column.columnDef.cell,
+                                            cell.getContext(),
+                                        )}
                                     </TableCell>
                                 ))}
                             </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center"
+                            >
+                                {t('NoResults')}
                             </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }

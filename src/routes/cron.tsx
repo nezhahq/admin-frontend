@@ -1,5 +1,5 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
+import { swrFetcher } from '@/api/api'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
     Table,
     TableBody,
@@ -7,43 +7,55 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ModelCron } from "@/types";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-import { deleteCron, runCron } from "@/api/cron";
-import { CronCard } from "@/components/cron";
-import { cronTypes } from "@/types";
-import { IconButton } from "@/components/xui/icon-button";
+} from '@/components/ui/table'
+import { ModelCron } from '@/types'
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from '@tanstack/react-table'
+import useSWR from 'swr'
+import { useEffect, useMemo } from 'react'
+import { ActionButtonGroup } from '@/components/action-button-group'
+import { HeaderButtonGroup } from '@/components/header-button-group'
+import { toast } from 'sonner'
+import { deleteCron, runCron } from '@/api/cron'
+import { CronCard } from '@/components/cron'
+import { cronTypes } from '@/types'
+import { IconButton } from '@/components/xui/icon-button'
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next'
 
 export default function CronPage() {
-    const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<ModelCron[]>("/api/v1/cron", swrFetcher);
+    const { t } = useTranslation()
+    const { data, mutate, error, isLoading } = useSWR<ModelCron[]>(
+        '/api/v1/cron',
+        swrFetcher,
+    )
 
     useEffect(() => {
         if (error)
-            toast(t("Error"), {
-                description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+            toast(t('Error'), {
+                description: t('Results.ErrorFetchingResource', {
+                    error: error.message,
+                }),
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [error])
 
     const columns: ColumnDef<ModelCron>[] = [
         {
-            id: "select",
+            id: 'select',
             header: ({ table }) => (
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && 'indeterminate')
                     }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    onCheckedChange={(value) =>
+                        table.toggleAllPageRowsSelected(!!value)
+                    }
                     aria-label="Select all"
                 />
             ),
@@ -58,95 +70,107 @@ export default function CronPage() {
             enableHiding: false,
         },
         {
-            header: "ID",
-            accessorKey: "id",
+            header: 'ID',
+            accessorKey: 'id',
             accessorFn: (row) => row.id,
         },
         {
-            header: t("Name"),
-            accessorKey: "name",
+            header: t('Name'),
+            accessorKey: 'name',
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {s.name}
+                    </div>
+                )
             },
         },
         {
-            header: t("Type"),
-            accessorKey: "taskType",
-            accessorFn: (row) => cronTypes[row.task_type] || "",
+            header: t('Type'),
+            accessorKey: 'taskType',
+            accessorFn: (row) => cronTypes[row.task_type] || '',
         },
         {
-            header: t("CronExpression"),
-            accessorKey: "scheduler",
+            header: t('CronExpression'),
+            accessorKey: 'scheduler',
             accessorFn: (row) => row.scheduler,
         },
         {
-            header: t("Command"),
-            accessorKey: "command",
+            header: t('Command'),
+            accessorKey: 'command',
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-48 whitespace-normal break-words">{s.command}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        {s.command}
+                    </div>
+                )
             },
         },
         {
-            header: t("NotifierGroup"),
-            accessorKey: "ngroup",
+            header: t('NotifierGroup'),
+            accessorKey: 'ngroup',
             accessorFn: (row) => row.notification_group_id,
         },
         {
-            header: t("SendSuccessNotification"),
-            accessorKey: "pushSuccessful",
+            header: t('SendSuccessNotification'),
+            accessorKey: 'pushSuccessful',
             accessorFn: (row) => row.push_successful ?? false,
         },
         {
-            header: t("Coverage"),
-            accessorKey: "cover",
+            header: t('Coverage'),
+            accessorKey: 'cover',
             accessorFn: (row) => row.cover,
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
                             switch (s.cover) {
-                            case 0: {
-                                return <span>Ignore All</span>;
-                            }
-                            case 1: {
-                                return <span>Cover All</span>;
-                            }
-                            case 2: {
-                                return <span>On alert</span>;
-                            }
+                                case 0: {
+                                    return <span>Ignore All</span>
+                                }
+                                case 1: {
+                                    return <span>Cover All</span>
+                                }
+                                case 2: {
+                                    return <span>On alert</span>
+                                }
                             }
                         })()}
                     </div>
-                );
+                )
             },
         },
         {
-            header: t("SpecificServers"),
-            accessorKey: "servers",
+            header: t('SpecificServers'),
+            accessorKey: 'servers',
             accessorFn: (row) => row.servers,
         },
         {
-            header: t("LastExecution"),
-            accessorKey: "lastExecution",
+            header: t('LastExecution'),
+            accessorKey: 'lastExecution',
             accessorFn: (row) => row.last_executed_at,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{s.last_executed_at}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-24 whitespace-normal break-words">
+                        {s.last_executed_at}
+                    </div>
+                )
             },
         },
         {
-            header: t("Result"),
-            accessorKey: "lastResult",
+            header: t('Result'),
+            accessorKey: 'lastResult',
             accessorFn: (row) => row.last_result ?? false,
         },
         {
-            id: "actions",
-            header: t("Actions"),
+            id: 'actions',
+            header: t('Actions'),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -158,45 +182,51 @@ export default function CronPage() {
                                 icon="play"
                                 onClick={async () => {
                                     try {
-                                        await runCron(s.id);
+                                        await runCron(s.id)
                                     } catch (e) {
-                                        console.error(e);
-                                        toast(t("Error"), {
-                                            description: t("Results.UnExpectedError"),
-                                        });
-                                        await mutate();
-                                        return;
+                                        console.error(e)
+                                        toast(t('Error'), {
+                                            description: t(
+                                                'Results.UnExpectedError',
+                                            ),
+                                        })
+                                        await mutate()
+                                        return
                                     }
-                                    toast(t("Success"), {
-                                        description: t("Results.TaskTriggeredSuccessfully"),
-                                    });
-                                    await mutate();
+                                    toast(t('Success'), {
+                                        description: t(
+                                            'Results.TaskTriggeredSuccessfully',
+                                        ),
+                                    })
+                                    await mutate()
                                 }}
                             />
                             <CronCard mutate={mutate} data={s} />
                         </>
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
         <div className="px-3">
             <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("Task")}</h1>
+                <h1 className="flex-1 text-3xl font-bold tracking-tight">
+                    {t('Task')}
+                </h1>
                 <HeaderButtonGroup
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
@@ -215,12 +245,19 @@ export default function CronPage() {
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <TableHead key={header.id} className="text-sm">
+                                    <TableHead
+                                        key={header.id}
+                                        className="text-sm"
+                                    >
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -228,29 +265,44 @@ export default function CronPage() {
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center"
+                            >
+                                {t('Loading')}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                            <TableRow
+                                key={row.id}
+                                data-state={row.getIsSelected() && 'selected'}
+                            >
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    <TableCell
+                                        key={cell.id}
+                                        className="text-xsm"
+                                    >
+                                        {flexRender(
+                                            cell.column.columnDef.cell,
+                                            cell.getContext(),
+                                        )}
                                     </TableCell>
                                 ))}
                             </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center"
+                            >
+                                {t('NoResults')}
                             </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }
