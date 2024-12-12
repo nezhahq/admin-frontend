@@ -10,16 +10,15 @@ import {
 import { Terminal } from "@xterm/xterm";
 import { AttachAddon } from "@xterm/addon-attach";
 import { FitAddon } from '@xterm/addon-fit';
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { sleep } from "@/lib/utils";
-import { IconButton } from "./xui/icon-button";
 import "@xterm/xterm/css/xterm.css";
-import { createTerminal } from "@/api/terminal";
-import { ModelCreateTerminalResponse } from "@/types";
 import { useParams } from 'react-router-dom';
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { FMCard } from "./fm";
+import useTerminal from "@/hooks/useTerminal";
+import { IconButton } from "./xui/icon-button";
 
 interface XtermProps {
     wsUrl: string;
@@ -27,18 +26,22 @@ interface XtermProps {
 }
 
 const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, setClose, ...props }) => {
-    const terminalRef = useRef<HTMLDivElement>(null);
+    const terminalIdRef = useRef<HTMLDivElement>(null);
+    const terminalRef = useRef<Terminal | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
         return () => {
-            if (wsRef.current) {
-                wsRef.current.close();
-            }
+            wsRef.current?.close();
+            terminalRef.current?.dispose();
         };
     }, []);
 
     useEffect(() => {
+        terminalRef.current = new Terminal({
+            cursorBlink: true,
+            fontSize: 16,
+        });
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
         ws.binaryType = "arraybuffer";
@@ -46,7 +49,7 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
             onResize();
         }
         ws.onclose = () => {
-            terminal.dispose();
+            terminalRef.current?.dispose();
             setClose(true);
         }
         ws.onerror = (e) => {
@@ -57,18 +60,12 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
         }
     }, [wsUrl]);
 
-    const terminal = useRef(
-        new Terminal({
-            cursorBlink: true,
-            fontSize: 16,
-        })
-    ).current;
 
     const fitAddon = useRef(new FitAddon()).current;
     const sendResize = useRef(false);
 
     const doResize = () => {
-        if (!terminalRef.current) return;
+        if (!terminalIdRef.current) return;
 
         fitAddon.fit();
 
@@ -104,11 +101,11 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
     };
 
     useEffect(() => {
-        if (!wsRef.current || !terminalRef.current) return;
+        if (!wsRef.current || !terminalIdRef.current || !terminalRef.current) return;
         const attachAddon = new AttachAddon(wsRef.current);
-        terminal.loadAddon(attachAddon);
-        terminal.loadAddon(fitAddon);
-        terminal.open(terminalRef.current);
+        terminalRef.current.loadAddon(attachAddon);
+        terminalRef.current.loadAddon(fitAddon);
+        terminalRef.current.open(terminalIdRef.current);
         window.addEventListener('resize', onResize);
         return () => {
             window.removeEventListener('resize', onResize);
@@ -116,36 +113,15 @@ const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({ w
                 wsRef.current.close();
             }
         };
-    }, [wsRef.current, terminal]);
+    }, [wsRef.current, terminalRef.current, terminalIdRef.current]);
 
-    return <div ref={terminalRef} {...props} />;
+    return <div ref={terminalIdRef} {...props} />;
 };
 
 export const TerminalPage = () => {
-    const [terminal, setTerminal] = useState<ModelCreateTerminalResponse | null>(null);
-    const [open, setOpen] = useState(false);
-
     const { id } = useParams<{ id: string }>();
-
-    const fetchTerminal = async () => {
-        if (id && !terminal) {
-            try {
-                const createdTerminal = await createTerminal(Number(id));
-                setTerminal(createdTerminal);
-            } catch (e) {
-                toast("Terminal API Error", {
-                    description: "View console for details.",
-                })
-                console.error("fetch error", e);
-                return;
-            }
-        }
-    }
-
-    useEffect(() => {
-        fetchTerminal();
-    }, [id]);
-
+    const [open, setOpen] = useState(false);
+    const terminal = useTerminal(id ? parseInt(id) : undefined);
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
@@ -158,7 +134,7 @@ export const TerminalPage = () => {
             </div>
             {terminal?.session_id
                 ?
-                <XtermComponent className="max-h-[60%] mb-5" wsUrl={`/api/v1/ws/terminal/${terminal.session_id}`} setClose={setOpen} />
+                <XtermComponent className="max-h-[60%] mb-5" wsUrl={`/api/v1/ws/terminal/${terminal?.session_id}`} setClose={setOpen} />
                 :
                 <p>The server does not exist, or have not been connected yet.</p>
             }

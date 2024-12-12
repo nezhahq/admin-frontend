@@ -7,14 +7,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      '^/api/v1/ws/.*': {
+        target: "ws://localhost:8008",
+        changeOrigin: true,
+        ws: true,
+      },
       '/api': {
         target: 'http://localhost:8008',
         changeOrigin: true,
-      },
-      '/api/v1/ws': {
-        target: 'http://localhost:8008',
-        changeOrigin: true,
-        ws: true,
       },
     },
   },

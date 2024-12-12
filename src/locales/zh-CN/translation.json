@@ -10,7 +10,7 @@
   "LoginFirst": "请先登录",
   "CurrentTime": "当前时间",
   "Results": {
-    "UsernameMin": "用户名必须至少有 2 个字符。",
+    "UsernameMin": "用户名必须至少有 {{number}} 个字符。",
     "PasswordRequired": "密码不能为空。",
     "ErrorFetchingResource": "获取资源时出错：{{error}}",
     "SelectAtLeastOneServer": "请至少选择一台服务器。",
@@ -20,7 +20,7 @@
     "ThisOperationIsUnrecoverable": "这个操作将无法恢复！",
     "TaskTriggeredSuccessfully": "任务触发成功",
     "TheServerDoesNotOnline": "服务器不存在或者还未连接",
-    "InstallHostRequired": "设置中尚未填写Agent对接地址",
+    "InstallHostRequired": "设置中尚未填写Agent对接地址。",
     "UnknownIdentifier": "未知标识符"
   },
   "Login": "登录",
@@ -116,7 +116,7 @@
   "Credential": "凭据",
   "RequestType": "请求类型",
   "RequestBody": "请求主体",
-  "FileManager": "文件管理器",
+  "FileManager": "文件列表",
   "Downloading": "下载中",
   "Uploading": "上传中",
   "EditNAT": "编辑内网穿透",
@@ -161,6 +161,6 @@
   "Community": "社区",
   "Official": "官方",
   "CommunityThemeWarning": "正在使用社区主题",
-  "CommunityThemeDescription": "社区主题未经官方审计，需自行甄别风险。",
+  "CommunityThemeDescription": "社区主题未经官方审计，需自行甄别风险",
   "Cancel": "取消"
 }
