@@ -149,7 +149,7 @@ export default function ServerPage() {
     const selectedRows = table.getSelectedRowModel().rows;
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <div className="flex mt-6 mb-4">
                 <h1 className="text-3xl font-bold tracking-tight">{t("Server")}</h1>
                 <HeaderButtonGroup

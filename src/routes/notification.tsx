@@ -135,7 +135,7 @@ export default function NotificationPage() {
     const selectedRows = table.getSelectedRowModel().rows;
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <div className="flex mt-6 mb-4">
                 <NotificationTab className="flex-1 mr-4 sm:max-w-[40%]" />
                 <HeaderButtonGroup

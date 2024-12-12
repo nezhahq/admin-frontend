@@ -117,7 +117,7 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <SettingsTab className="mt-6 mb-4 w-full" />
             <div>
                 <Form {...form}>

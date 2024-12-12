@@ -194,7 +194,7 @@ export default function CronPage() {
     const selectedRows = table.getSelectedRowModel().rows;
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("Task")}</h1>
                 <HeaderButtonGroup

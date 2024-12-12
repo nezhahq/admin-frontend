@@ -100,7 +100,7 @@ export default function UserPage() {
     const selectedRows = table.getSelectedRowModel().rows;
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <SettingsTab className="mt-6 w-full" />
             <div className="flex mt-4 mb-4">
                 <HeaderButtonGroup

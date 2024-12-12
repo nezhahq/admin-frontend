@@ -21,7 +21,11 @@ export default function Root() {
             <section className="text-sm mx-auto h-full flex flex-col justify-between">
                 <div>
                     <Header />
-                    <Outlet />
+                    <div className="max-w-5xl mx-auto">
+                        <Outlet />
+                    </div>
+
+
                 </div>
                 <footer className="mx-5 pb-5 text-foreground/60 font-thin text-center">
                     &copy; 2019-2024 {t('nezha')} {settings?.version}
