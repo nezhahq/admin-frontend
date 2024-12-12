@@ -4,6 +4,7 @@ import { getServerGroups } from "@/api/server-group"
 import { getServers } from "@/api/server"
 import { ServerContextProps } from "@/types"
 import { useLocation } from "react-router-dom"
+import { toast } from "sonner"
 
 const ServerContext = createContext<ServerContextProps>({});
 
@@ -28,7 +29,10 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children, withSe
                 try {
                     const sg = await getServerGroups();
                     setServerGroup(sg);
-                } catch (error) {
+                } catch (error: any) {
+                    toast("ServerProvider Error", {
+                        description: error.message,
+                    });
                     setServerGroup(undefined);
                 }
             })();
@@ -38,7 +42,10 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children, withSe
                     const s = await getServers();
                     const serverData = s.map(({ id, name }) => ({ id, name }));
                     setServer(serverData);
-                } catch (error) {
+                } catch (error: any) {
+                    toast("ServerProvider Error", {
+                        description: error.message,
+                    });
                     setServer(undefined);
                 }
             })();

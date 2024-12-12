@@ -22,8 +22,9 @@ export const AuthProvider = ({ children }: {
             try {
                 const user = await getProfile();
                 setProfile(user);
-            } catch (error) {
+            } catch (error: any) {
                 setProfile(undefined);
+                console.log("Error fetching profile", error);
             }
         })();
     }, [])

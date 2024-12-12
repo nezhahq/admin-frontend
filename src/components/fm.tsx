@@ -299,7 +299,14 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                             <DropdownMenuItem onClick={listFile}>{t('Refresh')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={
                                 async () => {
-                                    await copyToClipboard(formatPath(currentPath));
+                                    try {
+                                        await copyToClipboard(formatPath(currentPath));
+                                    } catch (error: any) {
+                                        toast("FM" + " " + t("Error"), {
+                                            description: error.message,
+                                        })
+                                        console.log("copy error: ", error);
+                                    }
                                 }
                             }>{t("CopyPath")}</DropdownMenuItem>
                             <AlertDialogTrigger asChild>

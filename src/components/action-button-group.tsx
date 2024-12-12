@@ -14,6 +14,7 @@ import { KeyedMutator } from "swr";
 import { buttonVariants } from "@/components/ui/button"
 
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 interface ButtonGroupProps<E, U> {
     className?: string;
@@ -24,7 +25,13 @@ interface ButtonGroupProps<E, U> {
 export function ActionButtonGroup<E, U>({ className, children, delete: { fn, id, mutate } }: ButtonGroupProps<E, U>) {
     const { t } = useTranslation();
     const handleDelete = async () => {
-        await fn([id]);
+        try {
+            await fn([id]);
+        } catch (error: any) {
+            toast(t("Error"), {
+                description: error.message,
+            });
+        }
         await mutate();
     }
 

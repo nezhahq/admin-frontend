@@ -4,6 +4,7 @@ import { getNotificationGroups } from "@/api/notification-group"
 import { getNotification } from "@/api/notification"
 import { NotificationContextProps } from "@/types"
 import { useLocation } from "react-router-dom"
+import { toast } from "sonner"
 
 const NotificationContext = createContext<NotificationContextProps>({});
 
@@ -28,7 +29,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                 try {
                     const ng = await getNotificationGroups();
                     setNotifierGroup(ng);
-                } catch (error) {
+                } catch (error: any) {
+                    toast("NotificationProvider Error", {
+                        description: error.message,
+                    });
                     setNotifierGroup(undefined);
                 }
             })();
@@ -38,7 +42,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                     const n = await getNotification();
                     const nData = n.map(({ id, name }) => ({ id, name }));
                     setNotifier(nData);
-                } catch (error) {
+                } catch (error: any) {
+                    toast("NotificationProvider Error", {
+                        description: error.message,
+                    });
                     setNotifier(undefined);
                 }
             })();
