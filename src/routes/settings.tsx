@@ -79,20 +79,21 @@ export default function SettingsPage() {
         resolver: zodResolver(settingFormSchema),
         defaultValues: config
             ? {
-                  ...config,
-                  site_name: config.site_name || '',
-                  user_template:
+                ...config,
+                site_name: config.site_name || '',
+                user_template:
                       config.user_template ||
-                      Object.keys(config.user_templates || {})[0] ||
+                      Object.keys(config.frontend_templates.filter((t) => !t.is_admin,
+                      ) || {})[0] ||
                       'user-dist',
-              }
+            }
             : {
-                  ip_change_notification_group_id: 0,
-                  cover: 1,
-                  site_name: '',
-                  language: '',
-                  user_template: 'user-dist',
-              },
+                ip_change_notification_group_id: 0,
+                cover: 1,
+                site_name: '',
+                language: '',
+                user_template: 'user-dist',
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -188,7 +189,7 @@ export default function SettingsPage() {
                                             value={field.value}
                                             onValueChange={(value) => {
                                                 const template =
-                                                    config?.user_templates?.find(
+                                                    config?.frontend_templates?.find(
                                                         (t) => t.path === value,
                                                     )
                                                 if (template) {
@@ -210,7 +211,7 @@ export default function SettingsPage() {
                                             </FormControl>
                                             <SelectContent>
                                                 {(
-                                                    config?.user_templates || []
+                                                    config?.frontend_templates.filter((t) => !t.is_admin) || []
                                                 ).map((template) => (
                                                     <div key={template.path}>
                                                         <SelectItem
@@ -234,7 +235,7 @@ export default function SettingsPage() {
                                                                             template.author
                                                                         }
                                                                     </span>
-                                                                    {template.community ? (
+                                                                    {!template.is_official ? (
                                                                         <span className="px-1.5 py-0.5 rounded-md bg-red-100 text-red-800 text-xs">
                                                                             {t(
                                                                                 'Community',
@@ -270,9 +271,9 @@ export default function SettingsPage() {
                                         </Select>
                                     </FormControl>
                                     <FormMessage />
-                                    {config?.user_templates?.find(
+                                    {!config?.frontend_templates?.find(
                                         (t) => t.path === field.value,
-                                    )?.community && (
+                                    )?.is_official && (
                                         <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
                                             <div className="font-medium text-lg mb-1">
                                                 {t('CommunityThemeWarning')}

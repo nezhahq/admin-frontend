@@ -592,7 +592,9 @@ export interface ModelUserTemplateItem {
   name: string;
   repository: string;
   author: string;
-  community: boolean;
+  version: string;
+  is_admin: boolean;
+  is_official: boolean;
 }
 
 export interface ModelSettingResponse {
@@ -628,7 +630,7 @@ export interface ModelSettingResponse {
   tls: boolean;
   version: string;
   /** 前台主题 */
-  user_templates: ModelUserTemplateItem[];
+  frontend_templates: ModelUserTemplateItem[];
   user_template: string;
 }
 
