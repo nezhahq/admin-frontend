@@ -416,9 +416,14 @@ function Overview() {
         <section className={'flex flex-col'}>
             {profile && (
                 <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-semibold">
+                    <div className="flex gap-1.5 text-sm font-semibold">
                         👋 Hi, {profile?.username}
-                    </p>
+                        {profile?.login_ip && (
+                            <p className='font-medium opacity-45'>
+                            from {profile?.login_ip}
+                            </p> 
+                        )}
+                    </div>
                 </div>
             )}
             {!profile && <p className="text-sm font-semibold">{t("LoginFirst")}</p>}
