@@ -109,12 +109,12 @@ export default function ServicePage() {
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
                             switch (s.cover) {
-                                case 0: {
-                                    return <span>{t('CoverAll')}</span>
-                                }
-                                case 1: {
-                                    return <span>{t('IgnoreAll')}</span>
-                                }
+                            case 0: {
+                                return <span>{t('CoverAll')}</span>
+                            }
+                            case 1: {
+                                return <span>{t('IgnoreAll')}</span>
+                            }
                             }
                         })()}
                     </div>
@@ -223,10 +223,10 @@ export default function ServicePage() {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext(),
+                                            )}
                                     </TableHead>
                                 )
                             })}

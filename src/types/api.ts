@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
@@ -623,7 +623,6 @@ export interface ModelSettingResponse {
   enable_ip_change_notification?: boolean;
   /** 通知信息IP不打码 */
   enable_plain_ip_in_notification?: boolean;
-  frontend_templates?: ModelFrontendTemplate[];
   /** 特定服务器IP（多个服务器用逗号分隔） */
   ignored_ip_notification?: string;
   /** [ServerID] -> bool(值为true代表当前ServerID在特定服务器列表内） */
@@ -641,7 +640,6 @@ export interface ModelSettingResponse {
   real_ip_header: string;
   site_name: string;
   tls: boolean;
-  version: string;
   /** 前台主题 */
   frontend_templates: ModelUserTemplateItem[];
   version?: string;

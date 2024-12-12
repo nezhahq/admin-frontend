@@ -128,15 +128,15 @@ export default function CronPage() {
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
                             switch (s.cover) {
-                                case 0: {
-                                    return <span>Ignore All</span>
-                                }
-                                case 1: {
-                                    return <span>Cover All</span>
-                                }
-                                case 2: {
-                                    return <span>On alert</span>
-                                }
+                            case 0: {
+                                return <span>Ignore All</span>
+                            }
+                            case 1: {
+                                return <span>Cover All</span>
+                            }
+                            case 2: {
+                                return <span>On alert</span>
+                            }
                             }
                         })()}
                     </div>
@@ -252,10 +252,10 @@ export default function CronPage() {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext(),
+                                            )}
                                     </TableHead>
                                 )
                             })}
