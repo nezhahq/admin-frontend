@@ -189,7 +189,7 @@ export default function ServerPage() {
                             });
                         }}
                     />
-                    <InstallCommandsMenu className="bg-blue-700" />
+                    <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
                 </HeaderButtonGroup>
             </div>
             <Table>
