@@ -24,10 +24,8 @@ export default function Root() {
                     <div className="max-w-5xl mx-auto">
                         <Outlet />
                     </div>
-
-
                 </div>
-                <footer className="mx-5 pb-5 text-foreground/60 font-thin text-center">
+                <footer className="mx-5 pb-5 text-foreground/50 font-light text-xs text-center">
                     &copy; 2019-2024 {t('nezha')} {settings?.version}
                 </footer>
             </section>
