@@ -1,15 +1,10 @@
-import {
-    Tabs,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useTranslation } from "react-i18next"
 import { Link, useLocation } from "react-router-dom"
 
-import { useTranslation } from "react-i18next";
-
 export const GroupTab = ({ className }: { className?: string }) => {
-    const { t } = useTranslation();
-    const location = useLocation();
+    const { t } = useTranslation()
+    const location = useLocation()
 
     return (
         <Tabs defaultValue={location.pathname} className={className}>

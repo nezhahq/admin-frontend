@@ -1,6 +1,9 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ServiceCard } from "@/components/service";
+import { swrFetcher } from "@/api/api"
+import { deleteService } from "@/api/service"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { ServiceCard } from "@/components/service"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -8,33 +11,28 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ModelService as Service } from "@/types";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { serviceTypes } from "@/types";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { deleteService } from "@/api/service";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-
-import { useTranslation } from "react-i18next";
+} from "@/components/ui/table"
+import { ModelService as Service } from "@/types"
+import { serviceTypes } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function ServicePage() {
-    const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<Service[]>(
-        "/api/v1/service/list",
-        swrFetcher
-    );
+    const { t } = useTranslation()
+    const { data, mutate, error, isLoading } = useSWR<Service[]>("/api/v1/service/list", swrFetcher)
 
     useEffect(() => {
         if (error)
             toast(t("Error"), {
-                description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
+                description: t("Results.ErrorFetchingResource", {
+                    error: error.message,
+                }),
+            })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+    }, [error])
 
     const columns: ColumnDef<Service>[] = [
         {
@@ -69,8 +67,8 @@ export default function ServicePage() {
             accessorFn: (row) => row.name,
             accessorKey: "name",
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
             },
         },
         {
@@ -78,8 +76,8 @@ export default function ServicePage() {
             accessorFn: (row) => row.target,
             accessorKey: "target",
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{s.target}</div>;
+                const s = row.original
+                return <div className="max-w-24 whitespace-normal break-words">{s.target}</div>
             },
         },
         {
@@ -87,29 +85,33 @@ export default function ServicePage() {
             accessorKey: "cover",
             accessorFn: (row) => row.cover,
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
                             switch (s.cover) {
                                 case 0: {
-                                    return <span>{t("CoverAll")}</span>;
+                                    return <span>{t("CoverAll")}</span>
                                 }
                                 case 1: {
-                                    return <span>{t("IgnoreAll")}</span>;
+                                    return <span>{t("IgnoreAll")}</span>
                                 }
                             }
                         })()}
                     </div>
-                );
+                )
             },
         },
         {
             header: t("SpecificServers"),
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{Object.keys(s.skip_servers ?? {}).join(',')}</div>;
-            }
+                const s = row.original
+                return (
+                    <div className="max-w-32 whitespace-normal break-words">
+                        {Object.keys(s.skip_servers ?? {}).join(",")}
+                    </div>
+                )
+            },
         },
         {
             header: t("Type"),
@@ -146,7 +148,7 @@ export default function ServicePage() {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -154,25 +156,25 @@ export default function ServicePage() {
                     >
                         <ServiceCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("Services")}</h1>
                 <HeaderButtonGroup
@@ -196,9 +198,12 @@ export default function ServicePage() {
                                     <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -230,5 +235,5 @@ export default function ServicePage() {
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }

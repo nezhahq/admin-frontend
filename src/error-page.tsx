@@ -1,18 +1,18 @@
-import { useRouteError, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { AlertCircle } from "lucide-react"
+import { useNavigate, useRouteError } from "react-router-dom"
 
 interface RouterError {
-    statusText?: string;
-    message?: string;
-    status?: number;
+    statusText?: string
+    message?: string
+    status?: number
 }
 
 export default function ErrorPage() {
-    const error = useRouteError() as RouterError;
-    const navigate = useNavigate();
-    console.error(error);
+    const error = useRouteError() as RouterError
+    const navigate = useNavigate()
+    console.error(error)
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
@@ -32,15 +32,11 @@ export default function ErrorPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-center pb-6">
-                    <Button 
-                        variant="default" 
-                        size="lg"
-                        onClick={() => navigate('/dashboard')}
-                    >
+                    <Button variant="default" size="lg" onClick={() => navigate("/dashboard")}>
                         Back to Dashboard
                     </Button>
                 </CardFooter>
             </Card>
         </div>
-    );
+    )
 }

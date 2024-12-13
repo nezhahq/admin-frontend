@@ -1,16 +1,19 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth"
+import { Navigate } from "react-router-dom"
 
-export const ProtectedRoute = ({ children }: {
-    children: React.ReactNode;
-}) => {
-    const { profile } = useAuth();
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    const { profile } = useAuth()
 
     if (!profile && window.location.pathname !== "/dashboard/login") {
-        return <><Navigate to="/dashboard/login" />{children}</>;
+        return (
+            <>
+                <Navigate to="/dashboard/login" />
+                {children}
+            </>
+        )
     }
 
-    return children;
-};
+    return children
+}
 
-export default ProtectedRoute;
+export default ProtectedRoute

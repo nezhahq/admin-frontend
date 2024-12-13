@@ -1,4 +1,6 @@
+import { createDDNSProfile, updateDDNSProfile } from "@/api/ddns"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogClose,
@@ -9,14 +11,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Form,
     FormControl,
@@ -25,28 +19,34 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelDDNSProfile } from "@/types"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { conv } from "@/lib/utils"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
-import { asOptionalField } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
-import { ddnsTypes, ddnsRequestTypes } from "@/types"
-import { createDDNSProfile, updateDDNSProfile } from "@/api/ddns"
+import { conv } from "@/lib/utils"
+import { asOptionalField } from "@/lib/utils"
+import { ModelDDNSProfile } from "@/types"
+import { ddnsRequestTypes, ddnsTypes } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
+
 import { Textarea } from "./ui/textarea"
 
-import { useTranslation } from "react-i18next";
-
 interface DDNSCardProps {
-    data?: ModelDDNSProfile;
-    providers: string[];
-    mutate: KeyedMutator<ModelDDNSProfile[]>;
+    data?: ModelDDNSProfile
+    providers: string[]
+    mutate: KeyedMutator<ModelDDNSProfile[]>
 }
 
 const ddnsFormSchema = z.object({
@@ -63,47 +63,44 @@ const ddnsFormSchema = z.object({
     webhook_request_type: asOptionalField(z.coerce.number().int().min(1).max(255)),
     webhook_request_body: asOptionalField(z.string()),
     webhook_headers: asOptionalField(z.string()),
-});
+})
 
 export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof ddnsFormSchema>>({
         resolver: zodResolver(ddnsFormSchema),
-        defaultValues: data ? data : {
-            max_retries: 3,
-            name: "",
-            provider: "dummy",
-            domains: [],
-        },
+        defaultValues: data
+            ? data
+            : {
+                  max_retries: 3,
+                  name: "",
+                  provider: "dummy",
+                  domains: [],
+              },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof ddnsFormSchema>) => {
-        data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>{data?t("EditDDNS"):t("CreateDDNS")}</DialogTitle>
+                            <DialogTitle>{data ? t("EditDDNS") : t("CreateDDNS")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -115,10 +112,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                         <FormItem>
                                             <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="My DDNS Profile"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="My DDNS Profile" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -130,7 +124,10 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("Provider")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select service type" />
@@ -138,7 +135,9 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                                 </FormControl>
                                                 <SelectContent>
                                                     {providers.map((v, i) => (
-                                                        <SelectItem key={i} value={v}>{v}</SelectItem>
+                                                        <SelectItem key={i} value={v}>
+                                                            {v}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -151,15 +150,17 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                     name="domains"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("Domains") + t("SeparateWithComma")}</FormLabel>
+                                            <FormLabel>
+                                                {t("Domains") + t("SeparateWithComma")}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="www.example.com"
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value);
-                                                        field.onChange(arr);
+                                                    onChange={(e) => {
+                                                        const arr = conv.strToArr(e.target.value)
+                                                        field.onChange(arr)
                                                     }}
                                                 />
                                             </FormControl>
@@ -174,10 +175,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                         <FormItem>
                                             <FormLabel>{t("Credential")} 1</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="Token ID"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Token ID" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -190,10 +188,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                         <FormItem>
                                             <FormLabel>{t("Credential")} 2</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="Token Secret"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Token Secret" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -206,11 +201,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                         <FormItem>
                                             <FormLabel>{t("MaximumRetryAttempts")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="3"
-                                                    {...field}
-                                                />
+                                                <Input type="number" placeholder="3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -238,7 +229,10 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Webhook {t("RequestMethod")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Webhook Request Method" />
@@ -246,7 +240,9 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                                 </FormControl>
                                                 <SelectContent>
                                                     {Object.entries(ddnsTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                        <SelectItem key={k} value={k}>
+                                                            {v}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -260,16 +256,23 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Webhook {t("RequestType")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Webhook Request Type" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(ddnsRequestTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
-                                                    ))}
+                                                    {Object.entries(ddnsRequestTypes).map(
+                                                        ([k, v]) => (
+                                                            <SelectItem key={k} value={k}>
+                                                                {v}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -321,7 +324,9 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("Enable")} IPv4</Label>
+                                                    <Label className="text-sm">
+                                                        {t("Enable")} IPv4
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -339,7 +344,9 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("Enable")} IPv6</Label>
+                                                    <Label className="text-sm">
+                                                        {t("Enable")} IPv6
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -352,7 +359,9 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

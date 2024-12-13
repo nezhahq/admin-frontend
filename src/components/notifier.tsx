@@ -1,4 +1,6 @@
+import { createNotification, updateNotification } from "@/api/notification"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogClose,
@@ -9,14 +11,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Form,
     FormControl,
@@ -25,26 +19,32 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelNotification } from "@/types"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
-import { asOptionalField } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
-import { nrequestTypes, nrequestMethods } from "@/types"
-import { createNotification, updateNotification } from "@/api/notification"
+import { asOptionalField } from "@/lib/utils"
+import { ModelNotification } from "@/types"
+import { nrequestMethods, nrequestTypes } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
+
 import { Textarea } from "./ui/textarea"
 
-import { useTranslation } from "react-i18next";
-
 interface NotifierCardProps {
-    data?: ModelNotification;
-    mutate: KeyedMutator<ModelNotification[]>;
+    data?: ModelNotification
+    mutate: KeyedMutator<ModelNotification[]>
 }
 
 const notificationFormSchema = z.object({
@@ -56,49 +56,48 @@ const notificationFormSchema = z.object({
     request_body: z.string(),
     verify_tls: asOptionalField(z.boolean()),
     skip_check: asOptionalField(z.boolean()),
-});
+})
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof notificationFormSchema>>({
         resolver: zodResolver(notificationFormSchema),
-        defaultValues: data ? data : {
-            name: "",
-            url: "",
-            request_method: 1,
-            request_type: 1,
-            request_header: "",
-            request_body: "",
-        },
+        defaultValues: data
+            ? data
+            : {
+                  name: "",
+                  url: "",
+                  request_method: 1,
+                  request_type: 1,
+                  request_header: "",
+                  request_body: "",
+              },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof notificationFormSchema>) => {
-        data?.id ? await updateNotification(data.id, values) : await createNotification(values);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        data?.id ? await updateNotification(data.id, values) : await createNotification(values)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>{data?t("EditNotifier"):t("CreateNotifier")}</DialogTitle>
+                            <DialogTitle>
+                                {data ? t("EditNotifier") : t("CreateNotifier")}
+                            </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -110,10 +109,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="My Notifier"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="My Notifier" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -126,9 +122,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>URL</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -140,16 +134,23 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("RequestMethod")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Request Method" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(nrequestMethods).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
-                                                    ))}
+                                                    {Object.entries(nrequestMethods).map(
+                                                        ([k, v]) => (
+                                                            <SelectItem key={k} value={k}>
+                                                                {v}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -162,7 +163,10 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("Type")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Request Type" />
@@ -170,7 +174,9 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     {Object.entries(nrequestTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                        <SelectItem key={k} value={k}>
+                                                            {v}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -223,7 +229,9 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("VerifyTLS")}</Label>
+                                                    <Label className="text-sm">
+                                                        {t("VerifyTLS")}
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -241,7 +249,9 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("DoNotSendTestMessage")}</Label>
+                                                    <Label className="text-sm">
+                                                        {t("DoNotSendTestMessage")}
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -254,7 +264,9 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

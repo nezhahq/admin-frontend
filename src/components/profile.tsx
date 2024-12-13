@@ -1,3 +1,4 @@
+import { getProfile, updateProfile } from "@/api/user"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -9,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import {
     Form,
     FormControl,
@@ -18,54 +18,53 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { getProfile, updateProfile } from "@/api/user"
-import { useState } from "react"
 import { useMainStore } from "@/hooks/useMainStore"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
-
-import { useTranslation } from "react-i18next";
+import { z } from "zod"
 
 const profileFormSchema = z.object({
     original_password: z.string().min(5).max(72),
     new_password: z.string().min(8).max(72),
     new_username: z.string().min(1).max(32),
-});
+})
 
 export const ProfileCard = ({ className }: { className: string }) => {
-    const { t } = useTranslation();
-    const { profile, setProfile } = useMainStore();
+    const { t } = useTranslation()
+    const { profile, setProfile } = useMainStore()
 
     const form = useForm<z.infer<typeof profileFormSchema>>({
         resolver: zodResolver(profileFormSchema),
         defaultValues: {
-            original_password: '',
-            new_password: '',
+            original_password: "",
+            new_password: "",
             new_username: profile?.username,
         },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
         try {
-            await updateProfile(values);
+            await updateProfile(values)
         } catch (e) {
             toast(t("Error"), {
                 description: `${e}`,
             })
-            return;
+            return
         }
-        const profile = await getProfile();
-        setProfile(profile);
-        setOpen(false);
-        form.reset();
+        const profile = await getProfile()
+        setProfile(profile)
+        setOpen(false)
+        form.reset()
     }
 
     return (
@@ -91,10 +90,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                         <FormItem>
                                             <FormLabel>{t("NewUsername")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    autoComplete="username"
-                                                    {...field}
-                                                />
+                                                <Input autoComplete="username" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -107,10 +103,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                         <FormItem>
                                             <FormLabel>{t("OriginalPassword")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    autoComplete="current-password"
-                                                    {...field}
-                                                />
+                                                <Input autoComplete="current-password" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -123,9 +116,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                         <FormItem>
                                             <FormLabel>{t("NewPassword")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -138,7 +129,9 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

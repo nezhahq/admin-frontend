@@ -1,42 +1,42 @@
 name: Build and release static export
 
 on:
-  push:
-    tags:
-      - "v*"
+    push:
+        tags:
+            - "v*"
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: "latest"
+            - name: Set up Bun
+              uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: "latest"
 
-      - name: Install dependencies
-        run: bun install
+            - name: Install dependencies
+              run: bun install
 
-      - name: Build static export
-        run: |
-          bun run build-ignore-error
+            - name: Build static export
+              run: |
+                  bun run build-ignore-error
 
-      - name: Compress dist folder
-        run: zip -r dist.zip dist
+            - name: Compress dist folder
+              run: zip -r dist.zip dist
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist.zip
-      
-      - name: Changelog
-        run: bun x changelogithub
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            - name: Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: dist.zip
+
+            - name: Changelog
+              run: bun x changelogithub
+              env:
+                  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

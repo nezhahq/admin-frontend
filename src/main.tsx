@@ -1,34 +1,30 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
+import { RouterProvider, createBrowserRouter } from "react-router-dom"
 
-import './index.css'
-import './lib/i18n';
-
-import Root from "./routes/root";
-import ErrorPage from "./error-page";
-import ProtectedRoute from './routes/protect';
-import LoginPage from './routes/login';
-import ServerPage from './routes/server';
-import ServicePage from './routes/service';
-import { AuthProvider } from './hooks/useAuth';
-import { TerminalPage } from './components/terminal';
-import DDNSPage from './routes/ddns';
-import NATPage from './routes/nat';
-import ServerGroupPage from './routes/server-group';
-import NotificationGroupPage from './routes/notification-group';
-import { ServerProvider } from './hooks/useServer';
-import { NotificationProvider } from './hooks/useNotfication';
-import CronPage from './routes/cron';
-import NotificationPage from './routes/notification';
-import AlertRulePage from './routes/alert-rule';
-import SettingsPage from './routes/settings';
-import UserPage from './routes/user';
-import WAFPage from './routes/waf';
-import ProfilePage from './routes/profile';
+import { TerminalPage } from "./components/terminal"
+import ErrorPage from "./error-page"
+import { AuthProvider } from "./hooks/useAuth"
+import { NotificationProvider } from "./hooks/useNotfication"
+import { ServerProvider } from "./hooks/useServer"
+import "./index.css"
+import "./lib/i18n"
+import AlertRulePage from "./routes/alert-rule"
+import CronPage from "./routes/cron"
+import DDNSPage from "./routes/ddns"
+import LoginPage from "./routes/login"
+import NATPage from "./routes/nat"
+import NotificationPage from "./routes/notification"
+import NotificationGroupPage from "./routes/notification-group"
+import ProfilePage from "./routes/profile"
+import ProtectedRoute from "./routes/protect"
+import Root from "./routes/root"
+import ServerPage from "./routes/server"
+import ServerGroupPage from "./routes/server-group"
+import ServicePage from "./routes/service"
+import SettingsPage from "./routes/settings"
+import UserPage from "./routes/user"
+import WAFPage from "./routes/waf"
 
 const router = createBrowserRouter([
     {
@@ -48,7 +44,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard",
-                element: <ServerProvider withServerGroup><ServerPage /></ServerProvider>,
+                element: (
+                    <ServerProvider withServerGroup>
+                        <ServerPage />
+                    </ServerProvider>
+                ),
             },
             {
                 path: "/dashboard/service",
@@ -72,11 +72,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/notification",
-                element: <NotificationProvider withNotifierGroup><NotificationPage /></NotificationProvider>,
+                element: (
+                    <NotificationProvider withNotifierGroup>
+                        <NotificationPage />
+                    </NotificationProvider>
+                ),
             },
             {
                 path: "/dashboard/alert-rule",
-                element: <NotificationProvider withNotifierGroup><AlertRulePage /></NotificationProvider>,
+                element: (
+                    <NotificationProvider withNotifierGroup>
+                        <AlertRulePage />
+                    </NotificationProvider>
+                ),
             },
             {
                 path: "/dashboard/ddns",
@@ -88,11 +96,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/server-group",
-                element: <ServerProvider withServer><ServerGroupPage /></ServerProvider>,
+                element: (
+                    <ServerProvider withServer>
+                        <ServerGroupPage />
+                    </ServerProvider>
+                ),
             },
             {
                 path: "/dashboard/notification-group",
-                element: <NotificationProvider withNotifier><NotificationGroupPage /></NotificationProvider>,
+                element: (
+                    <NotificationProvider withNotifier>
+                        <NotificationGroupPage />
+                    </NotificationProvider>
+                ),
             },
             {
                 path: "/dashboard/terminal/:id",
@@ -100,7 +116,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/profile",
-                element: <ServerProvider withServer withServerGroup><ProfilePage /></ServerProvider>,
+                element: (
+                    <ServerProvider withServer withServerGroup>
+                        <ProfilePage />
+                    </ServerProvider>
+                ),
             },
             {
                 path: "/dashboard/settings",
@@ -114,10 +134,8 @@ const router = createBrowserRouter([
                 path: "/dashboard/settings/waf",
                 element: <WAFPage />,
             },
-        ]
+        ],
     },
-]);
+])
 
-createRoot(document.getElementById('root')!).render(
-    <RouterProvider router={router} />
-)
+createRoot(document.getElementById("root")!).render(<RouterProvider router={router} />)

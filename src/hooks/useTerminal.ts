@@ -1,23 +1,23 @@
-import { createTerminal } from "@/api/terminal";
-import { ModelCreateTerminalResponse } from "@/types";
-import { useState, useEffect } from "react";
+import { createTerminal } from "@/api/terminal"
+import { ModelCreateTerminalResponse } from "@/types"
+import { useEffect, useState } from "react"
 
 export default function useTerminal(serverId?: number) {
-    const [terminal, setTerminal] = useState<ModelCreateTerminalResponse | null>(null);
+    const [terminal, setTerminal] = useState<ModelCreateTerminalResponse | null>(null)
 
     async function fetchTerminal() {
         try {
-            const response = await createTerminal(serverId!);
-            setTerminal(response);
+            const response = await createTerminal(serverId!)
+            setTerminal(response)
         } catch (error) {
-            console.error("Failed to fetch terminal:", error);
+            console.error("Failed to fetch terminal:", error)
         }
     }
 
     useEffect(() => {
-        if (!serverId) return;
-        fetchTerminal();
-    }, [serverId]);
+        if (!serverId) return
+        fetchTerminal()
+    }, [serverId])
 
-    return terminal;
+    return terminal
 }

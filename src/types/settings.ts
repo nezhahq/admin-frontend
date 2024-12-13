@@ -1,4 +1,5 @@
-import i18next from "i18next";
+import i18next from "i18next"
+
 export const settingCoverageTypes: Record<number, string> = {
     1: i18next.t("Coverages.Excludes"),
     2: i18next.t("Coverages.Only"),

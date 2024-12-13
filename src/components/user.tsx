@@ -1,3 +1,4 @@
+import { createUser } from "@/api/user"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -9,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import {
     Form,
     FormControl,
@@ -18,29 +18,28 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelUser } from "@/types"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
-import { createUser } from "@/api/user"
-
-import { useTranslation } from "react-i18next";
+import { ModelUser } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
 
 interface UserCardProps {
-    mutate: KeyedMutator<ModelUser[]>;
+    mutate: KeyedMutator<ModelUser[]>
 }
 
 const userFormSchema = z.object({
     username: z.string().min(1),
     password: z.string().min(8).max(72),
-});
+})
 
 export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof userFormSchema>>({
         resolver: zodResolver(userFormSchema),
         defaultValues: {
@@ -49,16 +48,16 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
         },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof userFormSchema>) => {
-        await createUser(values);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        await createUser(values)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
     return (
@@ -82,9 +81,7 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Username")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -97,9 +94,7 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Password")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -111,7 +106,9 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

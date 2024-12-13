@@ -1,6 +1,9 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
-import { NATCard } from "@/components/nat";
+import { swrFetcher } from "@/api/api"
+import { deleteNAT } from "@/api/nat"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { NATCard } from "@/components/nat"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -8,29 +11,27 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ModelNAT } from "@/types";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-import { deleteNAT } from "@/api/nat";
-
-import { useTranslation } from "react-i18next";
+} from "@/components/ui/table"
+import { ModelNAT } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function NATPage() {
-    const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<ModelNAT[]>("/api/v1/nat", swrFetcher);
+    const { t } = useTranslation()
+    const { data, mutate, error, isLoading } = useSWR<ModelNAT[]>("/api/v1/nat", swrFetcher)
 
     useEffect(() => {
         if (error)
             toast(t("Error"), {
-                description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+                description: t("Results.ErrorFetchingResource", {
+                    error: error.message,
+                }),
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [error])
 
     const columns: ColumnDef<ModelNAT>[] = [
         {
@@ -39,7 +40,7 @@ export default function NATPage() {
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
@@ -65,12 +66,12 @@ export default function NATPage() {
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
             },
         },
         {
-            header: t("Server")+" ID",
+            header: t("Server") + " ID",
             accessorKey: "serverID",
             accessorFn: (row) => row.server_id,
         },
@@ -79,8 +80,8 @@ export default function NATPage() {
             accessorKey: "host",
             accessorFn: (row) => row.host,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.host}</div>;
+                const s = row.original
+                return <div className="max-w-32 whitespace-normal break-words">{s.host}</div>
             },
         },
         {
@@ -88,15 +89,15 @@ export default function NATPage() {
             accessorKey: "domain",
             accessorFn: (row) => row.domain,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.domain}</div>;
+                const s = row.original
+                return <div className="max-w-32 whitespace-normal break-words">{s.domain}</div>
             },
         },
         {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -104,25 +105,25 @@ export default function NATPage() {
                     >
                         <NATCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight"> {t("NATT")}</h1>
                 <HeaderButtonGroup
@@ -146,9 +147,12 @@ export default function NATPage() {
                                     <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -180,5 +184,5 @@ export default function NATPage() {
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }

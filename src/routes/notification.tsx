@@ -1,5 +1,10 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
+import { swrFetcher } from "@/api/api"
+import { deleteNotification } from "@/api/notification"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { NotificationTab } from "@/components/notification-tab"
+import { NotifierCard } from "@/components/notifier"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -7,37 +12,32 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-import { ModelNotification } from "@/types";
-import { deleteNotification } from "@/api/notification";
-import { NotificationTab } from "@/components/notification-tab";
-import { NotifierCard } from "@/components/notifier";
-import { useNotification } from "@/hooks/useNotfication";
-
-import { useTranslation } from "react-i18next";
-
+} from "@/components/ui/table"
+import { useNotification } from "@/hooks/useNotfication"
+import { ModelNotification } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function NotificationPage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const { data, mutate, error, isLoading } = useSWR<ModelNotification[]>(
         "/api/v1/notification",
-        swrFetcher
-    );
-    const { notifierGroup } = useNotification();
+        swrFetcher,
+    )
+    const { notifierGroup } = useNotification()
 
     useEffect(() => {
         if (error)
             toast(t("Error"), {
-                description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+                description: t("Results.ErrorFetchingResource", {
+                    error: error.message,
+                }),
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [error])
 
     const columns: ColumnDef<ModelNotification>[] = [
         {
@@ -46,7 +46,7 @@ export default function NotificationPage() {
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
@@ -72,8 +72,8 @@ export default function NotificationPage() {
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
             },
         },
         {
@@ -84,7 +84,7 @@ export default function NotificationPage() {
                     notifierGroup
                         ?.filter((ng) => ng.notifications?.includes(row.id))
                         .map((ng) => ng.group.id) || []
-                );
+                )
             },
         },
         {
@@ -92,8 +92,8 @@ export default function NotificationPage() {
             accessorKey: "url",
             accessorFn: (row) => row.url,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-64 whitespace-normal break-words">{s.url}</div>;
+                const s = row.original
+                return <div className="max-w-64 whitespace-normal break-words">{s.url}</div>
             },
         },
         {
@@ -105,7 +105,7 @@ export default function NotificationPage() {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -117,25 +117,25 @@ export default function NotificationPage() {
                     >
                         <NotifierCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <div className="flex mt-6 mb-4">
                 <NotificationTab className="flex-1 mr-4 sm:max-w-[40%]" />
                 <HeaderButtonGroup
@@ -159,9 +159,12 @@ export default function NotificationPage() {
                                     <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -193,5 +196,5 @@ export default function NotificationPage() {
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }

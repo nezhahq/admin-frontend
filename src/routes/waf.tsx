@@ -1,5 +1,9 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
+import { swrFetcher } from "@/api/api"
+import { deleteWAF } from "@/api/waf"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { SettingsTab } from "@/components/settings-tab"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -7,31 +11,26 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-import { ModelWAFApiMock, wafBlockReasons } from "@/types";
-import { deleteWAF } from "@/api/waf";
-import { ip16Str } from "@/lib/utils";
-import { SettingsTab } from "@/components/settings-tab";
-
-import { useTranslation } from "react-i18next";
+} from "@/components/ui/table"
+import { ip16Str } from "@/lib/utils"
+import { ModelWAFApiMock, wafBlockReasons } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function WAFPage() {
-    const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock[]>("/api/v1/waf", swrFetcher);
+    const { t } = useTranslation()
+    const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock[]>("/api/v1/waf", swrFetcher)
 
     useEffect(() => {
         if (error)
             toast(t("Error"), {
                 description: t(`Error fetching resource: ${error.message}.`),
-            });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [error])
 
     const columns: ColumnDef<ModelWAFApiMock>[] = [
         {
@@ -40,7 +39,7 @@ export default function WAFPage() {
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
@@ -77,16 +76,16 @@ export default function WAFPage() {
             accessorKey: "lastBlockTime",
             accessorFn: (row) => row.last_block_timestamp,
             cell: ({ row }) => {
-                const s = row.original;
-                const date = new Date((s.last_block_timestamp || 0)*1000);
-                return <span>{date.toISOString()}</span>;
+                const s = row.original
+                const date = new Date((s.last_block_timestamp || 0) * 1000)
+                return <span>{date.toISOString()}</span>
             },
         },
         {
             id: "actions",
             header: "Actions",
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -98,25 +97,25 @@ export default function WAFPage() {
                     >
                         <></>
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-8">
+        <div className="px-3">
             <SettingsTab className="mt-6 w-full" />
             <div className="flex mt-4 mb-4">
                 <HeaderButtonGroup
@@ -139,9 +138,12 @@ export default function WAFPage() {
                                     <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -173,5 +175,5 @@ export default function WAFPage() {
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }
