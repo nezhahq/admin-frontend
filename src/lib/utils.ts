@@ -160,19 +160,89 @@ export function ip16Str(base64str: string) {
     return ipv6BinaryToString(buf);
 }
 
-function ipv6BinaryToString(binary: Uint8Array) {
-    const parts: string[] = [];
-    for (let i = 0; i < binary.length; i += 2) {
-        const hex = (binary[i] << 8 | binary[i + 1]).toString(16);
-        parts.push(hex);
+const digits = '0123456789abcdef';
+
+function appendHex(b: string[], x: number): void {
+  if (x >= 0x1000) {
+    b.push(digits[(x >> 12) & 0xf]);
+  }
+  if (x >= 0x100) {
+    b.push(digits[(x >> 8) & 0xf]);
+  }
+  if (x >= 0x10) {
+    b.push(digits[(x >> 4) & 0xf]);
+  }
+  b.push(digits[x & 0xf]);
+}
+
+function ipv6BinaryToString(ip: Uint8Array): string {
+  let ipBytes: Uint8Array;
+
+  if (ip.length !== 16) {
+    ipBytes = new Uint8Array(16);
+    const len = Math.min(ip.length, 16);
+    ipBytes.set(ip.subarray(0, len));
+  } else {
+    ipBytes = ip;
+  }
+
+  const hextets: number[] = [];
+  for (let i = 0; i < 16; i += 2) {
+    hextets.push((ipBytes[i] << 8) | ipBytes[i + 1]);
+  }
+
+  let zeroStart = -1;
+  let zeroLength = 0;
+
+  for (let i = 0; i <= hextets.length;) {
+    let j = i;
+    while (j < hextets.length && hextets[j] === 0) {
+      j++;
+    }
+    const length = j - i;
+    if (length >= 2 && length > zeroLength) {
+      zeroStart = i;
+      zeroLength = length;
+    }
+    if (j === i) {
+      i++;
+    } else {
+      i = j;
+    }
+  }
+
+  const parts: string[] = [];
+  for (let i = 0; i < hextets.length; i++) {
+    if (zeroLength > 0 && i === zeroStart) {
+      parts.push('');
+      i += zeroLength - 1;
+      continue;
     }
 
-    let ipv6 = parts.join(':');
-
-    ipv6 = ipv6.replace(/(:0)+$/, '');
-    if (ipv6.indexOf('::') === -1 && parts.filter(p => p === '0').length > 1) {
-        ipv6 = ipv6.replace(/(:0)+/, '::');
+    if (parts.length > 0) {
+      parts.push(':');
     }
+
+    const b: string[] = [];
+    appendHex(b, hextets[i]);
+    parts.push(b.join(''));
+  }
+
+  let ipv6 = parts.join('');
+
+  if (ipv6.startsWith('::')) {
+
+  } else if (ipv6.startsWith(':')) {
+    ipv6 = ':' + ipv6;
+  }
+  if (ipv6.endsWith('::')) {
+
+  } else if (ipv6.endsWith(':')) {
+    ipv6 = ipv6 + ':';
+  }
+  if (ipv6 === '') {
+    ipv6 = '::';
+  }
 
     return ipv6;
 }
