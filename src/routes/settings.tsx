@@ -383,7 +383,7 @@ export default function SettingsPage() {
                                                         </FormControl>
                                                         <SelectContent>
                                                             {Object.entries(
-                                                                settingCoverageTypes,
+                                                                settingCoverageTypes(t),
                                                             ).map(([k, v]) => (
                                                                 <SelectItem key={k} value={k}>
                                                                     {v}

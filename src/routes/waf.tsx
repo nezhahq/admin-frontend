@@ -69,7 +69,9 @@ export default function WAFPage() {
             header: t("LastBlockReason"),
             accessorKey: "lastBlockReason",
             accessorFn: (row) => row.last_block_reason,
-            cell: ({ row }) => <span>{wafBlockReasons[row.original.last_block_reason] || ""}</span>,
+            cell: ({ row }) => (
+                <span>{wafBlockReasons(t)[row.original.last_block_reason] || ""}</span>
+            ),
         },
         {
             header: t("LastBlockTime"),

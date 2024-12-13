@@ -81,7 +81,7 @@ export default function AlertRulePage() {
         {
             header: t("TriggerMode"),
             accessorKey: "trigger Mode",
-            accessorFn: (row) => triggerModes[row.trigger_mode] || "",
+            accessorFn: (row) => triggerModes(t)[row.trigger_mode] || "",
         },
         {
             header: t("Rules"),

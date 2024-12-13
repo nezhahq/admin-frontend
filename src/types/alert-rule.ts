@@ -1,6 +1,6 @@
-import i18next from "i18next"
+import { TFunction } from "i18next"
 
-export const triggerModes: Record<number, string> = {
-    0: i18next.t("Always"),
-    1: i18next.t("Once"),
-}
+export const triggerModes = (t: TFunction<"translation", undefined>) => ({
+    0: t("Always"),
+    1: t("Once"),
+})
