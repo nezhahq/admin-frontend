@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "build-ignore-error": "vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -26,6 +28,8 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
     "@tanstack/react-table": "^8.20.5",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.0",
+    "@types/luxon": "^3.4.2",
     "@xterm/addon-attach": "^0.11.0",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
@@ -38,6 +42,7 @@
     "jotai-zustand": "^0.6.0",
     "lucide-react": "^0.454.0",
     "next-themes": "^0.3.0",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.1",
