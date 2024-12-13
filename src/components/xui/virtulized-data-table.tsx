@@ -1,5 +1,9 @@
-"use client";
+"use client"
 
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { TableCell, TableHead, TableRow } from "@/components/ui/table"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
+import { cn } from "@/lib/utils"
 import {
     ColumnDef,
     Row,
@@ -9,36 +13,26 @@ import {
     getCoreRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table";
-
-import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { HTMLAttributes, forwardRef, useState, useRef, useEffect } from "react";
-import { TableVirtuoso } from "react-virtuoso";
-import { cn } from "@/lib/utils"
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+} from "@tanstack/react-table"
+import { HTMLAttributes, forwardRef, useEffect, useRef, useState } from "react"
+import { TableVirtuoso } from "react-virtuoso"
 
 // Original Table is wrapped with a <div> (see https://ui.shadcn.com/docs/components/table#radix-:r24:-content-manual),
 // but here we don't want it, so let's use a new component with only <table> tag
-const TableComponent = forwardRef<
-    HTMLTableElement,
-    React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-    <table
-        ref={ref}
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-    />
-));
-TableComponent.displayName = "TableComponent";
+const TableComponent = forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
+    ({ className, ...props }, ref) => (
+        <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+    ),
+)
+TableComponent.displayName = "TableComponent"
 
 const TableRowComponent = <TData,>(rows: Row<TData>[]) =>
     function getTableRow(props: HTMLAttributes<HTMLTableRowElement>) {
         // @ts-expect-error data-index is a valid attribute
-        const index = props["data-index"];
-        const row = rows[index];
+        const index = props["data-index"]
+        const row = rows[index]
 
-        if (!row) return null;
+        if (!row) return null
 
         return (
             <TableRow
@@ -53,11 +47,11 @@ const TableRowComponent = <TData,>(rows: Row<TData>[]) =>
                     </TableCell>
                 ))}
             </TableRow>
-        );
-    };
+        )
+    }
 
 function SortingIndicator({ isSorted }: { isSorted: SortDirection | false }) {
-    if (!isSorted) return null;
+    if (!isSorted) return null
     return (
         <div>
             {
@@ -67,13 +61,15 @@ function SortingIndicator({ isSorted }: { isSorted: SortDirection | false }) {
                 }[isSorted]
             }
         </div>
-    );
+    )
 }
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
-    rowComponent?: (rows: Row<TData>[]) => (props: HTMLAttributes<HTMLTableRowElement>) => JSX.Element | null,
+    columns: ColumnDef<TData, TValue>[]
+    data: TData[]
+    rowComponent?: (
+        rows: Row<TData>[],
+    ) => (props: HTMLAttributes<HTMLTableRowElement>) => JSX.Element | null
 }
 
 export function DataTable<TData, TValue>({
@@ -81,10 +77,12 @@ export function DataTable<TData, TValue>({
     data,
     rowComponent,
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = useState<SortingState>([{
-        id: 'type',
-        desc: true,
-    }]);
+    const [sorting, setSorting] = useState<SortingState>([
+        {
+            id: "type",
+            desc: true,
+        },
+    ])
     const table = useReactTable({
         data,
         columns,
@@ -94,41 +92,43 @@ export function DataTable<TData, TValue>({
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-    });
+    })
 
-    const { rows } = table.getRowModel();
+    const { rows } = table.getRowModel()
 
     const [heightState, setHeight] = useState(0)
-    const ref = useRef(null);
-    const isDesktop = useMediaQuery("(min-width: 640px)");
+    const ref = useRef(null)
+    const isDesktop = useMediaQuery("(min-width: 640px)")
 
     useEffect(() => {
         const calculateHeight = () => {
             if (ref.current) {
-                const virtuosoElement = ref.current;
-                let topOffset = 0;
-                let currentElement = virtuosoElement as any;
+                const virtuosoElement = ref.current
+                let topOffset = 0
+                let currentElement = virtuosoElement as any
 
                 // Calculate the total offset from the top of the document
                 while (currentElement) {
-                    topOffset += currentElement.offsetTop || 0;
-                    currentElement = currentElement.offsetParent as HTMLElement;
+                    topOffset += currentElement.offsetTop || 0
+                    currentElement = currentElement.offsetParent as HTMLElement
                 }
 
-                const totalHeight = window.innerHeight;
-                const calculatedHeight = totalHeight - topOffset;
+                const totalHeight = window.innerHeight
+                const calculatedHeight = totalHeight - topOffset
 
-                setHeight(calculatedHeight);
+                setHeight(calculatedHeight)
             }
-        };
-        calculateHeight(); // Initial calculation
+        }
+        calculateHeight() // Initial calculation
 
         if (isDesktop) {
-            window.addEventListener('resize', calculateHeight);
+            window.addEventListener("resize", calculateHeight)
         }
 
-        return () => { if (isDesktop) window.removeEventListener('resize', calculateHeight); }
-    }, [isDesktop]);
+        return () => {
+            if (isDesktop) window.removeEventListener("resize", calculateHeight)
+        }
+    }, [isDesktop])
 
     return (
         <div className="rounded-md border" ref={ref} style={{ height: heightState }}>
@@ -158,11 +158,12 @@ export function DataTable<TData, TValue>({
                                                 {...{
                                                     style: header.column.getCanSort()
                                                         ? {
-                                                            cursor: "pointer",
-                                                            userSelect: "none",
-                                                        }
+                                                              cursor: "pointer",
+                                                              userSelect: "none",
+                                                          }
                                                         : {},
-                                                    onClick: header.column.getToggleSortingHandler(),
+                                                    onClick:
+                                                        header.column.getToggleSortingHandler(),
                                                 }}
                                             >
                                                 {flexRender(
@@ -175,12 +176,12 @@ export function DataTable<TData, TValue>({
                                             </div>
                                         )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))
                 }
             />
         </div>
-    );
+    )
 }

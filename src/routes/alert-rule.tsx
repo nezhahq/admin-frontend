@@ -1,5 +1,10 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
+import { deleteAlertRules } from "@/api/alert-rule"
+import { swrFetcher } from "@/api/api"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { AlertRuleCard } from "@/components/alert-rule"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { NotificationTab } from "@/components/notification-tab"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -7,35 +12,29 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { useEffect, useMemo } from "react";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { toast } from "sonner";
-import { ModelAlertRule, triggerModes } from "@/types";
-import { deleteAlertRules } from "@/api/alert-rule";
-import { NotificationTab } from "@/components/notification-tab";
-import { AlertRuleCard } from "@/components/alert-rule";
-
-import { useTranslation } from "react-i18next";
+} from "@/components/ui/table"
+import { ModelAlertRule, triggerModes } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function AlertRulePage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
 
     const { data, mutate, error, isLoading } = useSWR<ModelAlertRule[]>(
         "/api/v1/alert-rule",
-        swrFetcher
-    );
+        swrFetcher,
+    )
 
     useEffect(() => {
         if (error)
             toast(t("Error"), {
                 description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
+            })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+    }, [error])
 
     const columns: ColumnDef<ModelAlertRule>[] = [
         {
@@ -70,8 +69,8 @@ export default function AlertRulePage() {
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
             },
         },
         {
@@ -87,8 +86,12 @@ export default function AlertRulePage() {
         {
             header: t("Rules"),
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-48 whitespace-normal break-words">{JSON.stringify(s.rules)}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        {JSON.stringify(s.rules)}
+                    </div>
+                )
             },
         },
         {
@@ -110,7 +113,7 @@ export default function AlertRulePage() {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -122,22 +125,22 @@ export default function AlertRulePage() {
                     >
                         <AlertRuleCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
         <div className="px-3">
@@ -164,9 +167,12 @@ export default function AlertRulePage() {
                                     <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -198,5 +204,5 @@ export default function AlertRulePage() {
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }

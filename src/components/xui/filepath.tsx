@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
     Breadcrumb,
     BreadcrumbEllipsis,
@@ -16,37 +15,45 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { formatPath } from "@/lib/utils"
+import * as React from "react"
 
 const ITEMS_TO_DISPLAY = 3
 
 interface FilepathProps {
-  path: string;
-  setPath: React.Dispatch<React.SetStateAction<string>>;
+    path: string
+    setPath: React.Dispatch<React.SetStateAction<string>>
 }
 
 function pathToItems(path: string) {
-    const segments = path.split('/').filter(Boolean);
+    const segments = path.split("/").filter(Boolean)
 
-    const result: { href: string; label: string; }[] = [];
+    const result: { href: string; label: string }[] = []
 
-    let currentPath = '';
-    segments.forEach(segment => {
-        currentPath += `/${segment}`;
-        result.push({ href: currentPath, label: segment });
-    });
+    let currentPath = ""
+    segments.forEach((segment) => {
+        currentPath += `/${segment}`
+        result.push({ href: currentPath, label: segment })
+    })
 
-    return result;
+    return result
 }
 
 export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
     const [open, setOpen] = React.useState(false)
-    const items = pathToItems(formatPath(path));
+    const items = pathToItems(formatPath(path))
 
     return (
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <p className="cursor-pointer hover:text-white transition" onClick={() => { setPath('/') }}>{'/'}</p>
+                    <p
+                        className="cursor-pointer hover:text-white transition"
+                        onClick={() => {
+                            setPath("/")
+                        }}
+                    >
+                        {"/"}
+                    </p>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 {items.length > ITEMS_TO_DISPLAY ? (
@@ -63,7 +70,11 @@ export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
                                     <DropdownMenuContent align="start">
                                         {items.slice(0, -ITEMS_TO_DISPLAY).map((item, index) => (
                                             <DropdownMenuItem key={index}>
-                                                <p onClick={() => { setPath(item.href) }}>
+                                                <p
+                                                    onClick={() => {
+                                                        setPath(item.href)
+                                                    }}
+                                                >
                                                     {item.label}
                                                 </p>
                                             </DropdownMenuItem>
@@ -82,7 +93,9 @@ export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
                                 <>
                                     <p
                                         className="max-w-20 truncate md:max-w-none cursor-pointer hover:text-white transition"
-                                        onClick={() => { setPath(item.href) }}
+                                        onClick={() => {
+                                            setPath(item.href)
+                                        }}
                                     >
                                         {item.label}
                                     </p>

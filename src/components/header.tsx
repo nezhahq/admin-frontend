@@ -1,29 +1,4 @@
-import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
-import { ModeToggle } from '@/components/mode-toggle'
-import { Card } from './ui/card'
-import { useMainStore } from '@/hooks/useMainStore'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { NzNavigationMenuLink } from './xui/navigation-menu'
-import { DateTime } from "luxon";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu'
-import { LogOut, Settings, User2 } from 'lucide-react'
-import { useAuth } from '@/hooks/useAuth'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { ModeToggle } from "@/components/mode-toggle"
 import {
     Drawer,
     DrawerClose,
@@ -33,22 +8,47 @@ import {
     DrawerHeader,
     DrawerTitle,
     DrawerTrigger,
-} from '@/components/ui/drawer'
-import { Button } from './ui/button'
-import { IconButton } from './xui/icon-button'
-import { useEffect, useRef, useState } from 'react'
+} from "@/components/ui/drawer"
+import {
+    NavigationMenu,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
+import { useAuth } from "@/hooks/useAuth"
+import { useMainStore } from "@/hooks/useMainStore"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
+import i18next from "i18next"
+import { LogOut, Settings, User2 } from "lucide-react"
+import { DateTime } from "luxon"
+import { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
-import { useTranslation } from 'react-i18next'
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { Button } from "./ui/button"
+import { Card } from "./ui/card"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
+import { IconButton } from "./xui/icon-button"
+import { NzNavigationMenuLink } from "./xui/navigation-menu"
 
-import i18next from 'i18next'
 const pages = [
-    { href: '/dashboard', label: i18next.t('Server') },
-    { href: '/dashboard/service', label: i18next.t('Service') },
-    { href: '/dashboard/cron', label: i18next.t('Task') },
-    { href: '/dashboard/notification', label: i18next.t('Notification') },
-    { href: '/dashboard/ddns', label: i18next.t('DDNS') },
-    { href: '/dashboard/nat', label: i18next.t('NATT') },
-    { href: '/dashboard/server-group', label: i18next.t('Group') },
+    { href: "/dashboard", label: i18next.t("Server") },
+    { href: "/dashboard/service", label: i18next.t("Service") },
+    { href: "/dashboard/cron", label: i18next.t("Task") },
+    { href: "/dashboard/notification", label: i18next.t("Notification") },
+    { href: "/dashboard/ddns", label: i18next.t("DDNS") },
+    { href: "/dashboard/nat", label: i18next.t("NATT") },
+    { href: "/dashboard/server-group", label: i18next.t("Group") },
 ]
 
 export default function Header() {
@@ -57,7 +57,7 @@ export default function Header() {
     const profile = useMainStore((store) => store.profile)
 
     const location = useLocation()
-    const isDesktop = useMediaQuery('(min-width: 890px)')
+    const isDesktop = useMediaQuery("(min-width: 890px)")
 
     const [open, setOpen] = useState(false)
     const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -71,17 +71,11 @@ export default function Header() {
                     <div className="flex justify-between items-center w-full">
                         <NavigationMenuLink
                             asChild
-                            className={
-                                navigationMenuTriggerStyle() +
-                                ' !text-foreground'
-                            }
+                            className={navigationMenuTriggerStyle() + " !text-foreground"}
                         >
-                            <Link to={profile ? '/dashboard' : '#'}>
-                                <img
-                                    className="h-7 mr-1"
-                                    src="/dashboard/logo.svg"
-                                />
-                                {t('nezha')}
+                            <Link to={profile ? "/dashboard" : "#"}>
+                                <img className="h-7 mr-1" src="/dashboard/logo.svg" />
+                                {t("nezha")}
                             </Link>
                         </NavigationMenuLink>
 
@@ -97,14 +91,12 @@ export default function Header() {
                                             <Avatar className="ml-1 h-8 w-8 cursor-pointer border-foreground border-[1px]">
                                                 <AvatarImage
                                                     src={
-                                                        'https://api.dicebear.com/7.x/notionists/svg?seed=' +
+                                                        "https://api.dicebear.com/7.x/notionists/svg?seed=" +
                                                         profile.username
                                                     }
                                                     alt={profile.username}
                                                 />
-                                                <AvatarFallback>
-                                                    {profile.username}
-                                                </AvatarFallback>
+                                                <AvatarFallback>{profile.username}</AvatarFallback>
                                             </Avatar>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-32">
@@ -116,29 +108,25 @@ export default function Header() {
                                                 <DropdownMenuItem
                                                     onClick={() => {
                                                         setDropdownOpen(false)
-                                                        navigate(
-                                                            '/dashboard/profile',
-                                                        )
+                                                        navigate("/dashboard/profile")
                                                     }}
                                                     className="cursor-pointer"
                                                 >
                                                     <div className="flex items-center gap-2 w-full">
                                                         <User2 />
-                                                        {t('Profile')}
+                                                        {t("Profile")}
                                                     </div>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => {
                                                         setDropdownOpen(false)
-                                                        navigate(
-                                                            '/dashboard/settings',
-                                                        )
+                                                        navigate("/dashboard/settings")
                                                     }}
                                                     className="cursor-pointer"
                                                 >
                                                     <div className="flex items-center gap-2 w-full">
                                                         <Settings />
-                                                        {t('Settings')}
+                                                        {t("Settings")}
                                                     </div>
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
@@ -148,7 +136,7 @@ export default function Header() {
                                                 className="cursor-pointer"
                                             >
                                                 <LogOut />
-                                                {t('Logout')}
+                                                {t("Logout")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -158,7 +146,7 @@ export default function Header() {
                     </div>
                 </section>
                 <div className="flex mt-4 ml-4">
-                    <Overview/>
+                    <Overview />
                 </div>
                 <div className="flex mt-4 list-none">
                     {profile && (
@@ -166,93 +154,70 @@ export default function Header() {
                             <NavigationMenuItem>
                                 <NzNavigationMenuLink
                                     asChild
-                                    active={location.pathname === '/dashboard'}
+                                    active={location.pathname === "/dashboard"}
                                     className={navigationMenuTriggerStyle()}
                                 >
-                                    <Link to="/dashboard">{t('Server')}</Link>
+                                    <Link to="/dashboard">{t("Server")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/service"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/service">{t("Service")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/cron"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/cron">{t("Task")}</Link>
                                 </NzNavigationMenuLink>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <NzNavigationMenuLink
                                     asChild
                                     active={
-                                        location.pathname ===
-                                        '/dashboard/service'
+                                        location.pathname === "/dashboard/notification" ||
+                                        location.pathname === "/dashboard/alert-rule"
                                     }
                                     className={navigationMenuTriggerStyle()}
                                 >
-                                    <Link to="/dashboard/service">
-                                        {t('Service')}
-                                    </Link>
+                                    <Link to="/dashboard/notification">{t("Notification")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/ddns"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/ddns">{t("DDNS")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/nat"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/nat">{t("NATT")}</Link>
                                 </NzNavigationMenuLink>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <NzNavigationMenuLink
                                     asChild
                                     active={
-                                        location.pathname === '/dashboard/cron'
+                                        location.pathname === "/dashboard/server-group" ||
+                                        location.pathname === "/dashboard/notification-group"
                                     }
                                     className={navigationMenuTriggerStyle()}
                                 >
-                                    <Link to="/dashboard/cron">
-                                        {t('Task')}
-                                    </Link>
-                                </NzNavigationMenuLink>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <NzNavigationMenuLink
-                                    asChild
-                                    active={
-                                        location.pathname ===
-                                            '/dashboard/notification' ||
-                                        location.pathname ===
-                                            '/dashboard/alert-rule'
-                                    }
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    <Link to="/dashboard/notification">
-                                        {t('Notification')}
-                                    </Link>
-                                </NzNavigationMenuLink>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <NzNavigationMenuLink
-                                    asChild
-                                    active={
-                                        location.pathname === '/dashboard/ddns'
-                                    }
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    <Link to="/dashboard/ddns">
-                                        {t('DDNS')}
-                                    </Link>
-                                </NzNavigationMenuLink>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <NzNavigationMenuLink
-                                    asChild
-                                    active={
-                                        location.pathname === '/dashboard/nat'
-                                    }
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    <Link to="/dashboard/nat">{t('NATT')}</Link>
-                                </NzNavigationMenuLink>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <NzNavigationMenuLink
-                                    asChild
-                                    active={
-                                        location.pathname ===
-                                            '/dashboard/server-group' ||
-                                        location.pathname ===
-                                            '/dashboard/notification-group'
-                                    }
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    <Link to="/dashboard/server-group">
-                                        {t('Group')}
-                                    </Link>
+                                    <Link to="/dashboard/server-group">{t("Group")}</Link>
                                 </NzNavigationMenuLink>
                             </NavigationMenuItem>
                         </>
@@ -270,16 +235,16 @@ export default function Header() {
                         </DrawerTrigger>
                         <DrawerContent>
                             <DrawerHeader className="text-left">
-                                <DrawerTitle>{t('NavigateTo')}</DrawerTitle>
+                                <DrawerTitle>{t("NavigateTo")}</DrawerTitle>
                                 <DrawerDescription>
-                                    {t('SelectAPageToNavigateTo')}
+                                    {t("SelectAPageToNavigateTo")}
                                 </DrawerDescription>
                             </DrawerHeader>
                             <div className="grid gap-1 px-4">
                                 {pages.slice(0).map((item, index) => (
                                     <Link
                                         key={index}
-                                        to={item.href ? item.href : '#'}
+                                        to={item.href ? item.href : "#"}
                                         className="py-1 text-sm"
                                         onClick={() => {
                                             setOpen(false)
@@ -291,9 +256,7 @@ export default function Header() {
                             </div>
                             <DrawerFooter>
                                 <DrawerClose asChild>
-                                    <Button variant="outline">
-                                        {t('Close')}
-                                    </Button>
+                                    <Button variant="outline">{t("Close")}</Button>
                                 </DrawerClose>
                             </DrawerFooter>
                         </DrawerContent>
@@ -303,7 +266,7 @@ export default function Header() {
             <Card className="mx-2 my-2 flex justify-center items-center hover:bg-accent transition duration-200">
                 <Link
                     className="inline-flex w-full items-center px-4 py-2"
-                    to={profile ? '/dashboard' : '#'}
+                    to={profile ? "/dashboard" : "#"}
                 >
                     <img className="h-7 mr-1" src="/dashboard/logo.svg" /> NEZHA
                 </Link>
@@ -312,65 +275,53 @@ export default function Header() {
                 <ModeToggle />
                 {profile && (
                     <>
-                        <DropdownMenu
-                            open={dropdownOpen}
-                            onOpenChange={setDropdownOpen}
-                        >
+                        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="ml-1 h-8 w-8 cursor-pointer border-foreground border-[1px]">
                                     <AvatarImage
                                         src={
-                                            'https://api.dicebear.com/7.x/notionists/svg?seed=' +
+                                            "https://api.dicebear.com/7.x/notionists/svg?seed=" +
                                             profile.username
                                         }
                                         alt={profile.username}
                                     />
-                                    <AvatarFallback>
-                                        {profile.username}
-                                    </AvatarFallback>
+                                    <AvatarFallback>{profile.username}</AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56">
-                                <DropdownMenuLabel>
-                                    {profile.username}
-                                </DropdownMenuLabel>
+                                <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem
                                         onClick={() => {
                                             setDropdownOpen(false)
-                                            navigate('/dashboard/profile')
+                                            navigate("/dashboard/profile")
                                         }}
                                         className="cursor-pointer"
                                     >
                                         <div className="flex items-center gap-2 w-full">
                                             <User2 />
-                                            {t('Profile')}
+                                            {t("Profile")}
                                         </div>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => {
                                             setDropdownOpen(false)
-                                            navigate('/dashboard/settings')
+                                            navigate("/dashboard/settings")
                                         }}
                                         className="cursor-pointer"
                                     >
                                         <div className="flex items-center gap-2 w-full">
                                             <Settings />
-                                            {t('Settings')}
+                                            {t("Settings")}
                                         </div>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    onClick={logout}
-                                    className="cursor-pointer"
-                                >
+                                <DropdownMenuItem onClick={logout} className="cursor-pointer">
                                     <LogOut />
-                                    {t('Logout')}
-                                    <DropdownMenuShortcut>
-                                        ⇧⌘Q
-                                    </DropdownMenuShortcut>
+                                    {t("Logout")}
+                                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -389,10 +340,7 @@ const useInterval = (callback: () => void, delay?: number | null) => {
     })
     useEffect(() => {
         if (delay !== null) {
-            const interval = setInterval(
-                () => savedCallback.current(),
-                delay || 0,
-            )
+            const interval = setInterval(() => savedCallback.current(), delay || 0)
             return () => clearInterval(interval)
         }
         return undefined
@@ -405,35 +353,27 @@ function Overview() {
     const timeOption = DateTime.TIME_SIMPLE
     timeOption.hour12 = true
     const [timeString, setTimeString] = useState(
-        DateTime.now().setLocale('en-US').toLocaleString(timeOption),
+        DateTime.now().setLocale("en-US").toLocaleString(timeOption),
     )
     useInterval(() => {
-        setTimeString(
-            DateTime.now().setLocale('en-US').toLocaleString(timeOption),
-        )
+        setTimeString(DateTime.now().setLocale("en-US").toLocaleString(timeOption))
     }, 1000)
     return (
-        <section className={'flex flex-col'}>
+        <section className={"flex flex-col"}>
             {profile && (
                 <div className="flex items-center gap-1.5">
                     <div className="flex gap-1.5 text-sm font-semibold">
                         👋 Hi, {profile?.username}
                         {profile?.login_ip && (
-                            <p className='font-medium opacity-45'>
-                            from {profile?.login_ip}
-                            </p> 
+                            <p className="font-medium opacity-45">from {profile?.login_ip}</p>
                         )}
                     </div>
                 </div>
             )}
             {!profile && <p className="text-sm font-semibold">{t("LoginFirst")}</p>}
             <div className="flex items-center gap-1.5">
-                <p className="text-[13px] font-medium opacity-50">
-                    {t("CurrentTime")}
-                </p>
-                <p className="opacity-1 text-[13px] font-medium">
-                    {timeString}
-                </p>
+                <p className="text-[13px] font-medium opacity-50">{t("CurrentTime")}</p>
+                <p className="opacity-1 text-[13px] font-medium">{timeString}</p>
             </div>
         </section>
     )

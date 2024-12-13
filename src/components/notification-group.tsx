@@ -1,3 +1,4 @@
+import { createNotificationGroup, updateNotificationGroup } from "@/api/notification-group"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -9,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import {
     Form,
     FormControl,
@@ -18,76 +18,76 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelNotificationGroupResponseItem } from "@/types"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
-import { createNotificationGroup, updateNotificationGroup } from "@/api/notification-group"
 import { MultiSelect } from "@/components/xui/multi-select"
 import { useNotification } from "@/hooks/useNotfication"
-
-import { useTranslation } from "react-i18next";
+import { ModelNotificationGroupResponseItem } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
 
 interface NotificationGroupCardProps {
-    data?: ModelNotificationGroupResponseItem;
-    mutate: KeyedMutator<ModelNotificationGroupResponseItem[]>;
+    data?: ModelNotificationGroupResponseItem
+    mutate: KeyedMutator<ModelNotificationGroupResponseItem[]>
 }
 
 const notificationGroupFormSchema = z.object({
     name: z.string().min(1),
     notifications: z.array(z.number()),
-});
+})
 
 export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ data, mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof notificationGroupFormSchema>>({
         resolver: zodResolver(notificationGroupFormSchema),
-        defaultValues: data ? {
-            name: data.group.name,
-            notifications: data.notifications,
-        } : {
-            name: "",
-            notifications: [],
-        },
+        defaultValues: data
+            ? {
+                  name: data.group.name,
+                  notifications: data.notifications,
+              }
+            : {
+                  name: "",
+                  notifications: [],
+              },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof notificationGroupFormSchema>) => {
-        data?.group.id ? await updateNotificationGroup(data.group.id, values) : await createNotificationGroup(values);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        data?.group.id
+            ? await updateNotificationGroup(data.group.id, values)
+            : await createNotificationGroup(values)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
-    const { notifiers } = useNotification();
-    const notifierList = notifiers?.map(n => ({
+    const { notifiers } = useNotification()
+    const notifierList = notifiers?.map((n) => ({
         value: `${n.id}`,
         label: n.name,
-    })) || [{ value: "", label: "" }];
+    })) || [{ value: "", label: "" }]
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>{data ? t("EditNotifierGroup") : t("CreateNotifierGroup")}</DialogTitle>
+                            <DialogTitle>
+                                {data ? t("EditNotifierGroup") : t("CreateNotifierGroup")}
+                            </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -99,10 +99,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                         <FormItem>
                                             <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="Group Name"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Group Name" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -116,9 +113,9 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                             <FormLabel>{t("Notification")}</FormLabel>
                                             <MultiSelect
                                                 options={notifierList}
-                                                onValueChange={e => {
-                                                    const arr = e.map(Number);
-                                                    field.onChange(arr);
+                                                onValueChange={(e) => {
+                                                    const arr = e.map(Number)
+                                                    field.onChange(arr)
                                                 }}
                                                 defaultValue={field.value?.map(String)}
                                             />
@@ -132,7 +129,9 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

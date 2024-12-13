@@ -1,6 +1,6 @@
-import { ModelServerGroupResponseItem, ServerIdentifierType } from "@/types";
+import { ModelServerGroupResponseItem, ServerIdentifierType } from "@/types"
 
 export interface ServerContextProps {
-    servers?: ServerIdentifierType[];
-    serverGroups?: ModelServerGroupResponseItem[];
+    servers?: ServerIdentifierType[]
+    serverGroups?: ModelServerGroupResponseItem[]
 }

@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { ModelSettingResponse, settingCoverageTypes, nezhaLang } from '@/types'
-import { SettingsTab } from '@/components/settings-tab'
-import { z } from 'zod'
-import { asOptionalField } from '@/lib/utils'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { getSettings, updateSettings } from "@/api/settings"
+import { SettingsTab } from "@/components/settings-tab"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Form,
     FormControl,
@@ -13,23 +10,25 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from '@/components/ui/form'
-import { getSettings, updateSettings } from '@/api/settings'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select'
-
-import { useTranslation } from 'react-i18next'
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { asOptionalField } from "@/lib/utils"
+import { ModelSettingResponse, nezhaLang, settingCoverageTypes } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import { z } from "zod"
 
 const settingFormSchema = z.object({
     dns_servers: asOptionalField(z.string()),
@@ -56,8 +55,8 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (error)
-            toast(t('Error'), {
-                description: t('Results.ErrorFetchingResource', {
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", {
                     error: error.message,
                 }),
             })
@@ -79,21 +78,20 @@ export default function SettingsPage() {
         resolver: zodResolver(settingFormSchema),
         defaultValues: config
             ? {
-                ...config,
-                site_name: config.site_name || '',
-                user_template:
+                  ...config,
+                  site_name: config.site_name || "",
+                  user_template:
                       config.user_template ||
-                      Object.keys(config.frontend_templates.filter((t) => !t.is_admin,
-                      ) || {})[0] ||
-                      'user-dist',
-            }
+                      Object.keys(config.frontend_templates.filter((t) => !t.is_admin) || {})[0] ||
+                      "user-dist",
+              }
             : {
-                ip_change_notification_group_id: 0,
-                cover: 1,
-                site_name: "",
-                language: "",
-                user_template: "user-dist",
-            },
+                  ip_change_notification_group_id: 0,
+                  cover: 1,
+                  site_name: "",
+                  language: "",
+                  user_template: "user-dist",
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -116,9 +114,9 @@ export default function SettingsPage() {
             return
         } finally {
             if (values.language != i18n.language) {
-                i18n.changeLanguage(values.language);
+                i18n.changeLanguage(values.language)
             }
-            toast(t("Success"));
+            toast(t("Success"))
         }
     }
 
@@ -127,16 +125,13 @@ export default function SettingsPage() {
             <SettingsTab className="mt-6 mb-4 w-full" />
             <div>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-2 my-2"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                         <FormField
                             control={form.control}
                             name="site_name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t('SiteName')}</FormLabel>
+                                    <FormLabel>{t("SiteName")}</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -149,140 +144,24 @@ export default function SettingsPage() {
                             name="language"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t('Language')}</FormLabel>
+                                    <FormLabel>{t("Language")}</FormLabel>
                                     <FormControl>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                        >
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {Object.entries(nezhaLang).map(
-                                                    ([k, v]) => (
-                                                        <SelectItem
-                                                            key={k}
-                                                            value={k}
-                                                        >
-                                                            {v}
-                                                        </SelectItem>
-                                                    ),
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="user_template"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('Theme')}</FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                const template =
-                                                    config?.frontend_templates?.find(
-                                                        (t) => t.path === value,
-                                                    )
-                                                if (template) {
-                                                    form.setValue(
-                                                        'user_template',
-                                                        template.path,
-                                                    )
-                                                }
-                                            }}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue
-                                                        placeholder={t(
-                                                            'SelectTheme',
-                                                        )}
-                                                    />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {(
-                                                    config?.frontend_templates.filter((t) => !t.is_admin) || []
-                                                ).map((template) => (
-                                                    <div key={template.path}>
-                                                        <SelectItem
-                                                            value={
-                                                                template.path
-                                                            }
-                                                        >
-                                                            <div className="flex flex-col items-start gap-1">
-                                                                <div className="font-medium">
-                                                                    {
-                                                                        template.name
-                                                                    }
-                                                                </div>
-                                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                                    <span>
-                                                                        {t(
-                                                                            'Author',
-                                                                        )}
-                                                                        :{' '}
-                                                                        {
-                                                                            template.author
-                                                                        }
-                                                                    </span>
-                                                                    {!template.is_official ? (
-                                                                        <span className="px-1.5 py-0.5 rounded-md bg-red-100 text-red-800 text-xs">
-                                                                            {t(
-                                                                                'Community',
-                                                                            )}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-xs">
-                                                                            {t(
-                                                                                'Official',
-                                                                            )}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </SelectItem>
-                                                        <div className="px-8 py-1">
-                                                            <a
-                                                                href={
-                                                                    template.repository
-                                                                }
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                                                            >
-                                                                {
-                                                                    template.repository
-                                                                }
-                                                            </a>
-                                                        </div>
-                                                    </div>
+                                                {Object.entries(nezhaLang).map(([k, v]) => (
+                                                    <SelectItem key={k} value={k}>
+                                                        {v}
+                                                    </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
                                     <FormMessage />
-                                    {!config?.frontend_templates?.find(
-                                        (t) => t.path === field.value,
-                                    )?.is_official && (
-                                        <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
-                                            <div className="font-medium text-lg mb-1">
-                                                {t('CommunityThemeWarning')}
-                                            </div>
-                                            <div className="text-yellow-700 dark:text-yellow-200">
-                                                {t('CommunityThemeDescription')}
-                                            </div>
-                                        </div>
-                                    )}
                                 </FormItem>
                             )}
                         />
@@ -296,9 +175,11 @@ export default function SettingsPage() {
                                         <Select
                                             value={field.value}
                                             onValueChange={(value) => {
-                                                const template = config?.frontend_templates?.find(t => t.path === value);
+                                                const template = config?.frontend_templates?.find(
+                                                    (t) => t.path === value,
+                                                )
                                                 if (template) {
-                                                    form.setValue("user_template", template.path ?? '');
+                                                    form.setValue("user_template", template.path)
                                                 }
                                             }}
                                         >
@@ -308,13 +189,22 @@ export default function SettingsPage() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {(config?.frontend_templates?.filter(t => !t.is_admin) || []).map((template) => (
+                                                {(
+                                                    config?.frontend_templates.filter(
+                                                        (t) => !t.is_admin,
+                                                    ) || []
+                                                ).map((template) => (
                                                     <div key={template.path}>
-                                                        <SelectItem value={template.path!}>
+                                                        <SelectItem value={template.path}>
                                                             <div className="flex flex-col items-start gap-1">
-                                                                <div className="font-medium">{template.name}</div>
+                                                                <div className="font-medium">
+                                                                    {template.name}
+                                                                </div>
                                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                                    <span>{t("Author")}: {template.author}</span>
+                                                                    <span>
+                                                                        {t("Author")}:{" "}
+                                                                        {template.author}
+                                                                    </span>
                                                                     {!template.is_official ? (
                                                                         <span className="px-1.5 py-0.5 rounded-md bg-red-100 text-red-800 text-xs">
                                                                             {t("Community")}
@@ -343,10 +233,102 @@ export default function SettingsPage() {
                                         </Select>
                                     </FormControl>
                                     <FormMessage />
-                                    {!config?.frontend_templates?.find(t => t.path === field.value)?.is_official && (
+                                    {!config?.frontend_templates?.find(
+                                        (t) => t.path === field.value,
+                                    )?.is_official && (
                                         <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
-                                            <div className="font-medium text-lg mb-1">{t("CommunityThemeWarning")}</div>
-                                            <div className="text-yellow-700 dark:text-yellow-200">{t("CommunityThemeDescription")}</div>
+                                            <div className="font-medium text-lg mb-1">
+                                                {t("CommunityThemeWarning")}
+                                            </div>
+                                            <div className="text-yellow-700 dark:text-yellow-200">
+                                                {t("CommunityThemeDescription")}
+                                            </div>
+                                        </div>
+                                    )}
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="user_template"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("Theme")}</FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={(value) => {
+                                                const template = config?.frontend_templates?.find(
+                                                    (t) => t.path === value,
+                                                )
+                                                if (template) {
+                                                    form.setValue(
+                                                        "user_template",
+                                                        template.path ?? "",
+                                                    )
+                                                }
+                                            }}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder={t("SelectTheme")} />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {(
+                                                    config?.frontend_templates?.filter(
+                                                        (t) => !t.is_admin,
+                                                    ) || []
+                                                ).map((template) => (
+                                                    <div key={template.path}>
+                                                        <SelectItem value={template.path!}>
+                                                            <div className="flex flex-col items-start gap-1">
+                                                                <div className="font-medium">
+                                                                    {template.name}
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                                    <span>
+                                                                        {t("Author")}:{" "}
+                                                                        {template.author}
+                                                                    </span>
+                                                                    {!template.is_official ? (
+                                                                        <span className="px-1.5 py-0.5 rounded-md bg-red-100 text-red-800 text-xs">
+                                                                            {t("Community")}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-xs">
+                                                                            {t("Official")}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </SelectItem>
+                                                        <div className="px-8 py-1">
+                                                            <a
+                                                                href={template.repository}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                                            >
+                                                                {template.repository}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                    {!config?.frontend_templates?.find(
+                                        (t) => t.path === field.value,
+                                    )?.is_official && (
+                                        <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
+                                            <div className="font-medium text-lg mb-1">
+                                                {t("CommunityThemeWarning")}
+                                            </div>
+                                            <div className="text-yellow-700 dark:text-yellow-200">
+                                                {t("CommunityThemeDescription")}
+                                            </div>
                                         </div>
                                     )}
                                 </FormItem>
@@ -357,12 +339,9 @@ export default function SettingsPage() {
                             name="custom_code"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t('CustomCodes')}</FormLabel>
+                                    <FormLabel>{t("CustomCodes")}</FormLabel>
                                     <FormControl>
-                                        <Textarea
-                                            className="resize-y min-h-48"
-                                            {...field}
-                                        />
+                                        <Textarea className="resize-y min-h-48" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -373,14 +352,9 @@ export default function SettingsPage() {
                             name="custom_code_dashboard"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        {t('CustomCodesDashboard')}
-                                    </FormLabel>
+                                    <FormLabel>{t("CustomCodesDashboard")}</FormLabel>
                                     <FormControl>
-                                        <Textarea
-                                            className="resize-y min-h-48"
-                                            {...field}
-                                        />
+                                        <Textarea className="resize-y min-h-48" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -391,9 +365,7 @@ export default function SettingsPage() {
                             name="install_host"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        {t('DashboardOriginalHost')}
-                                    </FormLabel>
+                                    <FormLabel>{t("DashboardOriginalHost")}</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -412,9 +384,7 @@ export default function SettingsPage() {
                                                 checked={field.value}
                                                 onCheckedChange={field.onChange}
                                             />
-                                            <Label className="text-sm">
-                                                {t('ConfigTLS')}
-                                            </Label>
+                                            <Label className="text-sm">{t("ConfigTLS")}</Label>
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -427,11 +397,9 @@ export default function SettingsPage() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        {t(
-                                            'CustomPublicDNSNameserversforDDNS',
-                                        ) +
-                                            ' ' +
-                                            t('SeparateWithComma')}
+                                        {t("CustomPublicDNSNameserversforDDNS") +
+                                            " " +
+                                            t("SeparateWithComma")}
                                     </FormLabel>
                                     <FormControl>
                                         <Input {...field} />
@@ -445,42 +413,33 @@ export default function SettingsPage() {
                             name="real_ip_header"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t('RealIPHeader')}</FormLabel>
+                                    <FormLabel>{t("RealIPHeader")}</FormLabel>
                                     <FormControl>
                                         <div className="flex items-center">
                                             <Input
-                                                disabled={
-                                                    field.value ==
-                                                    'NZ::Use-Peer-IP'
-                                                }
+                                                disabled={field.value == "NZ::Use-Peer-IP"}
                                                 className="w-1/2"
                                                 placeholder="CF-Connecting-IP"
                                                 {...field}
                                             />
                                             <Checkbox
-                                                checked={
-                                                    field.value ==
-                                                    'NZ::Use-Peer-IP'
-                                                }
+                                                checked={field.value == "NZ::Use-Peer-IP"}
                                                 className="ml-2"
                                                 onCheckedChange={(checked) => {
                                                     if (checked) {
                                                         field.disabled = true
                                                         form.setValue(
-                                                            'real_ip_header',
-                                                            'NZ::Use-Peer-IP',
+                                                            "real_ip_header",
+                                                            "NZ::Use-Peer-IP",
                                                         )
                                                     } else {
                                                         field.disabled = false
-                                                        form.setValue(
-                                                            'real_ip_header',
-                                                            '',
-                                                        )
+                                                        form.setValue("real_ip_header", "")
                                                     }
                                                 }}
                                             />
                                             <FormLabel className="font-normal ml-2">
-                                                {t('UseDirectConnectingIP')}
+                                                {t("UseDirectConnectingIP")}
                                             </FormLabel>
                                         </div>
                                     </FormControl>
@@ -489,7 +448,7 @@ export default function SettingsPage() {
                             )}
                         />
                         <FormItem>
-                            <FormLabel>{t('IPChangeNotification')}</FormLabel>
+                            <FormLabel>{t("IPChangeNotification")}</FormLabel>
                             <Card className="w-full">
                                 <CardContent>
                                     <div className="flex flex-col space-y-4 mt-4">
@@ -498,13 +457,9 @@ export default function SettingsPage() {
                                             name="cover"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>
-                                                        {t('Coverage')}
-                                                    </FormLabel>
+                                                    <FormLabel>{t("Coverage")}</FormLabel>
                                                     <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
+                                                        onValueChange={field.onChange}
                                                         value={`${field.value}`}
                                                     >
                                                         <FormControl>
@@ -516,10 +471,7 @@ export default function SettingsPage() {
                                                             {Object.entries(
                                                                 settingCoverageTypes,
                                                             ).map(([k, v]) => (
-                                                                <SelectItem
-                                                                    key={k}
-                                                                    value={k}
-                                                                >
+                                                                <SelectItem key={k} value={k}>
                                                                     {v}
                                                                 </SelectItem>
                                                             ))}
@@ -535,17 +487,12 @@ export default function SettingsPage() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>
-                                                        {t('SpecificServers') +
-                                                            ' ' +
-                                                            t(
-                                                                'SeparateWithComma',
-                                                            )}
+                                                        {t("SpecificServers") +
+                                                            " " +
+                                                            t("SeparateWithComma")}
                                                     </FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder="1,2,3"
-                                                            {...field}
-                                                        />
+                                                        <Input placeholder="1,2,3" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -556,9 +503,7 @@ export default function SettingsPage() {
                                             name="ip_change_notification_group_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>
-                                                        {t('NotifierGroupID')}
-                                                    </FormLabel>
+                                                    <FormLabel>{t("NotifierGroupID")}</FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             placeholder="0"
@@ -578,15 +523,11 @@ export default function SettingsPage() {
                                                     <FormControl>
                                                         <div className="flex items-center gap-2">
                                                             <Checkbox
-                                                                checked={
-                                                                    field.value
-                                                                }
-                                                                onCheckedChange={
-                                                                    field.onChange
-                                                                }
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
                                                             />
                                                             <Label className="text-sm">
-                                                                {t('Enable')}
+                                                                {t("Enable")}
                                                             </Label>
                                                         </div>
                                                     </FormControl>
@@ -610,7 +551,7 @@ export default function SettingsPage() {
                                                 onCheckedChange={field.onChange}
                                             />
                                             <Label className="text-sm">
-                                                {t('FullIPNotification')}
+                                                {t("FullIPNotification")}
                                             </Label>
                                         </div>
                                     </FormControl>
@@ -618,7 +559,7 @@ export default function SettingsPage() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">{t('Confirm')}</Button>
+                        <Button type="submit">{t("Confirm")}</Button>
                     </form>
                 </Form>
             </div>

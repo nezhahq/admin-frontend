@@ -1,7 +1,7 @@
-import { ModelProfile } from "@/types";
+import { ModelProfile } from "@/types"
 
 export interface AuthContextProps {
-    profile: ModelProfile | undefined;
-    login: (username: string, password: string) => void;
-    logout: () => void;
+    profile: ModelProfile | undefined
+    login: (username: string, password: string) => void
+    logout: () => void
 }

@@ -1,5 +1,12 @@
-import { swrFetcher } from "@/api/api";
-import { Checkbox } from "@/components/ui/checkbox";
+import { swrFetcher } from "@/api/api"
+import { deleteServer, forceUpdateServer } from "@/api/server"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { InstallCommandsMenu } from "@/components/install-commands"
+import { NoteMenu } from "@/components/note-menu"
+import { ServerCard } from "@/components/server"
+import { TerminalButton } from "@/components/terminal"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -7,37 +14,29 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import { ModelServer as Server, ModelForceUpdateResponse } from "@/types";
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import useSWR from "swr";
-import { HeaderButtonGroup } from "@/components/header-button-group";
-import { deleteServer, forceUpdateServer } from "@/api/server";
-import { ServerCard } from "@/components/server";
-import { ActionButtonGroup } from "@/components/action-button-group";
-import { useEffect, useMemo } from "react";
-import { toast } from "sonner";
-import { IconButton } from "@/components/xui/icon-button";
-import { InstallCommandsMenu } from "@/components/install-commands";
-import { NoteMenu } from "@/components/note-menu";
-import { TerminalButton } from "@/components/terminal";
-import { useServer } from "@/hooks/useServer";
-import { joinIP } from "@/lib/utils";
-
-import { useTranslation } from "react-i18next";
+} from "@/components/ui/table"
+import { IconButton } from "@/components/xui/icon-button"
+import { useServer } from "@/hooks/useServer"
+import { joinIP } from "@/lib/utils"
+import { ModelForceUpdateResponse, ModelServer as Server } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function ServerPage() {
-    const { t } = useTranslation();
-    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher);
-    const { serverGroups } = useServer();
+    const { t } = useTranslation()
+    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher)
+    const { serverGroups } = useServer()
 
     useEffect(() => {
         if (error)
             toast(t("Error"), {
                 description: t("Results.ErrorFetchingResource", { error: error.message }),
-            });
+            })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
+    }, [error])
 
     const columns: ColumnDef<Server>[] = [
         {
@@ -72,8 +71,8 @@ export default function ServerPage() {
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>;
+                const s = row.original
+                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
             },
         },
         {
@@ -81,16 +80,22 @@ export default function ServerPage() {
             accessorKey: "groups",
             accessorFn: (row) => {
                 return (
-                    serverGroups?.filter((sg) => sg.servers?.includes(row.id)).map((sg) => sg.group.id) || []
-                );
+                    serverGroups
+                        ?.filter((sg) => sg.servers?.includes(row.id))
+                        .map((sg) => sg.group.id) || []
+                )
             },
         },
         {
             id: "ip",
             header: "IP",
             cell: ({ row }) => {
-                const s = row.original;
-                return <div className="max-w-24 whitespace-normal break-words">{joinIP(s.geoip?.ip)}</div>;
+                const s = row.original
+                return (
+                    <div className="max-w-24 whitespace-normal break-words">
+                        {joinIP(s.geoip?.ip)}
+                    </div>
+                )
             },
         },
         {
@@ -112,15 +117,15 @@ export default function ServerPage() {
             id: "note",
             header: t("Note"),
             cell: ({ row }) => {
-                const s = row.original;
-                return <NoteMenu note={{ private: s.note, public: s.public_note }} />;
+                const s = row.original
+                return <NoteMenu note={{ private: s.note, public: s.public_note }} />
             },
         },
         {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {
-                const s = row.original;
+                const s = row.original
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
@@ -131,22 +136,22 @@ export default function ServerPage() {
                             <ServerCard mutate={mutate} data={s} />
                         </>
                     </ActionButtonGroup>
-                );
+                )
             },
         },
-    ];
+    ]
 
     const dataCache = useMemo(() => {
-        return data ?? [];
-    }, [data]);
+        return data ?? []
+    }, [data])
 
     const table = useReactTable({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
-    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedRows = table.getSelectedRowModel().rows
 
     return (
         <div className="px-3">
@@ -163,30 +168,37 @@ export default function ServerPage() {
                     <IconButton
                         icon="update"
                         onClick={async () => {
-                            const id = selectedRows.map((r) => r.original.id);
+                            const id = selectedRows.map((r) => r.original.id)
                             if (id.length < 1) {
                                 toast(t("Error"), {
                                     description: t("Results.SelectAtLeastOneServer"),
-                                });
-                                return;
+                                })
+                                return
                             }
 
-                            let resp: ModelForceUpdateResponse = {};
+                            let resp: ModelForceUpdateResponse = {}
                             try {
-                                resp = await forceUpdateServer(id);
+                                resp = await forceUpdateServer(id)
                             } catch (e) {
-                                console.error(e);
+                                console.error(e)
                                 toast(t("Error"), {
                                     description: t("Results.UnExpectedError"),
-                                });
-                                return;
+                                })
+                                return
                             }
                             toast(t("Done"), {
-                                description: t("Results.ForceUpdate")
-                                    + (resp.success?.length ? t(`Success`) + ` [${resp.success.join(",")}]` : "")
-                                    + (resp.failure?.length ? t(`Failure`) + ` [${resp.failure.join(",")}]` : "")
-                                    + (resp.offline?.length ? t(`Offline`) + ` [${resp.offline.join(",")}]` : "")
-                            });
+                                description:
+                                    t("Results.ForceUpdate") +
+                                    (resp.success?.length
+                                        ? t(`Success`) + ` [${resp.success.join(",")}]`
+                                        : "") +
+                                    (resp.failure?.length
+                                        ? t(`Failure`) + ` [${resp.failure.join(",")}]`
+                                        : "") +
+                                    (resp.offline?.length
+                                        ? t(`Offline`) + ` [${resp.offline.join(",")}]`
+                                        : ""),
+                            })
                         }}
                     />
                     <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
@@ -201,9 +213,12 @@ export default function ServerPage() {
                                     <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
-                                );
+                                )
                             })}
                         </TableRow>
                     ))}
@@ -235,5 +250,5 @@ export default function ServerPage() {
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }

@@ -1,3 +1,4 @@
+import { createCron, updateCron } from "@/api/cron"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -9,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import {
     Form,
     FormControl,
@@ -18,6 +18,8 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -25,28 +27,26 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelCron } from "@/types"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
 import { IconButton } from "@/components/xui/icon-button"
-import { createCron, updateCron } from "@/api/cron"
-import { asOptionalField } from "@/lib/utils"
-import { cronTypes, cronCoverageTypes } from "@/types"
-import { Textarea } from "./ui/textarea"
-import { useServer } from "@/hooks/useServer"
 import { useNotification } from "@/hooks/useNotfication"
-import { MultiSelect } from "./xui/multi-select"
-import { Combobox } from "./ui/combobox"
+import { useServer } from "@/hooks/useServer"
+import { asOptionalField } from "@/lib/utils"
+import { ModelCron } from "@/types"
+import { cronCoverageTypes, cronTypes } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
 
-import { useTranslation } from "react-i18next";
+import { Combobox } from "./ui/combobox"
+import { Textarea } from "./ui/textarea"
+import { MultiSelect } from "./xui/multi-select"
 
 interface CronCardProps {
-    data?: ModelCron;
-    mutate: KeyedMutator<ModelCron[]>;
+    data?: ModelCron
+    mutate: KeyedMutator<ModelCron[]>
 }
 
 const cronFormSchema = z.object({
@@ -58,61 +58,58 @@ const cronFormSchema = z.object({
     cover: z.coerce.number().int(),
     push_successful: asOptionalField(z.boolean()),
     notification_group_id: z.coerce.number().int(),
-});
+})
 
 export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof cronFormSchema>>({
         resolver: zodResolver(cronFormSchema),
-        defaultValues: data ? data : {
-            name: "",
-            task_type: 0,
-            scheduler: "",
-            servers: [],
-            cover: 0,
-            notification_group_id: 0,
-        },
+        defaultValues: data
+            ? data
+            : {
+                  name: "",
+                  task_type: 0,
+                  scheduler: "",
+                  servers: [],
+                  cover: 0,
+                  notification_group_id: 0,
+              },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof cronFormSchema>) => {
-        data?.id ? await updateCron(data.id, values) : await createCron(values);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        data?.id ? await updateCron(data.id, values) : await createCron(values)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
-    const { servers } = useServer();
-    const serverList = servers?.map(s => ({
+    const { servers } = useServer()
+    const serverList = servers?.map((s) => ({
         value: `${s.id}`,
         label: s.name,
-    })) || [{ value: "", label: "" }];
+    })) || [{ value: "", label: "" }]
 
-    const { notifierGroup } = useNotification();
-    const ngroupList = notifierGroup?.map(ng => ({
+    const { notifierGroup } = useNotification()
+    const ngroupList = notifierGroup?.map((ng) => ({
         value: `${ng.group.id}`,
         label: ng.group.name,
-    })) || [{ value: "", label: "" }];
+    })) || [{ value: "", label: "" }]
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>{data?t("EditTask"):t("CreateTask")}</DialogTitle>
+                            <DialogTitle>{data ? t("EditTask") : t("CreateTask")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -124,10 +121,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="My Task"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="My Task" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -139,7 +133,10 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("Type")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select task type" />
@@ -147,7 +144,9 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     {Object.entries(cronTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                        <SelectItem key={k} value={k}>
+                                                            {v}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -160,7 +159,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     name="scheduler"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("CronExpression") }</FormLabel>
+                                            <FormLabel>{t("CronExpression")}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="0 0 0 3 * * (At 3 AM)"
@@ -178,10 +177,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Command")}</FormLabel>
                                             <FormControl>
-                                                <Textarea
-                                                    className="resize-y"
-                                                    {...field}
-                                                />
+                                                <Textarea className="resize-y" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -193,16 +189,23 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("Coverage")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(cronCoverageTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
-                                                    ))}
+                                                    {Object.entries(cronCoverageTypes).map(
+                                                        ([k, v]) => (
+                                                            <SelectItem key={k} value={k}>
+                                                                {v}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -218,9 +221,9 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <MultiSelect
                                                     options={serverList}
-                                                    onValueChange={e => {
-                                                        const arr = e.map(Number);
-                                                        field.onChange(arr);
+                                                    onValueChange={(e) => {
+                                                        const arr = e.map(Number)
+                                                        field.onChange(arr)
                                                     }}
                                                     defaultValue={field.value?.map(String)}
                                                 />
@@ -253,7 +256,9 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

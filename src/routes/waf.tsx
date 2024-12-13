@@ -1,5 +1,9 @@
-import { swrFetcher } from '@/api/api'
-import { Checkbox } from '@/components/ui/checkbox'
+import { swrFetcher } from "@/api/api"
+import { deleteWAF } from "@/api/waf"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { SettingsTab } from "@/components/settings-tab"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -7,35 +11,22 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table'
-import {
-    ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table'
-import useSWR from 'swr'
-import { useEffect, useMemo } from 'react'
-import { ActionButtonGroup } from '@/components/action-button-group'
-import { HeaderButtonGroup } from '@/components/header-button-group'
-import { toast } from 'sonner'
-import { ModelWAFApiMock, wafBlockReasons } from '@/types'
-import { deleteWAF } from '@/api/waf'
-import { ip16Str } from '@/lib/utils'
-import { SettingsTab } from '@/components/settings-tab'
-
-import { useTranslation } from 'react-i18next'
+} from "@/components/ui/table"
+import { ip16Str } from "@/lib/utils"
+import { ModelWAFApiMock, wafBlockReasons } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function WAFPage() {
     const { t } = useTranslation()
-    const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock[]>(
-        '/api/v1/waf',
-        swrFetcher,
-    )
+    const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock[]>("/api/v1/waf", swrFetcher)
 
     useEffect(() => {
         if (error)
-            toast(t('Error'), {
+            toast(t("Error"), {
                 description: t(`Error fetching resource: ${error.message}.`),
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,16 +34,14 @@ export default function WAFPage() {
 
     const columns: ColumnDef<ModelWAFApiMock>[] = [
         {
-            id: 'select',
+            id: "select",
             header: ({ table }) => (
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && 'indeterminate')
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
                 />
             ),
@@ -67,28 +56,24 @@ export default function WAFPage() {
             enableHiding: false,
         },
         {
-            header: 'IP',
-            accessorKey: 'ip',
-            accessorFn: (row) => ip16Str(row.ip ?? ''),
+            header: "IP",
+            accessorKey: "ip",
+            accessorFn: (row) => ip16Str(row.ip ?? ""),
         },
         {
-            header: t('Count'),
-            accessorKey: 'count',
+            header: t("Count"),
+            accessorKey: "count",
             accessorFn: (row) => row.count,
         },
         {
-            header: t('LastBlockReason'),
-            accessorKey: 'lastBlockReason',
+            header: t("LastBlockReason"),
+            accessorKey: "lastBlockReason",
             accessorFn: (row) => row.last_block_reason,
-            cell: ({ row }) => (
-                <span>
-                    {wafBlockReasons[row.original.last_block_reason] || ''}
-                </span>
-            ),
+            cell: ({ row }) => <span>{wafBlockReasons[row.original.last_block_reason] || ""}</span>,
         },
         {
-            header: t('LastBlockTime'),
-            accessorKey: 'lastBlockTime',
+            header: t("LastBlockTime"),
+            accessorKey: "lastBlockTime",
             accessorFn: (row) => row.last_block_timestamp,
             cell: ({ row }) => {
                 const s = row.original
@@ -97,8 +82,8 @@ export default function WAFPage() {
             },
         },
         {
-            id: 'actions',
-            header: 'Actions',
+            id: "actions",
+            header: "Actions",
             cell: ({ row }) => {
                 const s = row.original
                 return (
@@ -106,7 +91,7 @@ export default function WAFPage() {
                         className="flex gap-2"
                         delete={{
                             fn: deleteWAF,
-                            id: ip16Str(s.ip ?? ''),
+                            id: ip16Str(s.ip ?? ""),
                             mutate: mutate,
                         }}
                     >
@@ -137,9 +122,7 @@ export default function WAFPage() {
                     className="flex-2 flex gap-2 ml-auto"
                     delete={{
                         fn: deleteWAF,
-                        id: selectedRows.map((r) =>
-                            ip16Str(r.original.ip ?? ''),
-                        ),
+                        id: selectedRows.map((r) => ip16Str(r.original.ip ?? "")),
                         mutate: mutate,
                     }}
                 >
@@ -152,17 +135,13 @@ export default function WAFPage() {
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <TableHead
-                                        key={header.id}
-                                        className="text-sm"
-                                    >
+                                    <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef
-                                                    .header,
-                                                header.getContext(),
-                                            )}
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
                                 )
                             })}
@@ -172,39 +151,24 @@ export default function WAFPage() {
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-24 text-center"
-                            >
-                                {t('Loading')}...
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && 'selected'}
-                            >
+                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell
-                                        key={cell.id}
-                                        className="text-xsm"
-                                    >
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext(),
-                                        )}
+                                    <TableCell key={cell.id} className="text-xsm">
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
                             </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-24 text-center"
-                            >
-                                {t('NoResults')}
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

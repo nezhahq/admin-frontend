@@ -1,4 +1,6 @@
+import { createAlertRule, updateAlertRule } from "@/api/alert-rule"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogClose,
@@ -9,14 +11,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Form,
     FormControl,
@@ -25,29 +19,35 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelAlertRule } from "@/types"
-import { createAlertRule, updateAlertRule } from "@/api/alert-rule"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { conv } from "@/lib/utils"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
-import { asOptionalField } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
-import { triggerModes } from "@/types"
-import { Textarea } from "./ui/textarea"
 import { useNotification } from "@/hooks/useNotfication"
-import { Combobox } from "./ui/combobox"
+import { conv } from "@/lib/utils"
+import { asOptionalField } from "@/lib/utils"
+import { ModelAlertRule } from "@/types"
+import { triggerModes } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
 
-import { useTranslation } from "react-i18next";
+import { Combobox } from "./ui/combobox"
+import { Textarea } from "./ui/textarea"
 
 interface AlertRuleCardProps {
-    data?: ModelAlertRule;
-    mutate: KeyedMutator<ModelAlertRule[]>;
+    data?: ModelAlertRule
+    mutate: KeyedMutator<ModelAlertRule[]>
 }
 
 const ruleSchema = z.object({
@@ -56,87 +56,91 @@ const ruleSchema = z.object({
     max: asOptionalField(z.number()),
     cycle_start: asOptionalField(z.string()),
     cycle_interval: asOptionalField(z.number()),
-    cycle_unit: asOptionalField(z.enum(['hour', 'day', 'week', 'month', 'year'])),
+    cycle_unit: asOptionalField(z.enum(["hour", "day", "week", "month", "year"])),
     duration: asOptionalField(z.number()),
     cover: z.number().int().min(0),
     ignore: asOptionalField(z.record(z.boolean())),
     next_transfer_at: asOptionalField(z.record(z.string())),
-    last_cycle_status: asOptionalField((z.boolean())),
-});
+    last_cycle_status: asOptionalField(z.boolean()),
+})
 
 const alertRuleFormSchema = z.object({
     name: z.string().min(1),
-    rules_raw: z.string().refine((val) => {
-        try {
-            JSON.parse(val);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }, {
-        message: 'Invalid JSON string',
-    }),
+    rules_raw: z.string().refine(
+        (val) => {
+            try {
+                JSON.parse(val)
+                return true
+            } catch (e) {
+                return false
+            }
+        },
+        {
+            message: "Invalid JSON string",
+        },
+    ),
     rules: z.array(ruleSchema),
     fail_trigger_tasks: z.array(z.number()),
     recover_trigger_tasks: z.array(z.number()),
     notification_group_id: z.coerce.number().int(),
     trigger_mode: z.coerce.number().int().min(0),
     enable: asOptionalField(z.boolean()),
-});
+})
 
 export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof alertRuleFormSchema>>({
         resolver: zodResolver(alertRuleFormSchema),
-        defaultValues: data ? {
-            ...data,
-            rules_raw: JSON.stringify(data.rules),
-        } : {
-            name: "",
-            rules_raw: "",
-            rules: [],
-            fail_trigger_tasks: [],
-            recover_trigger_tasks: [],
-            notification_group_id: 0,
-            trigger_mode: 0,
-        },
+        defaultValues: data
+            ? {
+                  ...data,
+                  rules_raw: JSON.stringify(data.rules),
+              }
+            : {
+                  name: "",
+                  rules_raw: "",
+                  rules: [],
+                  fail_trigger_tasks: [],
+                  recover_trigger_tasks: [],
+                  notification_group_id: 0,
+                  trigger_mode: 0,
+              },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof alertRuleFormSchema>) => {
-        values.rules = JSON.parse(values.rules_raw);
-        const { rules_raw, ...requiredFields } = values;
-        data?.id ? await updateAlertRule(data.id, requiredFields) : await createAlertRule(requiredFields);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        values.rules = JSON.parse(values.rules_raw)
+        const { rules_raw, ...requiredFields } = values
+        data?.id
+            ? await updateAlertRule(data.id, requiredFields)
+            : await createAlertRule(requiredFields)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
-    const { notifierGroup } = useNotification();
-    const ngroupList = notifierGroup?.map(ng => ({
+    const { notifierGroup } = useNotification()
+    const ngroupList = notifierGroup?.map((ng) => ({
         value: `${ng.group.id}`,
         label: ng.group.name,
-    })) || [{ value: "", label: "" }];
+    })) || [{ value: "", label: "" }]
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>{data ? t("EditAlertRule") : t("CreateAlertRule")}</DialogTitle>
+                            <DialogTitle>
+                                {data ? t("EditAlertRule") : t("CreateAlertRule")}
+                            </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -148,9 +152,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                         <FormItem>
                                             <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -163,10 +165,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                         <FormItem>
                                             <FormLabel>{t("Rules")}</FormLabel>
                                             <FormControl>
-                                                <Textarea
-                                                    className="resize-y"
-                                                    {...field}
-                                                />
+                                                <Textarea className="resize-y" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -196,7 +195,10 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("TriggerMode")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue />
@@ -204,7 +206,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                 </FormControl>
                                                 <SelectContent>
                                                     {Object.entries(triggerModes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                        <SelectItem key={k} value={k}>
+                                                            {v}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -217,15 +221,20 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="fail_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("TasksToTriggerOnAlert") + t("SeparateWithComma")}</FormLabel>
+                                            <FormLabel>
+                                                {t("TasksToTriggerOnAlert") +
+                                                    t("SeparateWithComma")}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value).map(Number);
-                                                        field.onChange(arr);
+                                                    onChange={(e) => {
+                                                        const arr = conv
+                                                            .strToArr(e.target.value)
+                                                            .map(Number)
+                                                        field.onChange(arr)
                                                     }}
                                                 />
                                             </FormControl>
@@ -238,15 +247,20 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     name="recover_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("TasksToTriggerAfterRecovery") + t("SeparateWithComma")}</FormLabel>
+                                            <FormLabel>
+                                                {t("TasksToTriggerAfterRecovery") +
+                                                    t("SeparateWithComma")}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value).map(Number);
-                                                        field.onChange(arr);
+                                                    onChange={(e) => {
+                                                        const arr = conv
+                                                            .strToArr(e.target.value)
+                                                            .map(Number)
+                                                        field.onChange(arr)
                                                     }}
                                                 />
                                             </FormControl>
@@ -278,7 +292,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Confirm")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Confirm")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

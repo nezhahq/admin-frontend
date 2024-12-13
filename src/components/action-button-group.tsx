@@ -1,4 +1,3 @@
-import { IconButton } from "@/components/xui/icon-button";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -10,29 +9,33 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { KeyedMutator } from "swr";
 import { buttonVariants } from "@/components/ui/button"
-
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { IconButton } from "@/components/xui/icon-button"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import { KeyedMutator } from "swr"
 
 interface ButtonGroupProps<E, U> {
-    className?: string;
-    children: React.ReactNode;
-    delete: { fn: (id: E[]) => Promise<void>, id: E, mutate: KeyedMutator<U> };
+    className?: string
+    children: React.ReactNode
+    delete: { fn: (id: E[]) => Promise<void>; id: E; mutate: KeyedMutator<U> }
 }
 
-export function ActionButtonGroup<E, U>({ className, children, delete: { fn, id, mutate } }: ButtonGroupProps<E, U>) {
-    const { t } = useTranslation();
+export function ActionButtonGroup<E, U>({
+    className,
+    children,
+    delete: { fn, id, mutate },
+}: ButtonGroupProps<E, U>) {
+    const { t } = useTranslation()
     const handleDelete = async () => {
         try {
-            await fn([id]);
+            await fn([id])
         } catch (error: any) {
             toast(t("Error"), {
                 description: error.message,
-            });
+            })
         }
-        await mutate();
+        await mutate()
     }
 
     return (
@@ -51,7 +54,12 @@ export function ActionButtonGroup<E, U>({ className, children, delete: { fn, id,
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
-                        <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleDelete}>{t("Confirm")}</AlertDialogAction>
+                        <AlertDialogAction
+                            className={buttonVariants({ variant: "destructive" })}
+                            onClick={handleDelete}
+                        >
+                            {t("Confirm")}
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

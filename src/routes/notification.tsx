@@ -1,5 +1,10 @@
-import { swrFetcher } from '@/api/api'
-import { Checkbox } from '@/components/ui/checkbox'
+import { swrFetcher } from "@/api/api"
+import { deleteNotification } from "@/api/notification"
+import { ActionButtonGroup } from "@/components/action-button-group"
+import { HeaderButtonGroup } from "@/components/header-button-group"
+import { NotificationTab } from "@/components/notification-tab"
+import { NotifierCard } from "@/components/notifier"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Table,
     TableBody,
@@ -7,38 +12,27 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table'
-import {
-    ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table'
-import useSWR from 'swr'
-import { useEffect, useMemo } from 'react'
-import { ActionButtonGroup } from '@/components/action-button-group'
-import { HeaderButtonGroup } from '@/components/header-button-group'
-import { toast } from 'sonner'
-import { ModelNotification } from '@/types'
-import { deleteNotification } from '@/api/notification'
-import { NotificationTab } from '@/components/notification-tab'
-import { NotifierCard } from '@/components/notifier'
-import { useNotification } from '@/hooks/useNotfication'
-
-import { useTranslation } from 'react-i18next'
+} from "@/components/ui/table"
+import { useNotification } from "@/hooks/useNotfication"
+import { ModelNotification } from "@/types"
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import useSWR from "swr"
 
 export default function NotificationPage() {
     const { t } = useTranslation()
     const { data, mutate, error, isLoading } = useSWR<ModelNotification[]>(
-        '/api/v1/notification',
+        "/api/v1/notification",
         swrFetcher,
     )
     const { notifierGroup } = useNotification()
 
     useEffect(() => {
         if (error)
-            toast(t('Error'), {
-                description: t('Results.ErrorFetchingResource', {
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", {
                     error: error.message,
                 }),
             })
@@ -47,16 +41,14 @@ export default function NotificationPage() {
 
     const columns: ColumnDef<ModelNotification>[] = [
         {
-            id: 'select',
+            id: "select",
             header: ({ table }) => (
                 <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && 'indeterminate')
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
                 />
             ),
@@ -71,26 +63,22 @@ export default function NotificationPage() {
             enableHiding: false,
         },
         {
-            header: 'ID',
-            accessorKey: 'id',
+            header: "ID",
+            accessorKey: "id",
             accessorFn: (row) => row.id,
         },
         {
-            header: t('Name'),
-            accessorKey: 'name',
+            header: t("Name"),
+            accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
                 const s = row.original
-                return (
-                    <div className="max-w-32 whitespace-normal break-words">
-                        {s.name}
-                    </div>
-                )
+                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
             },
         },
         {
-            header: t('Group'),
-            accessorKey: 'groups',
+            header: t("Group"),
+            accessorKey: "groups",
             accessorFn: (row) => {
                 return (
                     notifierGroup
@@ -100,26 +88,22 @@ export default function NotificationPage() {
             },
         },
         {
-            header: 'URL',
-            accessorKey: 'url',
+            header: "URL",
+            accessorKey: "url",
             accessorFn: (row) => row.url,
             cell: ({ row }) => {
                 const s = row.original
-                return (
-                    <div className="max-w-64 whitespace-normal break-words">
-                        {s.url}
-                    </div>
-                )
+                return <div className="max-w-64 whitespace-normal break-words">{s.url}</div>
             },
         },
         {
-            header: t('VerifyTLS'),
-            accessorKey: 'verify_tls',
+            header: t("VerifyTLS"),
+            accessorKey: "verify_tls",
             accessorFn: (row) => row.verify_tls,
         },
         {
-            id: 'actions',
-            header: t('Actions'),
+            id: "actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original
                 return (
@@ -172,17 +156,13 @@ export default function NotificationPage() {
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <TableHead
-                                        key={header.id}
-                                        className="text-sm"
-                                    >
+                                    <TableHead key={header.id} className="text-sm">
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef
-                                                    .header,
-                                                header.getContext(),
-                                            )}
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
                                 )
                             })}
@@ -192,39 +172,24 @@ export default function NotificationPage() {
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-24 text-center"
-                            >
-                                {t('Loading')}...
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t("Loading")}...
                             </TableCell>
                         </TableRow>
                     ) : table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && 'selected'}
-                            >
+                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell
-                                        key={cell.id}
-                                        className="text-xsm"
-                                    >
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext(),
-                                        )}
+                                    <TableCell key={cell.id} className="text-xsm">
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
                             </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-24 text-center"
-                            >
-                                {t('NoResults')}
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t("NoResults")}
                             </TableCell>
                         </TableRow>
                     )}

@@ -1,4 +1,6 @@
+import { createService, updateService } from "@/api/service"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogClose,
@@ -9,14 +11,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Form,
     FormControl,
@@ -25,30 +19,36 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ModelService } from "@/types"
-import { createService, updateService } from "@/api/service"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { conv } from "@/lib/utils"
-import { useState } from "react"
-import { KeyedMutator } from "swr"
-import { asOptionalField } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
-import { serviceTypes, serviceCoverageTypes } from "@/types"
-import { MultiSelect } from "./xui/multi-select"
-import { Combobox } from "./ui/combobox"
-import { useServer } from "@/hooks/useServer"
 import { useNotification } from "@/hooks/useNotfication"
+import { useServer } from "@/hooks/useServer"
+import { conv } from "@/lib/utils"
+import { asOptionalField } from "@/lib/utils"
+import { ModelService } from "@/types"
+import { serviceCoverageTypes, serviceTypes } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
+import { KeyedMutator } from "swr"
+import { z } from "zod"
 
-import { useTranslation } from "react-i18next";
+import { Combobox } from "./ui/combobox"
+import { MultiSelect } from "./xui/multi-select"
 
 interface ServiceCardProps {
-    data?: ModelService;
-    mutate: KeyedMutator<ModelService[]>;
+    data?: ModelService
+    mutate: KeyedMutator<ModelService[]>
 }
 
 const serviceFormSchema = z.object({
@@ -68,72 +68,73 @@ const serviceFormSchema = z.object({
     skip_servers_raw: z.array(z.string()),
     target: z.string(),
     type: z.coerce.number().int().min(0),
-});
+})
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const form = useForm<z.infer<typeof serviceFormSchema>>({
         resolver: zodResolver(serviceFormSchema),
-        defaultValues: data ? {
-            ...data,
-            skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
-        } : {
-            type: 1,
-            cover: 0,
-            name: "",
-            target: "",
-            max_latency: 0.0,
-            min_latency: 0.0,
-            duration: 30,
-            notification_group_id: 0,
-            fail_trigger_tasks: [],
-            recover_trigger_tasks: [],
-            skip_servers: {},
-            skip_servers_raw: [],
-        },
+        defaultValues: data
+            ? {
+                  ...data,
+                  skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
+              }
+            : {
+                  type: 1,
+                  cover: 0,
+                  name: "",
+                  target: "",
+                  max_latency: 0.0,
+                  min_latency: 0.0,
+                  duration: 30,
+                  notification_group_id: 0,
+                  fail_trigger_tasks: [],
+                  recover_trigger_tasks: [],
+                  skip_servers: {},
+                  skip_servers_raw: [],
+              },
         resetOptions: {
             keepDefaultValues: false,
-        }
+        },
     })
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
-        values.skip_servers = conv.arrToRecord(values.skip_servers_raw);
-        const { skip_servers_raw, ...requiredFields } = values;
-        data?.id ? await updateService(data.id, requiredFields) : await createService(requiredFields);
-        setOpen(false);
-        await mutate();
-        form.reset();
+        values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
+        const { skip_servers_raw, ...requiredFields } = values
+        data?.id
+            ? await updateService(data.id, requiredFields)
+            : await createService(requiredFields)
+        setOpen(false)
+        await mutate()
+        form.reset()
     }
 
-    const { servers } = useServer();
-    const serverList = servers?.map(s => ({
+    const { servers } = useServer()
+    const serverList = servers?.map((s) => ({
         value: `${s.id}`,
         label: s.name,
-    })) || [{ value: "", label: "" }];
+    })) || [{ value: "", label: "" }]
 
-    const { notifierGroup } = useNotification();
-    const ngroupList = notifierGroup?.map(ng => ({
+    const { notifierGroup } = useNotification()
+    const ngroupList = notifierGroup?.map((ng) => ({
         value: `${ng.group.id}`,
         label: ng.group.name,
-    })) || [{ value: "", label: "" }];
+    })) || [{ value: "", label: "" }]
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {data
-                    ?
-                    <IconButton variant="outline" icon="edit" />
-                    :
-                    <IconButton icon="plus" />
-                }
+                {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>
-                            <DialogTitle>{data?t("EditService"):t("CreateService")}</DialogTitle>
+                            <DialogTitle>
+                                {data ? t("EditService") : t("CreateService")}
+                            </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
@@ -176,7 +177,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("Type")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select service type" />
@@ -184,7 +188,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     {Object.entries(serviceTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                                                        <SelectItem key={k} value={k}>
+                                                            {v}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -203,7 +209,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("ShowInService")}</Label>
+                                                    <Label className="text-sm">
+                                                        {t("ShowInService")}
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -217,11 +225,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Interval")} (s)</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="30"
-                                                    {...field}
-                                                />
+                                                <Input type="number" placeholder="30" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -233,16 +237,23 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("Coverage")}</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={`${field.value}`}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(serviceCoverageTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>{v}</SelectItem>
-                                                    ))}
+                                                    {Object.entries(serviceCoverageTypes).map(
+                                                        ([k, v]) => (
+                                                            <SelectItem key={k} value={k}>
+                                                                {v}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -295,7 +306,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("EnableFailureNotification")}</Label>
+                                                    <Label className="text-sm">
+                                                        {t("EnableFailureNotification")}
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -347,7 +360,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("EnableLatencyNotification")}</Label>
+                                                    <Label className="text-sm">
+                                                        {t("EnableLatencyNotification")}
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -365,7 +380,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">{t("EnableTriggerTask")}</Label>
+                                                    <Label className="text-sm">
+                                                        {t("EnableTriggerTask")}
+                                                    </Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -377,15 +394,20 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="fail_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("TasksToTriggerOnAlert") + t("SeparateWithComma")}</FormLabel>
+                                            <FormLabel>
+                                                {t("TasksToTriggerOnAlert") +
+                                                    t("SeparateWithComma")}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value).map(Number);
-                                                        field.onChange(arr);
+                                                    onChange={(e) => {
+                                                        const arr = conv
+                                                            .strToArr(e.target.value)
+                                                            .map(Number)
+                                                        field.onChange(arr)
                                                     }}
                                                 />
                                             </FormControl>
@@ -398,15 +420,20 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     name="recover_trigger_tasks"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("TasksToTriggerAfterRecovery") + t("SeparateWithComma")}</FormLabel>
+                                            <FormLabel>
+                                                {t("TasksToTriggerAfterRecovery") +
+                                                    t("SeparateWithComma")}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="1,2,3"
                                                     {...field}
                                                     value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={e => {
-                                                        const arr = conv.strToArr(e.target.value).map(Number);
-                                                        field.onChange(arr);
+                                                    onChange={(e) => {
+                                                        const arr = conv
+                                                            .strToArr(e.target.value)
+                                                            .map(Number)
+                                                        field.onChange(arr)
                                                     }}
                                                 />
                                             </FormControl>
@@ -420,7 +447,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">{t("Submit")}</Button>
+                                    <Button type="submit" className="my-2">
+                                        {t("Submit")}
+                                    </Button>
                                 </DialogFooter>
                             </form>
                         </Form>

@@ -1,7 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -13,9 +9,11 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/useAuth"
-
+import { zodResolver } from "@hookform/resolvers/zod"
+import i18next from "i18next"
+import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import i18next from "i18next";
+import { z } from "zod"
 
 const formSchema = z.object({
     username: z.string().min(2, {
@@ -23,9 +21,8 @@ const formSchema = z.object({
     }),
     password: z.string().min(1, {
         message: i18next.t("Results.PasswordRequired"),
-    })
+    }),
 })
-
 
 function Login() {
     const { login } = useAuth()
@@ -42,7 +39,7 @@ function Login() {
         login(values.username, values.password)
     }
 
-    const { t } = useTranslation();
+    const { t } = useTranslation()
 
     return (
         <div className="mt-28 max-w-sm m-auto">
@@ -68,7 +65,12 @@ function Login() {
                             <FormItem>
                                 <FormLabel>{t("Password")}</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder="admin" autoComplete="current-password" {...field} />
+                                    <Input
+                                        type="password"
+                                        placeholder="admin"
+                                        autoComplete="current-password"
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -81,4 +83,4 @@ function Login() {
     )
 }
 
-export default Login;
+export default Login
