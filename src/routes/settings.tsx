@@ -79,6 +79,7 @@ export default function SettingsPage() {
         defaultValues: config
             ? {
                   ...config,
+                  language: config.language.replace("_", "-"),
                   site_name: config.site_name || "",
                   user_template:
                       config.user_template ||

@@ -1,5 +1,6 @@
 import { createCron, updateCron } from "@/api/cron"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogClose,
@@ -19,6 +20,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
@@ -245,6 +247,26 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                     onValueChange={field.onChange}
                                                     defaultValue={field.value.toString()}
                                                 />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="push_successful"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                    <Label className="text-sm">
+                                                        {t("PushSuccessful")}
+                                                    </Label>
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
