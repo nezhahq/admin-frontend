@@ -247,7 +247,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(serviceCoverageTypes(t)).map(
+                                                    {Object.entries(serviceCoverageTypes).map(
                                                         ([k, v]) => (
                                                             <SelectItem key={k} value={k}>
                                                                 {v}

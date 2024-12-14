@@ -67,13 +67,13 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
         defaultValues: data
             ? data
             : {
-                  name: "",
-                  task_type: 0,
-                  scheduler: "",
-                  servers: [],
-                  cover: 0,
-                  notification_group_id: 0,
-              },
+                name: "",
+                task_type: 0,
+                scheduler: "",
+                servers: [],
+                cover: 0,
+                notification_group_id: 0,
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -143,7 +143,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(cronTypes(t)).map(([k, v]) => (
+                                                    {Object.entries(cronTypes).map(([k, v]) => (
                                                         <SelectItem key={k} value={k}>
                                                             {v}
                                                         </SelectItem>
@@ -199,7 +199,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(cronCoverageTypes(t)).map(
+                                                    {Object.entries(cronCoverageTypes).map(
                                                         ([k, v]) => (
                                                             <SelectItem key={k} value={k}>
                                                                 {v}

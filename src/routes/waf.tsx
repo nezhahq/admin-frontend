@@ -70,7 +70,7 @@ export default function WAFPage() {
             accessorKey: "lastBlockReason",
             accessorFn: (row) => row.last_block_reason,
             cell: ({ row }) => (
-                <span>{wafBlockReasons(t)[row.original.last_block_reason] || ""}</span>
+                <span>{wafBlockReasons[row.original.last_block_reason] || ""}</span>
             ),
         },
         {
@@ -141,9 +141,9 @@ export default function WAFPage() {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
+                                                header.column.columnDef.header,
+                                                header.getContext(),
+                                            )}
                                     </TableHead>
                                 )
                             })}

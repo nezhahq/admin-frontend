@@ -1,12 +1,12 @@
-import { TFunction } from "i18next"
+import i18n from "@/lib/i18n"
 
-export const cronTypes = (t: TFunction<"translation", undefined>) => ({
-    0: t("Scheduled"),
-    1: t("Trigger"),
-})
+export const cronTypes: Record<number, string> = {
+    0: i18n.t("Scheduled"),
+    1: i18n.t("Trigger"),
+}
 
-export const cronCoverageTypes = (t: TFunction<"translation", undefined>) => ({
-    0: t("Coverages.Only"),
-    1: t("Coverages.Excludes"),
-    2: t("Coverages.Alarmed"),
-})
+export const cronCoverageTypes: Record<number, string> = {
+    0: i18n.t("Coverages.Only"),
+    1: i18n.t("Coverages.Excludes"),
+    2: i18n.t("Coverages.Alarmed"),
+}

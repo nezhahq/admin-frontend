@@ -1,4 +1,4 @@
-import { TFunction } from "i18next"
+import i18n from "@/lib/i18n"
 
 export const serviceTypes: Record<number, string> = {
     1: "HTTP GET",
@@ -6,7 +6,7 @@ export const serviceTypes: Record<number, string> = {
     3: "TCPing",
 }
 
-export const serviceCoverageTypes = (t: TFunction<"translation", undefined>) => ({
-    0: t("Coverages.Excludes"),
-    1: t("Coverages.Only"),
-})
+export const serviceCoverageTypes: Record<number, string> = {
+    0: i18n.t("Coverages.Excludes"),
+    1: i18n.t("Coverages.Only"),
+}
