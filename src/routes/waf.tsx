@@ -69,9 +69,7 @@ export default function WAFPage() {
             header: t("LastBlockReason"),
             accessorKey: "lastBlockReason",
             accessorFn: (row) => row.last_block_reason,
-            cell: ({ row }) => (
-                <span>{wafBlockReasons[row.original.last_block_reason] || ""}</span>
-            ),
+            cell: ({ row }) => <span>{wafBlockReasons[row.original.last_block_reason] || ""}</span>,
         },
         {
             header: t("LastBlockTime"),
@@ -141,9 +139,9 @@ export default function WAFPage() {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext(),
-                                            )}
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
                                 )
                             })}

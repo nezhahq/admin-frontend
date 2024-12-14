@@ -93,18 +93,18 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
         resolver: zodResolver(alertRuleFormSchema),
         defaultValues: data
             ? {
-                ...data,
-                rules_raw: JSON.stringify(data.rules),
-            }
+                  ...data,
+                  rules_raw: JSON.stringify(data.rules),
+              }
             : {
-                name: "",
-                rules_raw: "",
-                rules: [],
-                fail_trigger_tasks: [],
-                recover_trigger_tasks: [],
-                notification_group_id: 0,
-                trigger_mode: 0,
-            },
+                  name: "",
+                  rules_raw: "",
+                  rules: [],
+                  fail_trigger_tasks: [],
+                  recover_trigger_tasks: [],
+                  notification_group_id: 0,
+                  trigger_mode: 0,
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -205,13 +205,11 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(triggerModes).map(
-                                                        ([k, v]) => (
-                                                            <SelectItem key={k} value={k}>
-                                                                {v}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
+                                                    {Object.entries(triggerModes).map(([k, v]) => (
+                                                        <SelectItem key={k} value={k}>
+                                                            {v}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
