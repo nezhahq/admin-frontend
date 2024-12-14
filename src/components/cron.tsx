@@ -67,13 +67,13 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
         defaultValues: data
             ? data
             : {
-                name: "",
-                task_type: 0,
-                scheduler: "",
-                servers: [],
-                cover: 0,
-                notification_group_id: 0,
-            },
+                  name: "",
+                  task_type: 0,
+                  scheduler: "",
+                  servers: [],
+                  cover: 0,
+                  notification_group_id: 0,
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
