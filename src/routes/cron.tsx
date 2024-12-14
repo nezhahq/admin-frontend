@@ -74,7 +74,7 @@ export default function CronPage() {
         {
             header: t("Type"),
             accessorKey: "taskType",
-            accessorFn: (row) => cronTypes[row.task_type] || "",
+            accessorFn: (row) => cronTypes(t)[row.task_type] || "",
         },
         {
             header: t("CronExpression"),

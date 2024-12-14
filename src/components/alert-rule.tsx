@@ -205,11 +205,13 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(triggerModes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>
-                                                            {v}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {Object.entries(triggerModes(t)).map(
+                                                        ([k, v]) => (
+                                                            <SelectItem key={k} value={k}>
+                                                                {v}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />

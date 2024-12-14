@@ -143,7 +143,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(cronTypes).map(([k, v]) => (
+                                                    {Object.entries(cronTypes(t)).map(([k, v]) => (
                                                         <SelectItem key={k} value={k}>
                                                             {v}
                                                         </SelectItem>
@@ -199,7 +199,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {Object.entries(cronCoverageTypes).map(
+                                                    {Object.entries(cronCoverageTypes(t)).map(
                                                         ([k, v]) => (
                                                             <SelectItem key={k} value={k}>
                                                                 {v}

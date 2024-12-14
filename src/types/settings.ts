@@ -1,9 +1,9 @@
-import i18next from "i18next"
+import { TFunction } from "i18next"
 
-export const settingCoverageTypes: Record<number, string> = {
-    1: i18next.t("Coverages.Excludes"),
-    2: i18next.t("Coverages.Only"),
-}
+export const settingCoverageTypes = (t: TFunction<"translation", undefined>) => ({
+    1: t("Coverages.Excludes"),
+    2: t("Coverages.Only"),
+})
 
 export const nezhaLang: Record<string, string> = {
     "zh-CN": "简体中文（中国大陆）",
@@ -11,8 +11,8 @@ export const nezhaLang: Record<string, string> = {
     "en-US": "English",
 }
 
-export const wafBlockReasons: Record<number, string> = {
-    1: i18next.t("LoginFailed"),
-    2: i18next.t("BruteForceAttackingToken"),
-    3: i18next.t("BruteForceAttackingAgentSecret"),
-}
+export const wafBlockReasons = (t: TFunction<"translation", undefined>) => ({
+    1: t("LoginFailed"),
+    2: t("BruteForceAttackingToken"),
+    3: t("BruteForceAttackingAgentSecret"),
+})
