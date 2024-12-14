@@ -66,7 +66,12 @@ export default function Header() {
 
     return isDesktop ? (
         <header className="flex pt-8 px-4 overflow-x-auto dark:bg-black/40 bg-muted border-b-[1px]">
-            <NavigationMenu className="flex flex-col items-start max-w-5xl mx-auto">
+            <NavigationMenu className="flex flex-col items-start relative max-w-5xl mx-auto">
+                <img
+                    className="absolute -right-0 z-[9999] top-11 w-20 scale-100 pointer-events-none"
+                    alt={"animated-man"}
+                    src={"/dashboard/animated-man.webp"}
+                />
                 <section className="w-full flex items-center  justify-between">
                     <div className="flex justify-between items-center w-full">
                         <NavigationMenuLink
@@ -334,7 +339,7 @@ export default function Header() {
 
 // https://github.com/streamich/react-use/blob/master/src/useInterval.ts
 const useInterval = (callback: () => void, delay?: number | null) => {
-    const savedCallback = useRef<() => void>(() => {})
+    const savedCallback = useRef<() => void>(() => { })
     useEffect(() => {
         savedCallback.current = callback
     })
