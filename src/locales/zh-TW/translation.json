@@ -162,5 +162,7 @@
     "Official": "官方",
     "CommunityThemeWarning": "正在使用社區主題",
     "CommunityThemeDescription": "社群主題未經官方審計，需自行甄別風險",
-    "Cancel": "取消"
+    "Cancel": "取消",
+    "EnableDDNS": "啟用 DDNS",
+    "PushSuccessful": "推送成功的通知"
 }

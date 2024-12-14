@@ -162,5 +162,7 @@
     "Official": "Official",
     "CommunityThemeWarning": "You are using a community theme",
     "CommunityThemeDescription": "This theme is provided by the community, use at your own risk",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "EnableDDNS": "Enable DDNS",
+    "PushSuccessful": "Push if Successful"
 }

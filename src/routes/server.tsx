@@ -104,7 +104,7 @@ export default function ServerPage() {
             accessorFn: (row) => row.host.version || t("Unknown"),
         },
         {
-            header: t("Enable") + t("DDNS"),
+            header: t("EnableDDNS"),
             accessorKey: "enableDDNS",
             accessorFn: (row) => row.enable_ddns ?? false,
         },

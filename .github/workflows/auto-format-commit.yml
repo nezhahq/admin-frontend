@@ -6,6 +6,7 @@ on:
 
 jobs:
     auto-fix:
+        if: github.actor != 'weblate'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code

@@ -162,5 +162,7 @@
     "Official": "Ufficiale",
     "CommunityThemeWarning": "Questo tema appartiene alla comunità",
     "CommunityThemeDescription": "Questo tema viene fornito dalla comunità, utilizzalo a tuo rischio e pericolo",
-    "Cancel": "Annulla"
+    "Cancel": "Annulla",
+    "EnableDDNS": "Abilita DDNS",
+    "PushSuccessful": "Esegui il push se ha successo"
 }
