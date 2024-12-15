@@ -29,8 +29,8 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
         if (!copy) {
             try {
                 setCopy(true)
-                if (!settings) throw new Error("Settings is not found.")
-                await copyToClipboard(generateCommand(type, settings) || "")
+                if (!settings.data) throw new Error("Settings is not found.")
+                await copyToClipboard(generateCommand(type, settings.data) || "")
             } catch (e: Error | any) {
                 console.error(e)
                 toast(t("Error"), {
