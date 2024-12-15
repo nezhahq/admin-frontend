@@ -22,7 +22,7 @@ const resources = {
 }
 
 const getStoredLanguage = () => {
-    return localStorage.getItem("language") || "zh-CN"
+    return localStorage.getItem("language") || "en-US"
 }
 
 i18n.use(initReactI18next).init({

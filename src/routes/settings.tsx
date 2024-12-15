@@ -1,4 +1,4 @@
-import { getSettings, updateSettings } from "@/api/settings"
+import { updateSettings } from "@/api/settings"
 import { SettingsTab } from "@/components/settings-tab"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,10 +21,11 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import useSetting from "@/hooks/useSetting"
 import { asOptionalField } from "@/lib/utils"
-import { ModelSettingResponse, nezhaLang, settingCoverageTypes } from "@/types"
+import { nezhaLang, settingCoverageTypes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -50,49 +51,27 @@ const settingFormSchema = z.object({
 
 export default function SettingsPage() {
     const { t, i18n } = useTranslation()
-    const [config, setConfig] = useState<ModelSettingResponse>()
-    const [error, setError] = useState<Error>()
-
-    useEffect(() => {
-        if (error)
-            toast(t("Error"), {
-                description: t("Results.ErrorFetchingResource", {
-                    error: error.message,
-                }),
-            })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error])
-
-    useEffect(() => {
-        ;(async () => {
-            try {
-                const c = await getSettings()
-                setConfig(c)
-            } catch (e) {
-                if (e instanceof Error) setError(e)
-            }
-        })()
-    }, [])
+    const { data: config, mutate } = useSetting()
 
     const form = useForm<z.infer<typeof settingFormSchema>>({
         resolver: zodResolver(settingFormSchema),
         defaultValues: config
             ? {
-                  ...config,
-                  language: config.language.replace("_", "-"),
-                  site_name: config.site_name || "",
-                  user_template:
-                      config.user_template ||
-                      Object.keys(config.frontend_templates.filter((t) => !t.is_admin) || {})[0] ||
-                      "user-dist",
-              }
+                ...config,
+                language: config.language,
+                site_name: config.site_name || "",
+                user_template:
+                    config.user_template ||
+                    Object.keys(config.frontend_templates.filter((t) => !t.is_admin) || {})[0] ||
+                    "user-dist",
+            }
             : {
-                  ip_change_notification_group_id: 0,
-                  cover: 1,
-                  site_name: "",
-                  language: "",
-                  user_template: "user-dist",
-              },
+                ip_change_notification_group_id: 0,
+                cover: 1,
+                site_name: "",
+                language: "",
+                user_template: "user-dist",
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -107,11 +86,14 @@ export default function SettingsPage() {
     const onSubmit = async (values: z.infer<typeof settingFormSchema>) => {
         try {
             await updateSettings(values)
-            const newConfig = await getSettings()
-            setConfig(newConfig)
+            await mutate()
             form.reset()
         } catch (e) {
-            if (e instanceof Error) setError(e)
+            toast(t("Error"), {
+                description: t("Results.ErrorFetchingResource", {
+                    error: e?.toString(),
+                }),
+            })
             return
         } finally {
             if (values.language != i18n.language) {
@@ -237,15 +219,15 @@ export default function SettingsPage() {
                                     {!config?.frontend_templates?.find(
                                         (t) => t.path === field.value,
                                     )?.is_official && (
-                                        <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
-                                            <div className="font-medium text-lg mb-1">
-                                                {t("CommunityThemeWarning")}
+                                            <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
+                                                <div className="font-medium text-lg mb-1">
+                                                    {t("CommunityThemeWarning")}
+                                                </div>
+                                                <div className="text-yellow-700 dark:text-yellow-200">
+                                                    {t("CommunityThemeDescription")}
+                                                </div>
                                             </div>
-                                            <div className="text-yellow-700 dark:text-yellow-200">
-                                                {t("CommunityThemeDescription")}
-                                            </div>
-                                        </div>
-                                    )}
+                                        )}
                                 </FormItem>
                             )}
                         />
