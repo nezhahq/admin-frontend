@@ -42,7 +42,7 @@ export default function Root() {
         Array.from(tempDiv.childNodes).forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
                 const element = node as HTMLElement
-                    ; (handlers[element.tagName] || handlers.DEFAULT)(element)
+                ;(handlers[element.tagName] || handlers.DEFAULT)(element)
             } else if (node.nodeType === Node.TEXT_NODE) {
                 document.body.appendChild(document.createTextNode(node.textContent || ""))
             }
