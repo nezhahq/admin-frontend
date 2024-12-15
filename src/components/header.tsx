@@ -65,7 +65,7 @@ export default function Header() {
     const navigate = useNavigate()
 
     // @ts-expect-error DisableAnimatedMan is a global variable
-    const disableAnimatedMan = window.DisableAnimatedMan === true;
+    const disableAnimatedMan = window.DisableAnimatedMan === true
 
     return isDesktop ? (
         <header className="flex pt-8 px-4 dark:bg-black/40 bg-muted border-b-[1px] overflow-visible">
@@ -344,7 +344,7 @@ export default function Header() {
 
 // https://github.com/streamich/react-use/blob/master/src/useInterval.ts
 const useInterval = (callback: () => void, delay?: number | null) => {
-    const savedCallback = useRef<() => void>(() => { })
+    const savedCallback = useRef<() => void>(() => {})
     useEffect(() => {
         savedCallback.current = callback
     })
