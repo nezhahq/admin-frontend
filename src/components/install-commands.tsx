@@ -22,15 +22,15 @@ enum OSTypes {
 
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [copy, setCopy] = useState(false)
-    const settings = useSettings()
+    const {data: settings} = useSettings()
     const { t } = useTranslation()
 
     const switchState = async (type: number) => {
         if (!copy) {
             try {
                 setCopy(true)
-                if (!settings.data) throw new Error("Settings is not found.")
-                await copyToClipboard(generateCommand(type, settings.data) || "")
+                if (!settings) throw new Error("Settings is not found.")
+                await copyToClipboard(generateCommand(type, settings) || "")
             } catch (e: Error | any) {
                 console.error(e)
                 toast(t("Error"), {

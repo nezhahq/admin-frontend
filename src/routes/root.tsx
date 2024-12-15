@@ -16,37 +16,11 @@ export default function Root() {
     }, [settingData])
 
     const InjectContext = useCallback((content: string) => {
+        document.getElementById("nezha-custom-code")?.remove()
         const tempDiv = document.createElement("div")
+        tempDiv.id = "nezha-custom-code"
         tempDiv.innerHTML = content
-
-        const handlers: { [key: string]: (element: HTMLElement) => void } = {
-            SCRIPT: (element) => {
-                const script = document.createElement("script")
-                if ((element as HTMLScriptElement).src) {
-                    script.src = (element as HTMLScriptElement).src
-                } else {
-                    script.textContent = element.textContent
-                }
-                document.body.appendChild(script)
-            },
-            STYLE: (element) => {
-                const style = document.createElement("style")
-                style.textContent = element.textContent
-                document.head.appendChild(style)
-            },
-            DEFAULT: (element) => {
-                document.body.appendChild(element)
-            },
-        }
-
-        Array.from(tempDiv.childNodes).forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const element = node as HTMLElement
-                ;(handlers[element.tagName] || handlers.DEFAULT)(element)
-            } else if (node.nodeType === Node.TEXT_NODE) {
-                document.body.appendChild(document.createTextNode(node.textContent || ""))
-            }
-        })
+        document.body.appendChild(tempDiv)
     }, [])
 
     if (error) {
