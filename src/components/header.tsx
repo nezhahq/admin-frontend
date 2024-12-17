@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import { useMainStore } from "@/hooks/useMainStore"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
+import { cn } from "@/lib/utils"
 import i18next from "i18next"
 import { LogOut, Settings, User2 } from "lucide-react"
 import { DateTime } from "luxon"
@@ -72,7 +73,12 @@ export default function Header() {
             <NavigationMenu className="flex flex-col items-start relative max-w-5xl mx-auto">
                 {!disableAnimatedMan && (
                     <img
-                        className="absolute -right-0 z-[9999] top-11 w-20 scale-100 pointer-events-none"
+                        className={cn(
+                            "absolute right-0 z-[9999] top-11 w-20 scale-100 pointer-events-none",
+                            {
+                                "top-2 right-4": location.pathname === "/dashboard/login",
+                            },
+                        )}
                         alt={"animated-man"}
                         src={"/dashboard/animated-man.webp"}
                     />
