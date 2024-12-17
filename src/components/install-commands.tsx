@@ -22,7 +22,7 @@ enum OSTypes {
 
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [copy, setCopy] = useState(false)
-    const {data: settings} = useSettings()
+    const { data: settings } = useSettings()
     const { t } = useTranslation()
 
     const switchState = async (type: number) => {

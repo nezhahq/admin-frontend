@@ -40,7 +40,7 @@ export default function Root() {
     }
 
     return (
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
             <section className="text-sm mx-auto h-full flex flex-col justify-between">
                 <div>
                     <Header />
