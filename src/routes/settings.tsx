@@ -167,7 +167,7 @@ export default function SettingsPage() {
                                             }}
                                         >
                                             <FormControl>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="py-8">
                                                     <SelectValue placeholder={t("SelectTheme")} />
                                                 </SelectTrigger>
                                             </FormControl>
