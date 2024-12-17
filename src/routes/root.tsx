@@ -14,7 +14,13 @@ export default function Root() {
 
     useEffect(() => {
         document.title = settingData?.site_name || "哪吒监控 Nezha Monitoring"
-    }, [settingData])
+    }, [settingData?.site_name])
+
+    useEffect(() => {
+        if (settingData?.custom_code_dashboard) {
+            InjectContext(settingData?.custom_code_dashboard)
+        }
+    }, [settingData?.custom_code_dashboard])
 
     if (error) {
         throw error
@@ -27,12 +33,6 @@ export default function Root() {
     if (settingData?.language && !localStorage.getItem("language")) {
         i18n.changeLanguage(settingData?.language)
     }
-
-    useEffect(() => {
-        if (settingData?.custom_code_dashboard) {
-            InjectContext(settingData?.custom_code)
-        }
-    }, [settingData?.custom_code_dashboard])
 
     return (
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
