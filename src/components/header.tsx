@@ -116,7 +116,7 @@ export default function Header() {
                                             </Avatar>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-32">
-                                            <DropdownMenuLabel>
+                                            <DropdownMenuLabel className="break-all">
                                                 {profile.username}
                                             </DropdownMenuLabel>
                                             <DropdownMenuSeparator />
