@@ -66,7 +66,7 @@ export default function Header() {
     const navigate = useNavigate()
 
     // @ts-expect-error DisableAnimatedMan is a global variable
-    const disableAnimatedMan = window.DisableAnimatedMan === true
+    const disableAnimatedMan = window.DisableAnimatedMan as boolean
 
     return isDesktop ? (
         <header className="flex pt-8 px-4 dark:bg-black/40 bg-muted border-b-[1px] overflow-visible">
