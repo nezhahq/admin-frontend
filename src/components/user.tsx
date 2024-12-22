@@ -20,6 +20,13 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
 import { ModelUser } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -35,6 +42,7 @@ interface UserCardProps {
 
 const userFormSchema = z.object({
     username: z.string().min(1),
+    role: z.number().int().min(0).max(1),
     password: z.string().min(8).max(72),
 })
 
@@ -44,6 +52,7 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
         resolver: zodResolver(userFormSchema),
         defaultValues: {
             username: "",
+            role: 1,
             password: "",
         },
         resetOptions: {
@@ -96,6 +105,34 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                             <FormControl>
                                                 <Input {...field} />
                                             </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="role"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("Role")}</FormLabel>
+                                            <Select
+                                                onValueChange={(value) =>
+                                                    field.onChange(parseInt(value))
+                                                }
+                                                defaultValue={field.value.toString()}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder={t("SelectRole")}
+                                                        />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="0">{t("Admin")}</SelectItem>
+                                                    <SelectItem value="1">{t("User")}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                             <FormMessage />
                                         </FormItem>
                                     )}

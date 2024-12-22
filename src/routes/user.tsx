@@ -68,6 +68,13 @@ export default function UserPage() {
             accessorFn: (row) => row.username,
         },
         {
+            header: t("Role"),
+            accessorKey: "role",
+            accessorFn: (row) => {
+                return row.role === 1 ? t("User") : t("Admin")
+            },
+        },
+        {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {

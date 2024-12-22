@@ -404,6 +404,8 @@ export interface ModelProfile {
     password: string
     updated_at: string
     username: string
+    role: number
+    agent_secret: string
 }
 
 export interface ModelProfileForm {
@@ -673,6 +675,7 @@ export interface ModelUser {
     password: string
     updated_at: string
     username: string
+    role: number
 }
 
 export interface ModelUserForm {
@@ -680,9 +683,32 @@ export interface ModelUserForm {
     username: string
 }
 
-export interface ModelWAFApiMock {
+export interface Pagination {
+    limit: number
+    offset: number
+    total: number
+}
+
+export interface ModelWAF {
     count: number
     ip: string
-    last_block_reason: number
-    last_block_timestamp: number
+    block_identifier: number
+    block_reason: number
+    block_timestamp: number
+}
+
+export interface ModelWAFApiMock {
+    pagination: Pagination
+    value: ModelWAF[]
+}
+
+export interface ModelOnlineUser {
+    connected_at: string
+    ip: string
+    user_id: number
+}
+
+export interface ModelOnlineUserApi {
+    pagination: Pagination
+    value: ModelOnlineUser[]
 }

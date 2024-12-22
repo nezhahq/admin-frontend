@@ -5,9 +5,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/hooks/useAuth"
 import useSettings from "@/hooks/useSetting"
 import { copyToClipboard } from "@/lib/utils"
-import { ModelSettingResponse } from "@/types"
+import { ModelProfile, ModelSettingResponse } from "@/types"
 import i18next from "i18next"
 import { Check, Clipboard } from "lucide-react"
 import { forwardRef, useState } from "react"
@@ -23,14 +24,17 @@ enum OSTypes {
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [copy, setCopy] = useState(false)
     const { data: settings } = useSettings()
+    const { profile } = useAuth()
+
     const { t } = useTranslation()
 
     const switchState = async (type: number) => {
         if (!copy) {
             try {
                 setCopy(true)
+                if (!profile) throw new Error("Profile is not found.")
                 if (!settings) throw new Error("Settings is not found.")
-                await copyToClipboard(generateCommand(type, settings) || "")
+                await copyToClipboard(generateCommand(type, settings, profile) || "")
             } catch (e: Error | any) {
                 console.error(e)
                 toast(t("Error"), {
@@ -85,8 +89,18 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
 const generateCommand = (
     type: number,
     { agent_secret_key, install_host, tls }: ModelSettingResponse,
+    { agent_secret, role }: ModelProfile,
 ) => {
     if (!install_host) throw new Error(i18next.t("Results.InstallHostRequired"))
+
+    // 如果 agent_secret 为空且 role 为 0 ，则使用 agent_secret_key，否则如果 agent_secret 为空则报错
+    if (!agent_secret && role === 0) {
+        agent_secret = agent_secret_key
+    } else if (!agent_secret) {
+        throw new Error(i18next.t("Results.AgentSecretRequired"))
+    }
+
+    agent_secret_key = agent_secret
 
     const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`
     const env_win = `$env:NZ_SERVER=\"${install_host}\";$env:NZ_TLS=\"${tls || false}\";$env:NZ_CLIENT_SECRET=\"${agent_secret_key}\";`

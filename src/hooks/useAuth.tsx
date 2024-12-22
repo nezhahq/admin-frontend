@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ;(async () => {
             try {
                 const user = await getProfile()
+                user.role = user.role || 0
                 setProfile(user)
             } catch (error: any) {
                 setProfile(undefined)

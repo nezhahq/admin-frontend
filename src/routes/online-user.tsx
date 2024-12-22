@@ -1,5 +1,5 @@
 import { swrFetcher } from "@/api/api"
-import { deleteWAF } from "@/api/waf"
+import { blockUser } from "@/api/online-user"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { SettingsTab } from "@/components/settings-tab"
@@ -22,8 +22,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
-import { ip16Str } from "@/lib/utils"
-import { ModelWAF, ModelWAFApiMock, wafBlockIdentifiers, wafBlockReasons } from "@/types"
+import { ModelOnlineUser, ModelOnlineUserApi } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -31,7 +30,7 @@ import { useSearchParams } from "react-router-dom"
 import { toast } from "sonner"
 import useSWR from "swr"
 
-export default function WAFPage() {
+export default function OnlineUserPage() {
     const { t } = useTranslation()
     const { profile } = useAuth()
     const [searchParams, setSearchParams] = useSearchParams()
@@ -41,8 +40,8 @@ export default function WAFPage() {
     // 计算 offset
     const offset = (page - 1) * pageSize
 
-    const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock>(
-        `/api/v1/waf?offset=${offset}&limit=${pageSize}`,
+    const { data, mutate, error, isLoading } = useSWR<ModelOnlineUserApi>(
+        `/api/v1/online-user?offset=${offset}&limit=${pageSize}`,
         swrFetcher,
     )
 
@@ -56,7 +55,7 @@ export default function WAFPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    let columns: ColumnDef<ModelWAF>[] = [
+    let columns: ColumnDef<ModelOnlineUser>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -82,33 +81,20 @@ export default function WAFPage() {
         {
             header: "IP",
             accessorKey: "ip",
-            accessorFn: (row) => ip16Str(row.ip ?? ""),
+            accessorFn: (row) => row.ip ?? "",
         },
         {
-            header: t("Count"),
-            accessorKey: "count",
-            accessorFn: (row) => row.count,
+            header: t("UserId"),
+            accessorKey: "user_id",
+            accessorFn: (row) => row.user_id || "",
         },
         {
-            header: t("LastBlockReason"),
-            accessorKey: "lastBlockReason",
-            accessorFn: (row) => row.block_reason,
-            cell: ({ row }) => <span>{wafBlockReasons[row.original.block_reason] || ""}</span>,
-        },
-        {
-            header: t("LastBlockIdentifier"),
-            accessorKey: "lastBlockIdentifier",
-            accessorFn: (row) => (
-                <span>{wafBlockIdentifiers[row.block_identifier] || row.block_identifier}</span>
-            ),
-        },
-        {
-            header: t("LastBlockTime"),
-            accessorKey: "lastBlockTime",
-            accessorFn: (row) => row.block_timestamp,
+            header: t("ConnectedAt"),
+            accessorKey: "connected_at",
+            accessorFn: (row) => row.connected_at,
             cell: ({ row }) => {
                 const s = row.original
-                const date = new Date((s.block_timestamp || 0) * 1000)
+                const date = new Date(s.connected_at)
                 return <span>{date.toISOString()}</span>
             },
         },
@@ -121,8 +107,8 @@ export default function WAFPage() {
                     <ActionButtonGroup
                         className="flex gap-2"
                         delete={{
-                            fn: deleteWAF,
-                            id: ip16Str(s.ip ?? ""),
+                            fn: blockUser,
+                            id: s.ip ?? "",
                             mutate: mutate,
                         }}
                     >
@@ -259,8 +245,8 @@ export default function WAFPage() {
                     <HeaderButtonGroup
                         className="flex-2 flex gap-2 ml-auto"
                         delete={{
-                            fn: deleteWAF,
-                            id: selectedRows.map((r) => ip16Str(r.original.ip ?? "")),
+                            fn: blockUser,
+                            id: selectedRows.map((r) => r.original.ip ?? ""),
                             mutate: mutate,
                         }}
                     >
