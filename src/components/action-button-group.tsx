@@ -99,7 +99,7 @@ export function BlockButtonGroup<E, U>({
                 </AlertDialogTrigger>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{t("ConfirmDeletion")}</AlertDialogTitle>
+                        <AlertDialogTitle>{t("ConfirmBlock")}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {t("Results.ThisOperationIsUnrecoverable")}
                         </AlertDialogDescription>
