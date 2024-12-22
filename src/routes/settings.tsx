@@ -59,7 +59,10 @@ export default function SettingsPage() {
 
     const isAdmin = profile?.role === 0
 
+    console.log(isAdmin)
+
     if (!isAdmin) {
+        console.log("redirect")
         navigate("/dashboard/settings/waf")
     }
 

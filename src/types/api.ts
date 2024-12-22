@@ -701,3 +701,14 @@ export interface ModelWAFApiMock {
     pagination: Pagination
     value: ModelWAF[]
 }
+
+export interface ModelOnlineUser {
+    connected_at: string
+    ip: string
+    user_id: number
+}
+
+export interface ModelOnlineUserApi {
+    pagination: Pagination
+    value: ModelOnlineUser[]
+}

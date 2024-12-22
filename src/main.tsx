@@ -15,6 +15,7 @@ import LoginPage from "./routes/login"
 import NATPage from "./routes/nat"
 import NotificationPage from "./routes/notification"
 import NotificationGroupPage from "./routes/notification-group"
+import OnlineUserPage from "./routes/online-user"
 import ProfilePage from "./routes/profile"
 import ProtectedRoute from "./routes/protect"
 import Root from "./routes/root"
@@ -132,6 +133,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/settings/waf",
                 element: <WAFPage />,
+            },
+            {
+                path: "/dashboard/settings/online-user",
+                element: <OnlineUserPage />,
             },
         ],
     },

@@ -11,7 +11,7 @@ export const SettingsTab = ({ className }: { className?: string }) => {
 
     return (
         <Tabs defaultValue={window.location.pathname} className={className}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
                 {isAdmin && (
                     <>
                         <TabsTrigger value="/dashboard/settings" asChild>
@@ -19,6 +19,9 @@ export const SettingsTab = ({ className }: { className?: string }) => {
                         </TabsTrigger>
                         <TabsTrigger value="/dashboard/settings/user" asChild>
                             <Link to="/dashboard/settings/user">{t("User")}</Link>
+                        </TabsTrigger>
+                        <TabsTrigger value="/dashboard/settings/online-user" asChild>
+                            <Link to="/dashboard/settings/online-user">{t("OnlineUser")}</Link>
                         </TabsTrigger>
                     </>
                 )}
