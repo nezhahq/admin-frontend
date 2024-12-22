@@ -683,9 +683,21 @@ export interface ModelUserForm {
     username: string
 }
 
-export interface ModelWAFApiMock {
+export interface Pagination {
+    limit: number
+    offset: number
+    total: number
+}
+
+export interface ModelWAF {
     count: number
     ip: string
-    last_block_reason: number
-    last_block_timestamp: number
+    block_identifier: number
+    block_reason: number
+    block_timestamp: number
+}
+
+export interface ModelWAFApiMock {
+    pagination: Pagination
+    value: ModelWAF[]
 }

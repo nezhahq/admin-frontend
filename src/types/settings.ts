@@ -16,3 +16,10 @@ export const wafBlockReasons: Record<number, string> = {
     2: i18n.t("BruteForceAttackingToken"),
     3: i18n.t("BruteForceAttackingAgentSecret"),
 }
+
+export const wafBlockIdentifiers: Record<number, string> = {
+    "-127": i18n.t("GrpcAuthFailed"),
+    "-126": i18n.t("APITokenInvalid"),
+    "-125": i18n.t("UserInvalid"),
+    "-124": i18n.t("BlockByUser"),
+}
