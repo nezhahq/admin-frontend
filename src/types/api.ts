@@ -404,6 +404,8 @@ export interface ModelProfile {
     password: string
     updated_at: string
     username: string
+    role: number
+    agent_secret: string
 }
 
 export interface ModelProfileForm {

@@ -62,7 +62,7 @@ export default function SettingsPage() {
                   site_name: config.site_name || "",
                   user_template:
                       config.user_template ||
-                      Object.keys(config.frontend_templates.filter((t) => !t.is_admin) || {})[0] ||
+                      Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
                       "user-dist",
               }
             : {
@@ -173,7 +173,7 @@ export default function SettingsPage() {
                                             </FormControl>
                                             <SelectContent>
                                                 {(
-                                                    config?.frontend_templates.filter(
+                                                    config?.frontend_templates?.filter(
                                                         (t) => !t.is_admin,
                                                     ) || []
                                                 ).map((template) => (
