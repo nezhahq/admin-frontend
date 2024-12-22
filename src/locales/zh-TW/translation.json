@@ -173,5 +173,6 @@
     "UserId": "使用者 ID",
     "ConnectedAt": "連接時間",
     "OnlineUser": "線上使用者",
-    "Total": "總數"
+    "Total": "總數",
+    "ConfirmBlock": "確認封鎖"
 }
