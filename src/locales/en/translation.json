@@ -173,5 +173,6 @@
     "UserId": "User ID",
     "ConnectedAt": "Connected at",
     "OnlineUser": "Online User",
-    "Total": "Total"
+    "Total": "Total",
+    "ConfirmBlock": "Confirm Block"
 }
