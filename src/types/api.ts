@@ -673,6 +673,7 @@ export interface ModelUser {
     password: string
     updated_at: string
     username: string
+    role: number
 }
 
 export interface ModelUserForm {
