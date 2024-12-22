@@ -21,6 +21,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { useAuth } from "@/hooks/useAuth"
 import useSetting from "@/hooks/useSetting"
 import { asOptionalField } from "@/lib/utils"
 import { nezhaLang, settingCoverageTypes } from "@/types"
@@ -28,6 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -52,6 +54,14 @@ const settingFormSchema = z.object({
 export default function SettingsPage() {
     const { t, i18n } = useTranslation()
     const { data: config, mutate } = useSetting()
+    const { profile } = useAuth()
+    const navigate = useNavigate()
+
+    const isAdmin = profile?.role === 0
+
+    if (!isAdmin) {
+        navigate("/dashboard/settings/waf")
+    }
 
     const form = useForm<z.infer<typeof settingFormSchema>>({
         resolver: zodResolver(settingFormSchema),
