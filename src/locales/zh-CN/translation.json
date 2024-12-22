@@ -164,5 +164,15 @@
     "CommunityThemeDescription": "社区主题未经官方审计，需自行甄别风险",
     "Cancel": "取消",
     "EnableDDNS": "启用 DDNS",
-    "PushSuccessful": "推送成功的通知"
+    "PushSuccessful": "推送成功的通知",
+    "GrpcAuthFailed": "gRPC 认证失败",
+    "APITokenInvalid": "API 令牌无效",
+    "UserInvalid": "用户无效",
+    "BlockByUser": "被用户封禁",
+    "BlockIdentifier": "封禁标识",
+    "UserId": "用户 ID",
+    "ConnectedAt": "连接时间",
+    "OnlineUser": "在线用户",
+    "Total": "总数",
+    "ConfirmBlock": "确认封禁"
 }

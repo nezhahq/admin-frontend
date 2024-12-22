@@ -164,5 +164,15 @@
     "CommunityThemeDescription": "This theme is provided by the community, use at your own risk",
     "Cancel": "Cancel",
     "EnableDDNS": "Enable DDNS",
-    "PushSuccessful": "Push if Successful"
+    "PushSuccessful": "Push if Successful",
+    "GrpcAuthFailed": "gRPC authentication failed",
+    "APITokenInvalid": "API token is invalid",
+    "UserInvalid": "User is invalid",
+    "BlockByUser": "Blocked by user",
+    "BlockIdentifier": "Block identifier",
+    "UserId": "User ID",
+    "ConnectedAt": "Connected at",
+    "OnlineUser": "Online User",
+    "Total": "Total",
+    "ConfirmBlock": "Confirm Block"
 }

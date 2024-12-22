@@ -1,7 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { blockUser } from "@/api/online-user"
-import { ActionButtonGroup } from "@/components/action-button-group"
-import { HeaderButtonGroup } from "@/components/header-button-group"
+import { BlockButtonGroup } from "@/components/action-button-group"
+import { HeaderBlockButtonGroup } from "@/components/header-button-group"
 import { SettingsTab } from "@/components/settings-tab"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -104,16 +104,16 @@ export default function OnlineUserPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <ActionButtonGroup
+                    <BlockButtonGroup
                         className="flex gap-2"
-                        delete={{
+                        block={{
                             fn: blockUser,
                             id: s.ip ?? "",
                             mutate: mutate,
                         }}
                     >
                         <></>
-                    </ActionButtonGroup>
+                    </BlockButtonGroup>
                 )
             },
         },
@@ -242,16 +242,16 @@ export default function OnlineUserPage() {
             <SettingsTab className="mt-6 w-full" />
             <div className="flex mt-4 mb-4">
                 {isAdmin && (
-                    <HeaderButtonGroup
+                    <HeaderBlockButtonGroup
                         className="flex-2 flex gap-2 ml-auto"
-                        delete={{
+                        block={{
                             fn: blockUser,
                             id: selectedRows.map((r) => r.original.ip ?? ""),
                             mutate: mutate,
                         }}
                     >
                         <></>
-                    </HeaderButtonGroup>
+                    </HeaderBlockButtonGroup>
                 )}
             </div>
             <Table>

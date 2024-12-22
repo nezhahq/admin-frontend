@@ -1,5 +1,6 @@
 import { Button, ButtonProps } from "@/components/ui/button"
 import {
+    BanIcon,
     Check,
     CircleArrowUp,
     Clipboard,
@@ -29,6 +30,7 @@ export interface IconButtonProps extends ButtonProps {
         | "download"
         | "upload"
         | "menu"
+        | "ban"
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
@@ -76,6 +78,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props,
                     }
                     case "menu": {
                         return <Menu />
+                    }
+                    case "ban": {
+                        return <BanIcon />
                     }
                 }
             })()}

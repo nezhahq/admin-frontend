@@ -164,5 +164,15 @@
     "CommunityThemeDescription": "社群主題未經官方審計，需自行甄別風險",
     "Cancel": "取消",
     "EnableDDNS": "啟用 DDNS",
-    "PushSuccessful": "推送成功的通知"
+    "PushSuccessful": "推送成功的通知",
+    "GrpcAuthFailed": "gRPC 認證失敗",
+    "APITokenInvalid": "API 令牌無效",
+    "UserInvalid": "使用者無效",
+    "BlockByUser": "被使用者封鎖",
+    "BlockIdentifier": "封鎖標識符",
+    "UserId": "使用者 ID",
+    "ConnectedAt": "連接時間",
+    "OnlineUser": "線上使用者",
+    "Total": "總數",
+    "ConfirmBlock": "確認封鎖"
 }
