@@ -38,8 +38,11 @@ export default function WAFPage() {
     const page = Number(searchParams.get("page")) || 1
     const pageSize = Number(searchParams.get("pageSize")) || 10
 
+    // 计算 offset
+    const offset = (page - 1) * pageSize
+
     const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock>(
-        `/api/v1/waf?offset=${page}&limit=${pageSize}`,
+        `/api/v1/waf?offset=${offset}&limit=${pageSize}`,
         swrFetcher,
     )
 

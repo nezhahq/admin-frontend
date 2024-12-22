@@ -22,7 +22,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
-import { ip16Str } from "@/lib/utils"
 import { ModelOnlineUser, ModelOnlineUserApi } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
@@ -38,8 +37,11 @@ export default function OnlineUserPage() {
     const page = Number(searchParams.get("page")) || 1
     const pageSize = Number(searchParams.get("pageSize")) || 10
 
+    // 计算 offset
+    const offset = (page - 1) * pageSize
+
     const { data, mutate, error, isLoading } = useSWR<ModelOnlineUserApi>(
-        `/api/v1/online-user?offset=${page}&limit=${pageSize}`,
+        `/api/v1/online-user?offset=${offset}&limit=${pageSize}`,
         swrFetcher,
     )
 
