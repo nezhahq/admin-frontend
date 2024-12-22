@@ -99,9 +99,8 @@ export default function WAFPage() {
             header: t("BlockIdentifier"),
             accessorKey: "BlockIdentifier",
             accessorFn: (row) => {
-                return  wafBlockIdentifiers[row.block_identifier] || row.block_identifier
-            }
-            ,
+                return wafBlockIdentifiers[row.block_identifier] || row.block_identifier
+            },
         },
         {
             header: t("LastBlockTime"),
