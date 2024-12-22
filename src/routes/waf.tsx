@@ -12,6 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { useAuth } from "@/hooks/useAuth"
 import { ip16Str } from "@/lib/utils"
 import { ModelWAFApiMock, wafBlockReasons } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
@@ -22,7 +23,10 @@ import useSWR from "swr"
 
 export default function WAFPage() {
     const { t } = useTranslation()
+    const { profile } = useAuth()
     const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock[]>("/api/v1/waf", swrFetcher)
+
+    const isAdmin = profile?.role === 0
 
     useEffect(() => {
         if (error)
@@ -32,7 +36,7 @@ export default function WAFPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<ModelWAFApiMock>[] = [
+    let columns: ColumnDef<ModelWAFApiMock>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -102,6 +106,11 @@ export default function WAFPage() {
         },
     ]
 
+    if (!isAdmin) {
+        // 非管理员隐藏操作列
+        columns = columns.filter((c) => c.id !== "actions")
+    }
+
     const dataCache = useMemo(() => {
         return data ?? []
     }, [data])
@@ -118,16 +127,18 @@ export default function WAFPage() {
         <div className="px-3">
             <SettingsTab className="mt-6 w-full" />
             <div className="flex mt-4 mb-4">
-                <HeaderButtonGroup
-                    className="flex-2 flex gap-2 ml-auto"
-                    delete={{
-                        fn: deleteWAF,
-                        id: selectedRows.map((r) => ip16Str(r.original.ip ?? "")),
-                        mutate: mutate,
-                    }}
-                >
-                    <></>
-                </HeaderButtonGroup>
+                {isAdmin && (
+                    <HeaderButtonGroup
+                        className="flex-2 flex gap-2 ml-auto"
+                        delete={{
+                            fn: deleteWAF,
+                            id: selectedRows.map((r) => ip16Str(r.original.ip ?? "")),
+                            mutate: mutate,
+                        }}
+                    >
+                        <></>
+                    </HeaderButtonGroup>
+                )}
             </div>
             <Table>
                 <TableHeader>
