@@ -126,7 +126,7 @@ export function HeaderBlockButtonGroup<E, U>({
                 <>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <IconButton variant="destructive" icon="trash" />
+                            <IconButton variant="destructive" icon="ban" />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="sm:max-w-lg">
                             <AlertDialogHeader>

@@ -15,6 +15,7 @@ export const wafBlockReasons: Record<number, string> = {
     1: i18n.t("LoginFailed"),
     2: i18n.t("BruteForceAttackingToken"),
     3: i18n.t("BruteForceAttackingAgentSecret"),
+    4: i18n.t("BlockByUser"),
 }
 
 export const wafBlockIdentifiers: Record<number, string> = {

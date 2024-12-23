@@ -168,7 +168,7 @@
     "GrpcAuthFailed": "gRPC authentication failed",
     "APITokenInvalid": "API token is invalid",
     "UserInvalid": "User is invalid",
-    "BlockByUser": "Blocked by user",
+    "BlockByUser": "Blocked by admin",
     "BlockIdentifier": "Block identifier",
     "UserId": "User ID",
     "ConnectedAt": "Connected at",

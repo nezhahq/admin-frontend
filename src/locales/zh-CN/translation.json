@@ -168,7 +168,7 @@
     "GrpcAuthFailed": "gRPC 认证失败",
     "APITokenInvalid": "API 令牌无效",
     "UserInvalid": "用户无效",
-    "BlockByUser": "被用户封禁",
+    "BlockByUser": "被管理员封禁",
     "BlockIdentifier": "封禁标识",
     "UserId": "用户 ID",
     "ConnectedAt": "连接时间",
