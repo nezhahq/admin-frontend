@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             await loginRequest(username, password)
             const user = await getProfile()
+            user.role = user.role || 0
             setProfile(user)
             navigate("/dashboard")
         } catch (error: any) {
