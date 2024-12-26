@@ -164,5 +164,15 @@
     "CommunityThemeDescription": "Questo tema viene fornito dalla comunità, utilizzalo a tuo rischio e pericolo",
     "Cancel": "Annulla",
     "EnableDDNS": "Abilita DDNS",
-    "PushSuccessful": "Esegui il push se ha successo"
+    "PushSuccessful": "Esegui il push se ha successo",
+    "GrpcAuthFailed": "Autenticazione gRPC fallita",
+    "APITokenInvalid": "Il token API non è valido",
+    "UserInvalid": "L'utente non è valido",
+    "BlockByUser": "Bloccato dall'amministratore",
+    "Total": "Totale",
+    "ConfirmBlock": "Conferma blocco",
+    "OnlineUser": "Utente online",
+    "BlockIdentifier": "Identificatore del blocco",
+    "UserId": "ID utente",
+    "ConnectedAt": "Connesso alle"
 }

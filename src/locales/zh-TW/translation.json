@@ -171,7 +171,7 @@
     "BlockByUser": "被管理员封鎖",
     "BlockIdentifier": "封鎖標識符",
     "UserId": "使用者 ID",
-    "ConnectedAt": "連接時間",
+    "ConnectedAt": "連線時間",
     "OnlineUser": "線上使用者",
     "Total": "總數",
     "ConfirmBlock": "確認封鎖"
