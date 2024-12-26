@@ -164,5 +164,15 @@
     "CommunityThemeDescription": "Dieses Design wird von der Community bereitgestellt, Benutzung auf eigene Gefahr",
     "Language": "Sprache",
     "FullIPNotification": "Vollständige IP-Adresse in Benachrichtigung anzeigen",
-    "CreateService": "Service erstellen"
+    "CreateService": "Service erstellen",
+    "GrpcAuthFailed": "gRPC-Authentifizierung fehlgeschlagen",
+    "APITokenInvalid": "API-Token ist ungültig",
+    "BlockIdentifier": "Blockierungskennung",
+    "ConnectedAt": "Verbunden um",
+    "UserId": "Benutzer-ID",
+    "Total": "Gesamt",
+    "ConfirmBlock": "Blockierung bestätigen",
+    "BlockByUser": "Vom Administrator blockiert",
+    "UserInvalid": "Benutzer ist ungültig",
+    "OnlineUser": "Online-Benutzer"
 }
