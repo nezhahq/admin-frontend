@@ -13,14 +13,14 @@ export default function Root() {
     const { data: settingData, error } = useSetting()
 
     useEffect(() => {
-        document.title = settingData?.site_name || "哪吒监控 Nezha Monitoring"
-    }, [settingData?.site_name])
+        document.title = settingData?.config?.site_name || "哪吒监控 Nezha Monitoring"
+    }, [settingData?.config?.site_name])
 
     useEffect(() => {
-        if (settingData?.custom_code_dashboard) {
-            InjectContext(settingData?.custom_code_dashboard)
+        if (settingData?.config?.custom_code_dashboard) {
+            InjectContext(settingData?.config?.custom_code_dashboard)
         }
-    }, [settingData?.custom_code_dashboard])
+    }, [settingData?.config?.custom_code_dashboard])
 
     if (error) {
         throw error
@@ -30,8 +30,8 @@ export default function Root() {
         return null
     }
 
-    if (settingData?.language && !localStorage.getItem("language")) {
-        i18n.changeLanguage(settingData?.language)
+    if (settingData?.config?.language && !localStorage.getItem("language")) {
+        i18n.changeLanguage(settingData?.config?.language)
     }
 
     return (

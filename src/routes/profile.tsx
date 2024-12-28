@@ -1,15 +1,61 @@
+import { bindOauth2, getOauth2RedirectURL, Oauth2RequestType, unbindOauth2 } from "@/api/oauth2"
+import { getProfile } from "@/api/user"
 import { ProfileCard } from "@/components/profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useMainStore } from "@/hooks/useMainStore"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { useServer } from "@/hooks/useServer"
+import useSetting from "@/hooks/useSetting"
 import { Boxes, Server } from "lucide-react"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
 export default function ProfilePage() {
-    const { profile } = useMainStore()
+    const { profile, setProfile } = useMainStore()
     const { servers, serverGroups } = useServer()
+    const { data: settingData } = useSetting()
     const isDesktop = useMediaQuery("(min-width: 890px)")
+
+    useEffect(() => {
+        const oauth2Code = new URLSearchParams(window.location.search).get("code")
+        const oauth2State = new URLSearchParams(window.location.search).get("state")
+        const oauth2Provider = new URLSearchParams(window.location.search).get("provider")
+        if (oauth2Code && oauth2State && oauth2Provider) {
+            bindOauth2(oauth2Provider, oauth2State, oauth2Code)
+                .catch((error) => {
+                    toast.error(error.message)
+                })
+                .then(() => {
+                    getProfile().then((profile) => {
+                        setProfile(profile)
+                    })
+                }).finally(() => {
+                    window.history.replaceState({}, document.title, window.location.pathname)
+                })
+        }
+    }, [window.location.search])
+
+    const bindO2 = async (provider: string) => {
+        try {
+            const redirectUrl = await getOauth2RedirectURL(provider, Oauth2RequestType.BIND)
+            window.location.href = redirectUrl.redirect!
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+    }
+
+    const unbindO2 = async (provider: string) => {
+        try {
+            await unbindOauth2(provider)
+            getProfile().then((profile) => {
+                setProfile(profile)
+            })
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+    }
 
     return (
         profile && (
@@ -60,6 +106,22 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className="text-lg font-semibold">
                                 {serverGroups?.length || 0}
+                            </CardContent>
+                        </Card>
+
+                        <Card className="w-full">
+                            <CardHeader>
+                                <CardTitle className="flex gap-2 text-xl items-center">
+                                    <Boxes /> Oauth2 bindings
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-lg font-semibold">
+                                {settingData?.config?.oauth2_providers?.map((provider) => <div>
+                                    {provider}: {profile.oauth2_bind?.[provider.toLowerCase()]} {profile.oauth2_bind?.[provider.toLowerCase()] ?
+                                        <Button size="sm" onClick={() => unbindO2(provider)}>Unbind</Button>
+                                        :
+                                        <Button size="sm" onClick={() => bindO2(provider)}>Bind</Button>}
+                                </div>)}
                             </CardContent>
                         </Card>
                     </div>

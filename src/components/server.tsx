@@ -62,7 +62,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof serverFormSchema>) => {
-        await updateServer(data.id, values)
+        await updateServer(data!.id!, values)
         setOpen(false)
         await mutate()
         form.reset()
@@ -122,7 +122,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     {...field}
                                                     value={conv.arrToStr(field.value || [])}
                                                     onChange={(e) => {
-                                                        console.log(field.value)
                                                         const arr = conv
                                                             .strToArr(e.target.value)
                                                             .map(Number)

@@ -8,7 +8,7 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import useSettings from "@/hooks/useSetting"
 import { copyToClipboard } from "@/lib/utils"
-import { ModelProfile, ModelSettingResponse } from "@/types"
+import { ModelProfile, ModelConfig } from "@/types"
 import i18next from "i18next"
 import { Check, Clipboard } from "lucide-react"
 import { forwardRef, useState } from "react"
@@ -33,8 +33,8 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
             try {
                 setCopy(true)
                 if (!profile) throw new Error("Profile is not found.")
-                if (!settings) throw new Error("Settings is not found.")
-                await copyToClipboard(generateCommand(type, settings, profile) || "")
+                if (!settings?.config) throw new Error("Settings is not found.")
+                await copyToClipboard(generateCommand(type, settings!.config, profile) || "")
             } catch (e: Error | any) {
                 console.error(e)
                 toast(t("Error"), {
@@ -88,7 +88,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
 
 const generateCommand = (
     type: number,
-    { agent_secret_key, install_host, tls }: ModelSettingResponse,
+    { agent_secret_key, install_host, tls }: ModelConfig,
     { agent_secret, role }: ModelProfile,
 ) => {
     if (!install_host) throw new Error(i18next.t("Results.InstallHostRequired"))

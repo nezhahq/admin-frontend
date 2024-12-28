@@ -6,7 +6,7 @@ interface CommonResponse<T> {
 
 function buildUrl(path: string, data?: any): string {
     if (!data) return path
-    const url = new URL(path)
+    const url = new URL(window.location.origin + path)
     for (const key in data) {
         url.searchParams.append(key, data[key])
     }
@@ -25,7 +25,7 @@ let lastestRefreshTokenAt = 0
 
 export async function fetcher<T>(method: FetcherMethod, path: string, data?: any): Promise<T> {
     let response
-    if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {
+    if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {        
         response = await fetch(buildUrl(path, data), {
             method: "GET",
         })

@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 import { useMainStore } from "./useMainStore"
+import { oauth2callback } from "@/api/oauth2"
 
 const AuthContext = createContext<AuthContextProps>({
     profile: undefined,
-    login: () => {},
-    logout: () => {},
+    login: () => { },
+    loginOauth2: () => { },
+    logout: () => { },
 })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -17,7 +19,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const setProfile = useMainStore((store) => store.setProfile)
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             try {
                 const user = await getProfile()
                 user.role = user.role || 0
@@ -43,6 +45,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
+    const loginOauth2 = async (provider: string, state: string, code: string) => {
+        try {
+            await oauth2callback(provider, state, code)
+            const user = await getProfile()
+            user.role = user.role || 0
+            setProfile(user)
+            navigate("/dashboard")
+        } catch (error: any) {
+            toast(error.message)
+        } finally {
+            window.history.replaceState({}, document.title, window.location.pathname)
+        }
+    }
+
     const logout = () => {
         document.cookie.split(";").forEach(function (c) {
             document.cookie = c
@@ -57,6 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         () => ({
             profile,
             login,
+            loginOauth2,
             logout,
         }),
         [profile],
