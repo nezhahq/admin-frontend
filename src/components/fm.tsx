@@ -41,6 +41,7 @@ import { HTMLAttributes, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+import { Button } from "./ui/button"
 import { TableCell, TableRow } from "./ui/table"
 import { Filepath } from "./xui/filepath"
 import { IconButton } from "./xui/icon-button"
@@ -53,7 +54,6 @@ import {
     SheetTrigger,
 } from "./xui/overlayless-sheet"
 import { DataTable } from "./xui/virtulized-data-table"
-import { Button } from "./ui/button"
 
 interface FMProps {
     wsUrl: string
@@ -103,7 +103,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
             header: () => <span>{t("Actions")}</span>,
             id: "download",
             cell: ({ row }) => {
-                return (row.original.type == 0 ?
+                return row.original.type == 0 ? (
                     <IconButton
                         variant="ghost"
                         icon="download"
@@ -111,7 +111,9 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                             if (!dOpen) setdOpen(true)
                             downloadFile(row.original.name)
                         }}
-                    /> : <Button size="icon" variant="ghost" className="pointer-events-none" />
+                    />
+                ) : (
+                    <Button size="icon" variant="ghost" className="pointer-events-none" />
                 )
             },
         },
@@ -253,14 +255,14 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
 
         const handleBeforeUnload = () => {
             worker.postMessage({
-                operation: 3
-            });
-        };
+                operation: 3,
+            })
+        }
 
-        window.addEventListener("beforeunload", handleBeforeUnload);
+        window.addEventListener("beforeunload", handleBeforeUnload)
         return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
+            window.removeEventListener("beforeunload", handleBeforeUnload)
+        }
     }, [worker, dOpen])
 
     const [currentPath, setPath] = useState("")

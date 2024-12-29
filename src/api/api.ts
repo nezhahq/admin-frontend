@@ -25,7 +25,7 @@ let lastestRefreshTokenAt = 0
 
 export async function fetcher<T>(method: FetcherMethod, path: string, data?: any): Promise<T> {
     let response
-    if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {        
+    if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {
         response = await fetch(buildUrl(path, data), {
             method: "GET",
         })
