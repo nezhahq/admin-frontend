@@ -11,8 +11,9 @@ export const getOauth2RedirectURL = async (
     provider: string,
     rType: Oauth2RequestType,
 ): Promise<ModelOauth2LoginResponse> => {
+    const sType = 'type'
     return fetcher<ModelOauth2LoginResponse>(FetcherMethod.GET, `/api/v1/oauth2/${provider}`, {
-        type: rType,
+       sType : rType,
     })
 }
 
