@@ -1,3 +1,4 @@
+import { oauth2callback } from "@/api/oauth2"
 import { getProfile, login as loginRequest } from "@/api/user"
 import { AuthContextProps } from "@/types"
 import { createContext, useContext, useEffect, useMemo } from "react"
@@ -5,13 +6,12 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 import { useMainStore } from "./useMainStore"
-import { oauth2callback } from "@/api/oauth2"
 
 const AuthContext = createContext<AuthContextProps>({
     profile: undefined,
-    login: () => { },
-    loginOauth2: () => { },
-    logout: () => { },
+    login: () => {},
+    loginOauth2: () => {},
+    logout: () => {},
 })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const setProfile = useMainStore((store) => store.setProfile)
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             try {
                 const user = await getProfile()
                 user.role = user.role || 0

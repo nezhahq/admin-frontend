@@ -52,7 +52,7 @@ export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
                             setPath("/")
                         }}
                     >
-                        {"/"}
+                        /
                     </p>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />

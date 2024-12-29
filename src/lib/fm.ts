@@ -38,9 +38,8 @@ onmessage = async function (event) {
                     throw new Error("accessHandle is undefined")
                 }
 
-                const dataChunk = arrayBuffer
-                accessHandle.write(dataChunk, { at: receivedLength })
-                receivedLength += dataChunk.byteLength
+                accessHandle.write(arrayBuffer, { at: receivedLength })
+                receivedLength += arrayBuffer.byteLength
 
                 if (receivedLength === expectedLength) {
                     accessHandle.flush()

@@ -1,4 +1,4 @@
-import { bindOauth2, getOauth2RedirectURL, Oauth2RequestType, unbindOauth2 } from "@/api/oauth2"
+import { Oauth2RequestType, bindOauth2, getOauth2RedirectURL, unbindOauth2 } from "@/api/oauth2"
 import { getProfile } from "@/api/user"
 import { ProfileCard } from "@/components/profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -31,7 +31,8 @@ export default function ProfilePage() {
                     getProfile().then((profile) => {
                         setProfile(profile)
                     })
-                }).finally(() => {
+                })
+                .finally(() => {
                     window.history.replaceState({}, document.title, window.location.pathname)
                 })
         }
@@ -116,12 +117,20 @@ export default function ProfilePage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="text-lg font-semibold">
-                                {settingData?.config?.oauth2_providers?.map((provider) => <div>
-                                    {provider}: {profile.oauth2_bind?.[provider.toLowerCase()]} {profile.oauth2_bind?.[provider.toLowerCase()] ?
-                                        <Button size="sm" onClick={() => unbindO2(provider)}>Unbind</Button>
-                                        :
-                                        <Button size="sm" onClick={() => bindO2(provider)}>Bind</Button>}
-                                </div>)}
+                                {settingData?.config?.oauth2_providers?.map((provider) => (
+                                    <div>
+                                        {provider}: {profile.oauth2_bind?.[provider.toLowerCase()]}{" "}
+                                        {profile.oauth2_bind?.[provider.toLowerCase()] ? (
+                                            <Button size="sm" onClick={() => unbindO2(provider)}>
+                                                Unbind
+                                            </Button>
+                                        ) : (
+                                            <Button size="sm" onClick={() => bindO2(provider)}>
+                                                Bind
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
                     </div>

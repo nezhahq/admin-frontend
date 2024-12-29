@@ -67,21 +67,21 @@ export default function SettingsPage() {
         resolver: zodResolver(settingFormSchema),
         defaultValues: config
             ? {
-                ...config,
-                language: config?.config?.language,
-                site_name: config.config?.site_name || "",
-                user_template:
-                    config.config?.user_template ||
-                    Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
-                    "user-dist",
-            }
+                  ...config,
+                  language: config?.config?.language,
+                  site_name: config.config?.site_name || "",
+                  user_template:
+                      config.config?.user_template ||
+                      Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
+                      "user-dist",
+              }
             : {
-                ip_change_notification_group_id: 0,
-                cover: 1,
-                site_name: "",
-                language: "",
-                user_template: "user-dist",
-            },
+                  ip_change_notification_group_id: 0,
+                  cover: 1,
+                  site_name: "",
+                  language: "",
+                  user_template: "user-dist",
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -229,15 +229,15 @@ export default function SettingsPage() {
                                     {!config?.frontend_templates?.find(
                                         (t) => t.path === field.value,
                                     )?.is_official && (
-                                            <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
-                                                <div className="font-medium text-lg mb-1">
-                                                    {t("CommunityThemeWarning")}
-                                                </div>
-                                                <div className="text-yellow-700 dark:text-yellow-200">
-                                                    {t("CommunityThemeDescription")}
-                                                </div>
+                                        <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-2">
+                                            <div className="font-medium text-lg mb-1">
+                                                {t("CommunityThemeWarning")}
                                             </div>
-                                        )}
+                                            <div className="text-yellow-700 dark:text-yellow-200">
+                                                {t("CommunityThemeDescription")}
+                                            </div>
+                                        </div>
+                                    )}
                                 </FormItem>
                             )}
                         />

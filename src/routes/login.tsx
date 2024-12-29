@@ -1,4 +1,4 @@
-import { getOauth2RedirectURL, Oauth2RequestType } from "@/api/oauth2"
+import { Oauth2RequestType, getOauth2RedirectURL } from "@/api/oauth2"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -59,7 +59,7 @@ function Login() {
             window.location.href = redirectUrl.redirect!
         } catch (error: any) {
             toast.error(error.message)
-        } 
+        }
     }
 
     const { t } = useTranslation()
@@ -103,9 +103,9 @@ function Login() {
                 </form>
             </Form>
             <div className="mt-4">
-                {settingData?.config?.oauth2_providers?.map((p: string) =>
+                {settingData?.config?.oauth2_providers?.map((p: string) => (
                     <Button onClick={() => loginWith(p)}>{p}</Button>
-                )}
+                ))}
             </div>
         </div>
     )
