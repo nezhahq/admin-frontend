@@ -101,7 +101,12 @@ function Login() {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">{t("Login")}</Button>
+                    <Button
+                        type="submit"
+                        className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                    >
+                        {t("Login")}
+                    </Button>
                 </form>
                 <section className="flex items-center my-3 w-full">
                     <Separator className="flex-1" />
@@ -113,8 +118,11 @@ function Login() {
             </Form>
             <div className="mt-3">
                 {settingData?.config?.oauth2_providers?.map((p: string) => (
-                    <Button className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80" onClick={() => loginWith(p)}>
-                        {p === "GitHub" && (<GitHubIcon className="-mt-[1px] size-4" />)}
+                    <Button
+                        className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80"
+                        onClick={() => loginWith(p)}
+                    >
+                        {p === "GitHub" && <GitHubIcon className="-mt-[1px] size-4" />}
                         {p}
                     </Button>
                 ))}

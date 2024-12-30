@@ -121,10 +121,18 @@ export default function ProfilePage() {
                                     <div className="flex justify-between items-center flex-wrap gap-2">
                                         <section className="flex gap-2 items-center">
                                             <p>{provider}: </p>
-                                            {profile.oauth2_bind?.[provider.toLowerCase()] && ( <p className=" bg-muted px-1.5 py-0.5 text-sm rounded-full">{profile.oauth2_bind?.[provider.toLowerCase()]}</p>)}
+                                            {profile.oauth2_bind?.[provider.toLowerCase()] && (
+                                                <p className=" bg-muted px-1.5 py-0.5 text-sm rounded-full">
+                                                    {profile.oauth2_bind?.[provider.toLowerCase()]}
+                                                </p>
+                                            )}
                                         </section>
                                         {profile.oauth2_bind?.[provider.toLowerCase()] ? (
-                                            <Button className="w-fit bg-red-600 hover:bg-red-500 dark:text-white rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]" size="sm" onClick={() => unbindO2(provider)}>
+                                            <Button
+                                                className="w-fit bg-red-600 hover:bg-red-500 dark:text-white rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                                                size="sm"
+                                                onClick={() => unbindO2(provider)}
+                                            >
                                                 Unbind
                                             </Button>
                                         ) : (
