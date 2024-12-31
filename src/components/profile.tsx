@@ -1,5 +1,6 @@
 import { getProfile, updateProfile } from "@/api/user"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogClose,
@@ -18,16 +19,15 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMainStore } from "@/hooks/useMainStore"
+import { asOptionalField } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { asOptionalField } from "@/lib/utils"
 import { toast } from "sonner"
 import { z } from "zod"
 

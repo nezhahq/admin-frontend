@@ -39,11 +39,11 @@ export default function ProfilePage() {
 
     const unbindO2 = async (provider: string) => {
         try {
-            await unbindOauth2(provider);
-            const profile = await getProfile();
-            setProfile(profile);
+            await unbindOauth2(provider)
+            const profile = await getProfile()
+            setProfile(profile)
         } catch (error: any) {
-            toast.error(error.message);
+            toast.error(error.message)
         }
     }
 
