@@ -1,4 +1,4 @@
-import { Oauth2RequestType, bindOauth2, getOauth2RedirectURL, unbindOauth2 } from "@/api/oauth2"
+import { Oauth2RequestType, getOauth2RedirectURL, unbindOauth2 } from "@/api/oauth2"
 import { getProfile } from "@/api/user"
 import { ProfileCard } from "@/components/profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -19,22 +19,12 @@ export default function ProfilePage() {
     const isDesktop = useMediaQuery("(min-width: 890px)")
 
     useEffect(() => {
-        const oauth2Code = new URLSearchParams(window.location.search).get("code")
-        const oauth2State = new URLSearchParams(window.location.search).get("state")
-        const oauth2Provider = new URLSearchParams(window.location.search).get("provider")
-        if (oauth2Code && oauth2State && oauth2Provider) {
-            bindOauth2(oauth2Provider, oauth2State, oauth2Code)
-                .catch((error) => {
-                    toast.error(error.message)
-                })
-                .then(() => {
-                    getProfile().then((profile) => {
-                        setProfile(profile)
-                    })
-                })
-                .finally(() => {
-                    window.history.replaceState({}, document.title, window.location.pathname)
-                })
+        const oauth2 = new URLSearchParams(window.location.search).get("oauth2")
+        if (oauth2) {
+            getProfile().then((profile) => {
+                setProfile(profile)
+            })
+            window.history.replaceState({}, document.title, window.location.pathname)
         }
     }, [window.location.search])
 
@@ -49,12 +39,11 @@ export default function ProfilePage() {
 
     const unbindO2 = async (provider: string) => {
         try {
-            await unbindOauth2(provider)
-            getProfile().then((profile) => {
-                setProfile(profile)
-            })
+            await unbindOauth2(provider);
+            const profile = await getProfile();
+            setProfile(profile);
         } catch (error: any) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
     }
 

@@ -1,4 +1,3 @@
-import { oauth2callback } from "@/api/oauth2"
 import { getProfile, login as loginRequest } from "@/api/user"
 import { AuthContextProps } from "@/types"
 import { createContext, useContext, useEffect, useMemo } from "react"
@@ -45,9 +44,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
-    const loginOauth2 = async (provider: string, state: string, code: string) => {
+    const loginOauth2 = async () => {
         try {
-            await oauth2callback(provider, state, code)
             const user = await getProfile()
             user.role = user.role || 0
             setProfile(user)

@@ -16,35 +16,9 @@ export const getOauth2RedirectURL = async (
     })
 }
 
-export const bindOauth2 = async (
-    provider: string,
-    state: string,
-    code: string,
-): Promise<ModelOauth2LoginResponse> => {
-    return fetcher<ModelOauth2LoginResponse>(
-        FetcherMethod.POST,
-        `/api/v1/oauth2/${provider}/bind`,
-        {
-            state: state,
-            code: code,
-        },
-    )
-}
-
 export const unbindOauth2 = async (provider: string): Promise<ModelOauth2LoginResponse> => {
     return fetcher<ModelOauth2LoginResponse>(
         FetcherMethod.POST,
         `/api/v1/oauth2/${provider}/unbind`,
     )
-}
-
-export const oauth2callback = async (
-    provider: string,
-    state: string,
-    code: string,
-): Promise<void> => {
-    return fetcher<void>(FetcherMethod.POST, `/api/v1/oauth2/${provider}/callback`, {
-        state,
-        code,
-    })
 }

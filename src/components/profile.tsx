@@ -18,6 +18,8 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMainStore } from "@/hooks/useMainStore"
@@ -32,6 +34,7 @@ const profileFormSchema = z.object({
     original_password: z.string().min(5).max(72),
     new_password: z.string().min(8).max(72),
     new_username: z.string().min(1).max(32),
+    reject_password: z.boolean(),
 })
 
 export const ProfileCard = ({ className }: { className: string }) => {
@@ -44,6 +47,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
             original_password: "",
             new_password: "",
             new_username: profile?.username,
+            reject_password: profile?.reject_password,
         },
         resetOptions: {
             keepDefaultValues: false,
@@ -117,6 +121,26 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                             <FormLabel>{t("NewPassword")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="reject_password"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                    <Label className="text-sm">
+                                                        {t("RejectPassword")}
+                                                    </Label>
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

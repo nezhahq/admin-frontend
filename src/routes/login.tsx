@@ -35,11 +35,9 @@ function Login() {
     const { data: settingData } = useSetting()
 
     useEffect(() => {
-        const oauth2Code = new URLSearchParams(window.location.search).get("code")
-        const oauth2State = new URLSearchParams(window.location.search).get("state")
-        const oauth2Provider = new URLSearchParams(window.location.search).get("provider")
-        if (oauth2Code && oauth2State && oauth2Provider) {
-            loginOauth2(oauth2Provider, oauth2State, oauth2Code)
+        const oauth2 = new URLSearchParams(window.location.search).get("oauth2")
+        if (oauth2) {
+            loginOauth2()
         }
     }, [window.location.search])
 
