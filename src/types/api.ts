@@ -506,7 +506,7 @@ export interface ModelProfileForm {
     new_password: string;
     new_username: string;
     original_password: string;
-    reject_password: boolean;
+    reject_password?: boolean;
 }
 
 export interface ModelRule {

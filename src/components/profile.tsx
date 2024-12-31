@@ -27,6 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { asOptionalField } from "@/lib/utils"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -34,7 +35,7 @@ const profileFormSchema = z.object({
     original_password: z.string().min(5).max(72),
     new_password: z.string().min(8).max(72),
     new_username: z.string().min(1).max(32),
-    reject_password: z.boolean(),
+    reject_password: asOptionalField(z.boolean()),
 })
 
 export const ProfileCard = ({ className }: { className: string }) => {
