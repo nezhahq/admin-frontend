@@ -174,5 +174,6 @@
     "ConnectedAt": "Connected at",
     "OnlineUser": "Online User",
     "Total": "Total",
-    "ConfirmBlock": "Confirm Block"
+    "ConfirmBlock": "Confirm Block",
+    "RejectPassword": "Reject Password Login"
 }
