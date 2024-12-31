@@ -174,5 +174,6 @@
     "ConnectedAt": "连接时间",
     "OnlineUser": "在线用户",
     "Total": "总数",
-    "ConfirmBlock": "确认封禁"
+    "ConfirmBlock": "确认封禁",
+    "RejectPassword": "禁止密码登录"
 }
