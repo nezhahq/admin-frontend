@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setProfile(user)
             } catch (error: any) {
                 setProfile(undefined)
-                console.log("Error fetching profile", error)
+                console.error("Error fetching profile", error)
             }
         })()
     }, [])

@@ -61,8 +61,9 @@ export const ProfileCard = ({ className }: { className: string }) => {
         try {
             await updateProfile(values)
         } catch (e) {
+            console.error(e)
             toast(t("Error"), {
-                description: `${e}`,
+                description: t("Results.UnExpectedError"),
             })
             return
         }

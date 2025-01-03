@@ -40,6 +40,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
@@ -103,9 +104,17 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     const onSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
         values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
         const { skip_servers_raw, ...requiredFields } = values
-        data?.id
-            ? await updateService(data.id, requiredFields)
-            : await createService(requiredFields)
+        try {
+            data?.id
+                ? await updateService(data.id, requiredFields)
+                : await createService(requiredFields)
+        } catch (e) {
+            console.error(e)
+            toast(t("Error"), {
+                description: t("Results.UnExpectedError"),
+            })
+            return
+        }
         setOpen(false)
         await mutate()
         form.reset()

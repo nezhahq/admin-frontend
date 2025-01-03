@@ -38,6 +38,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
@@ -85,7 +86,15 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
     const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof ddnsFormSchema>) => {
-        data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values)
+        try {
+            data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values)
+        } catch (e) {
+            console.error(e)
+            toast(t("Error"), {
+                description: t("Results.UnExpectedError"),
+            })
+            return
+        }
         setOpen(false)
         await mutate()
         form.reset()
