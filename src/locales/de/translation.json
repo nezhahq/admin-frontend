@@ -174,5 +174,6 @@
     "ConfirmBlock": "Blockierung bestätigen",
     "BlockByUser": "Vom Administrator blockiert",
     "UserInvalid": "Benutzer ist ungültig",
-    "OnlineUser": "Online-Benutzer"
+    "OnlineUser": "Online-Benutzer",
+    "RejectPassword": "Passwort Login verbieten"
 }
