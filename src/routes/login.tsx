@@ -106,15 +106,16 @@ function Login() {
                         {t("Login")}
                     </Button>
                 </form>
-                {settingData?.config?.oauth2_providers && settingData?.config?.oauth2_providers.length > 0 && (
-                    <section className="flex items-center my-3 w-full">
-                    <Separator className="flex-1" />
-                    <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
-                        OAuth2
-                    </div>
-                    <Separator className="flex-1" />
-                </section>
-                )}
+                {settingData?.config?.oauth2_providers &&
+                    settingData?.config?.oauth2_providers.length > 0 && (
+                        <section className="flex items-center my-3 w-full">
+                            <Separator className="flex-1" />
+                            <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
+                                OAuth2
+                            </div>
+                            <Separator className="flex-1" />
+                        </section>
+                    )}
             </Form>
             <div className="mt-3 flex flex-col space-y-2">
                 {settingData?.config?.oauth2_providers?.map((p: string) => (
