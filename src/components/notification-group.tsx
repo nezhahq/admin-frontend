@@ -28,6 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
@@ -62,9 +63,17 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
     const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof notificationGroupFormSchema>) => {
-        data?.group.id
-            ? await updateNotificationGroup(data.group.id, values)
-            : await createNotificationGroup(values)
+        try {
+            data?.group.id
+                ? await updateNotificationGroup(data.group.id, values)
+                : await createNotificationGroup(values)
+        } catch (e) {
+            console.error(e)
+            toast(t("Error"), {
+                description: t("Results.UnExpectedError"),
+            })
+            return
+        }
         setOpen(false)
         await mutate()
         form.reset()

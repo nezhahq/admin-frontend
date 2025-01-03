@@ -37,6 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
@@ -80,7 +81,15 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
     const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof notificationFormSchema>) => {
-        data?.id ? await updateNotification(data.id, values) : await createNotification(values)
+        try {
+            data?.id ? await updateNotification(data.id, values) : await createNotification(values)
+        } catch (e) {
+            console.error(e)
+            toast(t("Error"), {
+                description: t("Results.UnExpectedError"),
+            })
+            return
+        }
         setOpen(false)
         await mutate()
         form.reset()

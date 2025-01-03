@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
@@ -61,7 +62,15 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
     const [open, setOpen] = useState(false)
 
     const onSubmit = async (values: z.infer<typeof natFormSchema>) => {
-        data?.id ? await updateNAT(data.id, values) : await createNAT(values)
+        try {
+            data?.id ? await updateNAT(data.id, values) : await createNAT(values)
+        } catch (e) {
+            console.error(e)
+            toast(t("Error"), {
+                description: t("Results.UnExpectedError"),
+            })
+            return
+        }
         setOpen(false)
         await mutate()
         form.reset()
