@@ -1,11 +1,11 @@
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 
+import deTranslation from "../locales/de/translation.json"
 import enTranslation from "../locales/en/translation.json"
 import itTranslation from "../locales/it/translation.json"
 import zhCNTranslation from "../locales/zh-CN/translation.json"
 import zhTWTranslation from "../locales/zh-TW/translation.json"
-import deTranslation from "../locales/de/translation.json"
 
 const resources = {
     "en-US": {
