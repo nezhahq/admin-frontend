@@ -22,8 +22,12 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
-import { ip16Str } from "@/lib/utils"
-import { ModelWAF, ModelWAFApiMock, wafBlockIdentifiers, wafBlockReasons } from "@/types"
+import {
+    GithubComNezhahqNezhaModelValueArrayModelWAFApiMock,
+    ModelWAFApiMock,
+    wafBlockIdentifiers,
+    wafBlockReasons,
+} from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -41,10 +45,11 @@ export default function WAFPage() {
     // 计算 offset
     const offset = (page - 1) * pageSize
 
-    const { data, mutate, error, isLoading } = useSWR<ModelWAFApiMock>(
-        `/api/v1/waf?offset=${offset}&limit=${pageSize}`,
-        swrFetcher,
-    )
+    const { data, mutate, error, isLoading } =
+        useSWR<GithubComNezhahqNezhaModelValueArrayModelWAFApiMock>(
+            `/api/v1/waf?offset=${offset}&limit=${pageSize}`,
+            swrFetcher,
+        )
 
     const isAdmin = profile?.role === 0
 
@@ -56,7 +61,7 @@ export default function WAFPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    let columns: ColumnDef<ModelWAF>[] = [
+    let columns: ColumnDef<ModelWAFApiMock>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -82,7 +87,7 @@ export default function WAFPage() {
         {
             header: "IP",
             accessorKey: "ip",
-            accessorFn: (row) => ip16Str(row.ip ?? ""),
+            accessorFn: (row) => row.ip,
         },
         {
             header: t("Count"),
@@ -122,7 +127,7 @@ export default function WAFPage() {
                         className="flex gap-2"
                         delete={{
                             fn: deleteWAF,
-                            id: ip16Str(s.ip ?? ""),
+                            id: s.ip || "",
                             mutate: mutate,
                         }}
                     >
@@ -260,7 +265,7 @@ export default function WAFPage() {
                         className="flex-2 flex gap-2 ml-auto"
                         delete={{
                             fn: deleteWAF,
-                            id: selectedRows.map((r) => ip16Str(r.original.ip ?? "")),
+                            id: selectedRows.map((r) => r.original.ip || ""),
                             mutate: mutate,
                         }}
                     >
