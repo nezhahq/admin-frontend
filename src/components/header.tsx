@@ -20,7 +20,7 @@ import { useMainStore } from "@/hooks/useMainStore"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { cn } from "@/lib/utils"
 import i18next from "i18next"
-import { LogOut, Settings, User2 } from "lucide-react"
+import { LogOut, Settings, User2,HomeIcon } from "lucide-react"
 import { DateTime } from "luxon"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -147,6 +147,18 @@ export default function Header() {
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                             <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setDropdownOpen(false)
+                                                    navigate("/")
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
+                                                    <HomeIcon />
+                                                    {t("BackToHome")}
+                                                </div>
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={logout}
                                                 className="cursor-pointer"
