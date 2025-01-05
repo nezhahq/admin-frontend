@@ -17,9 +17,9 @@ export default function ErrorPage() {
 
     useEffect(() => {
         if (window.location.pathname !== "/dashboard/404") {
-          window.location.href = "/dashboard/404";
+            window.location.href = "/dashboard/404"
         }
-      }, []);
+    }, [])
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
