@@ -20,7 +20,7 @@ import { useMainStore } from "@/hooks/useMainStore"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { cn } from "@/lib/utils"
 import i18next from "i18next"
-import { HomeIcon, LogOut, Settings, User2 } from "lucide-react"
+import { LogOut, Settings, User2 } from "lucide-react"
 import { DateTime } from "luxon"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -28,7 +28,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Button } from "./ui/button"
-import { Card } from "./ui/card"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -76,7 +75,7 @@ export default function Header() {
                         className={cn(
                             "absolute right-0 z-[9999] top-11 w-20 scale-100 pointer-events-none",
                             {
-                                "top-2 right-4": location.pathname === "/dashboard/login",
+                                hidden: location.pathname === "/dashboard/login",
                             },
                         )}
                         alt={"animated-man"}
@@ -87,7 +86,10 @@ export default function Header() {
                     <div className="flex justify-between items-center w-full">
                         <NavigationMenuLink
                             asChild
-                            className={navigationMenuTriggerStyle() + " !text-foreground"}
+                            className={
+                                navigationMenuTriggerStyle() +
+                                " !text-foreground hover:opacity-60 transition-opacity"
+                            }
                         >
                             <Link to={profile ? "/dashboard" : "#"}>
                                 <img className="h-7 mr-1" src="/dashboard/logo.svg" />
@@ -96,6 +98,13 @@ export default function Header() {
                         </NavigationMenuLink>
 
                         <div className="flex items-center gap-1">
+                            <a
+                                href={"/"}
+                                rel="noopener noreferrer"
+                                className="flex items-center text-nowrap gap-1 text-sm font-medium opacity-50 transition-opacity hover:opacity-100"
+                            >
+                                {t("BackToHome")}
+                            </a>
                             <ModeToggle />
                             {profile && (
                                 <>
@@ -147,15 +156,6 @@ export default function Header() {
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="cursor-pointer">
-                                                <a
-                                                    href="/"
-                                                    className="flex items-center gap-2 w-full"
-                                                >
-                                                    <HomeIcon />
-                                                    {t("BackToHome")}
-                                                </a>
-                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={logout}
                                                 className="cursor-pointer"
@@ -251,7 +251,7 @@ export default function Header() {
             </NavigationMenu>
         </header>
     ) : (
-        <header className="flex border-b-2 px-4 h-16">
+        <header className="flex dark:bg-black/40 bg-muted border-b-[1px] px-4 h-16">
             <div className="flex max-w-max flex-1 items-center justify-center gap-2">
                 {profile && (
                     <Drawer open={open} onOpenChange={setOpen}>
@@ -288,15 +288,20 @@ export default function Header() {
                     </Drawer>
                 )}
             </div>
-            <Card className="mx-2 my-2 flex justify-center items-center hover:bg-accent transition duration-200">
-                <Link
-                    className="inline-flex w-full items-center px-4 py-2"
-                    to={profile ? "/dashboard" : "#"}
-                >
-                    <img className="h-7 mr-1" src="/dashboard/logo.svg" /> NEZHA
-                </Link>
-            </Card>
+            <Link
+                className="mx-2 my-2 inline-flex w-full items-center"
+                to={profile ? "/dashboard" : "#"}
+            >
+                <img className="h-7 mr-1" src="/dashboard/logo.svg" /> {t("nezha")}
+            </Link>
             <div className="ml-auto flex items-center gap-1">
+                <a
+                    href={"/"}
+                    rel="noopener noreferrer"
+                    className="flex items-center text-nowrap gap-1 text-sm font-medium opacity-50 transition-opacity hover:opacity-100"
+                >
+                    {t("BackToHome")}
+                </a>
                 <ModeToggle />
                 {profile && (
                     <>
