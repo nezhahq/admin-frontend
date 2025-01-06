@@ -64,6 +64,8 @@ function Login() {
 
     const { t } = useTranslation()
 
+    settingData!.config.oauth2_providers = ["GitHub", "Google", "Facebook", "Twitter", "LinkedIn", "Microsoft"]
+
     return (
         <div className="mt-28 sm:max-w-sm m-auto max-w-xs">
             <Form {...form}>
@@ -117,13 +119,13 @@ function Login() {
                         </section>
                     )}
             </Form>
-            <div className="mt-3 flex flex-col space-y-2">
+            <div className="mt-3 flex flex-col gap-3">
                 {settingData?.config?.oauth2_providers?.map((p: string) => (
                     <Button
-                        className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80 mb-3"
+                        className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80"
                         onClick={() => loginWith(p)}
                     >
-                        {p === "GitHub" && <GitHubIcon className="-mt-[1px] size-4" />}
+                        {p === "GitHub" && <GitHubIcon className="size-4" />}
                         {p}
                     </Button>
                 ))}
