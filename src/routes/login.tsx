@@ -64,8 +64,6 @@ function Login() {
 
     const { t } = useTranslation()
 
-    settingData!.config.oauth2_providers = ["GitHub", "Google", "Facebook", "Twitter", "LinkedIn", "Microsoft"]
-
     return (
         <div className="mt-28 sm:max-w-sm m-auto max-w-xs">
             <Form {...form}>
