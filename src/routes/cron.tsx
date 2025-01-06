@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { deleteCron, runCron } from "@/api/cron"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { CopyButton } from "@/components/copy-button"
 import { CronCard } from "@/components/cron"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -12,7 +13,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { CopyButton } from "@/components/xui/copy-button"
 import { IconButton } from "@/components/xui/icon-button"
 import { ModelCron } from "@/types"
 import { cronTypes } from "@/types"

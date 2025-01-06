@@ -2,6 +2,7 @@ import { deleteAlertRules } from "@/api/alert-rule"
 import { swrFetcher } from "@/api/api"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { AlertRuleCard } from "@/components/alert-rule"
+import { CopyButton } from "@/components/copy-button"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { NotificationTab } from "@/components/notification-tab"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -13,7 +14,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { CopyButton } from "@/components/xui/copy-button"
 import { ModelAlertRule, triggerModes } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"

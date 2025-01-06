@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { deleteNotification } from "@/api/notification"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { CopyButton } from "@/components/copy-button"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { NotificationTab } from "@/components/notification-tab"
 import { NotifierCard } from "@/components/notifier"
@@ -13,7 +14,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { CopyButton } from "@/components/xui/copy-button"
 import { useNotification } from "@/hooks/useNotfication"
 import { ModelNotification } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"

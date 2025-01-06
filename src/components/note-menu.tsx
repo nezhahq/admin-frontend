@@ -23,7 +23,7 @@ export const NoteMenu = forwardRef<HTMLButtonElement, NoteMenuProps>((props, ref
     const switchState = async (text?: string) => {
         if (!text) {
             toast("Warning", {
-                description: "You didn't have any note.",
+                description: t("EmptyNote"),
             })
             return
         }

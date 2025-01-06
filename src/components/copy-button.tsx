@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { IconButton } from "./icon-button"
+import { IconButton } from "./xui/icon-button"
 
 interface CopyButtonProps extends ButtonProps {
     text?: string
@@ -18,7 +18,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>((props,
     const switchState = async (text?: string) => {
         if (!text) {
             toast("Warning", {
-                description: t("Text is empty."),
+                description: t("EmptyText"),
             })
             return
         }

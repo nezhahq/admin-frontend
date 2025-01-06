@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { CopyButton } from "@/components/copy-button"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { InstallCommandsMenu } from "@/components/install-commands"
 import { NoteMenu } from "@/components/note-menu"
@@ -15,7 +16,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { CopyButton } from "@/components/xui/copy-button"
 import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
 import { joinIP } from "@/lib/utils"
