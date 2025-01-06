@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { CopyButton } from "@/components/xui/copy-button"
 import { useNotification } from "@/hooks/useNotfication"
 import { ModelNotification } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
@@ -93,7 +94,7 @@ export default function NotificationPage() {
             accessorFn: (row) => row.url,
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-64 whitespace-normal break-words">{s.url}</div>
+                return <CopyButton text={s.url} />
             },
         },
         {

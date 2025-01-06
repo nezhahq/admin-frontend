@@ -12,6 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { CopyButton } from "@/components/xui/copy-button"
 import { IconButton } from "@/components/xui/icon-button"
 import { ModelCron } from "@/types"
 import { cronTypes } from "@/types"
@@ -86,7 +87,7 @@ export default function CronPage() {
             accessorKey: "command",
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-48 whitespace-normal break-words">{s.command}</div>
+                return <CopyButton text={s.command} />
             },
         },
         {

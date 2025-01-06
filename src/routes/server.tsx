@@ -15,6 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { CopyButton } from "@/components/xui/copy-button"
 import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
 import { joinIP } from "@/lib/utils"
@@ -119,6 +120,14 @@ export default function ServerPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return <NoteMenu note={{ private: s.note, public: s.public_note }} />
+            },
+        },
+        {
+            id: "uuid",
+            header: "UUID",
+            cell: ({ row }) => {
+                const s = row.original
+                return <CopyButton text={s.uuid} />
             },
         },
         {

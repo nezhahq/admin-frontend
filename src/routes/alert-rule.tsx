@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { CopyButton } from "@/components/xui/copy-button"
 import { ModelAlertRule, triggerModes } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
@@ -87,11 +88,7 @@ export default function AlertRulePage() {
             header: t("Rules"),
             cell: ({ row }) => {
                 const s = row.original
-                return (
-                    <div className="max-w-48 whitespace-normal break-words">
-                        {JSON.stringify(s.rules)}
-                    </div>
-                )
+                return <CopyButton text={JSON.stringify(s.rules)} />
             },
         },
         {
