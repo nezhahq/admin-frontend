@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { CopyButton } from "@/components/copy-button"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { InstallCommandsMenu } from "@/components/install-commands"
 import { NoteMenu } from "@/components/note-menu"
@@ -119,6 +120,14 @@ export default function ServerPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return <NoteMenu note={{ private: s.note, public: s.public_note }} />
+            },
+        },
+        {
+            id: "uuid",
+            header: "UUID",
+            cell: ({ row }) => {
+                const s = row.original
+                return <CopyButton text={s.uuid} />
             },
         },
         {

@@ -176,5 +176,7 @@
     "OnlineUser": "Online User",
     "Total": "Total",
     "ConfirmBlock": "Confirm Block",
-    "RejectPassword": "Reject Password Login"
+    "RejectPassword": "Reject Password Login",
+    "EmptyText": "Text is empty",
+    "EmptyNote": "You didn't have any note."
 }

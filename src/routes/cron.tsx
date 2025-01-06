@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { deleteCron, runCron } from "@/api/cron"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { CopyButton } from "@/components/copy-button"
 import { CronCard } from "@/components/cron"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -86,7 +87,7 @@ export default function CronPage() {
             accessorKey: "command",
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-48 whitespace-normal break-words">{s.command}</div>
+                return <CopyButton text={s.command} />
             },
         },
         {
