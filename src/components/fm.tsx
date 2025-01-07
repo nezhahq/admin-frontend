@@ -199,7 +199,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                         setFMEntries(fmList)
                     } else if (arraysEqual(identifier, FMIdentifier.complete)) {
                         // Upload completed
-                        if (uOpen) setuOpen(false)
+                        setuOpen(false)
                         listFile()
                     } else {
                         throw new Error(t("Results.UnknownIdentifier"))
