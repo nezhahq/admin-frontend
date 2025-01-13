@@ -138,7 +138,7 @@
     "InstallCommands": "Installationsbefehl",
     "Actions": "Aktionen",
     "Weight": "Gewicht (je größer die Zahl, desto höher wird es angezeigt)",
-    "TasksToTriggerOnAlert": "Die Aufgabe, die den Alarm ausgelöst hat",
+    "TasksToTriggerOnAlert": "Aufgaben, die bei Alarm ausgelöst werden sollen",
     "NotifierGroup": "Benachrichtigungsgruppe",
     "EditNAT": "NAT-Konfiguration bearbeiten",
     "BindHostname": "Bind Domain Name",

@@ -111,13 +111,13 @@ export default function CronPage() {
                         {(() => {
                             switch (s.cover) {
                                 case 0: {
-                                    return <span>Ignore All</span>
+                                    return <span>{t("IgnoreAll")}</span>
                                 }
                                 case 1: {
-                                    return <span>Cover All</span>
+                                    return <span>{t("CoverAll")}</span>
                                 }
                                 case 2: {
-                                    return <span>On alert</span>
+                                    return <span>{t("OnAlert")}</span>
                                 }
                             }
                         })()}
