@@ -28,6 +28,38 @@ export default function ProfilePage() {
         }
     }, [window.location.search])
 
+    const initTelegramWidget = async () => {
+        try {
+            const redirectUrl = await getOauth2RedirectURL("Telegram", Oauth2RequestType.BIND)
+            const [botName, authUrl] = redirectUrl.redirect!.split("---")
+            const container = document.getElementById("telegram-bind-container")
+            if (container) {
+                container.innerHTML = ''
+                const widget = loadTelegramWidget(botName, authUrl)
+                container.appendChild(widget)
+            }
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+    }
+
+    useEffect(() => {
+        if (settingData?.config?.oauth2_providers?.includes("Telegram")) {
+            initTelegramWidget()
+        }
+    }, [settingData?.config?.oauth2_providers])
+
+    const loadTelegramWidget = (botName: string, authUrl: string) => {
+        const script = document.createElement('script')
+        script.src = "https://telegram.org/js/telegram-widget.js?22"
+        script.async = true
+        script.setAttribute("data-telegram-login", botName)
+        script.setAttribute("data-size", "medium")
+        script.setAttribute("data-auth-url", authUrl)
+        script.setAttribute("data-request-access", "write")
+        return script
+    }
+
     const bindO2 = async (provider: string) => {
         try {
             const redirectUrl = await getOauth2RedirectURL(provider, Oauth2RequestType.BIND)
@@ -42,6 +74,9 @@ export default function ProfilePage() {
             await unbindOauth2(provider)
             const profile = await getProfile()
             setProfile(profile)
+            if (provider === "Telegram") {
+                initTelegramWidget()
+            }
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -111,7 +146,7 @@ export default function ProfilePage() {
                                         <section className="flex gap-2 items-center">
                                             <p>{provider}: </p>
                                             {profile.oauth2_bind?.[provider.toLowerCase()] && (
-                                                <p className=" bg-muted px-1.5 py-0.5 text-sm rounded-full">
+                                                <p className="bg-muted px-1.5 py-0.5 text-sm rounded-full">
                                                     {profile.oauth2_bind?.[provider.toLowerCase()]}
                                                 </p>
                                             )}
@@ -124,6 +159,8 @@ export default function ProfilePage() {
                                             >
                                                 Unbind
                                             </Button>
+                                        ) : provider === "Telegram" ? (
+                                            <div id="telegram-bind-container" />
                                         ) : (
                                             <Button
                                                 className="my-1"
