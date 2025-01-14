@@ -45,11 +45,14 @@ function Login() {
         if (settingData?.config?.oauth2_providers?.includes("Telegram")) {
             const initTelegramLogin = async () => {
                 try {
-                    const redirectUrl = await getOauth2RedirectURL("Telegram", Oauth2RequestType.LOGIN)
+                    const redirectUrl = await getOauth2RedirectURL(
+                        "Telegram",
+                        Oauth2RequestType.LOGIN,
+                    )
                     const [botName, authUrl] = redirectUrl.redirect!.split("---")
                     const container = document.getElementById("telegram-login-container")
                     if (container) {
-                        container.innerHTML = ''
+                        container.innerHTML = ""
                         const widget = loadTelegramWidget(botName, authUrl)
                         container.appendChild(widget)
                     }
@@ -57,7 +60,7 @@ function Login() {
                     toast.error(error.message)
                 }
             }
-            
+
             initTelegramLogin()
         }
     }, [settingData?.config?.oauth2_providers])
@@ -86,7 +89,7 @@ function Login() {
     const { t } = useTranslation()
 
     const loadTelegramWidget = (botName: string, authUrl: string) => {
-        const script = document.createElement('script')
+        const script = document.createElement("script")
         script.src = "https://telegram.org/js/telegram-widget.js?22"
         script.async = true
         script.setAttribute("data-telegram-login", botName)
@@ -149,22 +152,26 @@ function Login() {
                         </section>
                     )}
             </Form>
-                <div className="mt-3 flex flex-col gap-3">
-                    {settingData?.config?.oauth2_providers?.map((p: string) => (
-                        p === "Telegram" ? (
-                            <div id="telegram-login-container" key={p} className="flex justify-center" />
-                        ) : (
-                            <Button
-                                key={p}
-                                className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80"
-                                onClick={() => loginWith(p)}
-                            >
-                                {p === "GitHub" && <GitHubIcon className="size-4" />}
-                                {p}
-                            </Button>
-                        )
-                    ))}
-                </div>
+            <div className="mt-3 flex flex-col gap-3">
+                {settingData?.config?.oauth2_providers?.map((p: string) =>
+                    p === "Telegram" ? (
+                        <div
+                            id="telegram-login-container"
+                            key={p}
+                            className="flex justify-center"
+                        />
+                    ) : (
+                        <Button
+                            key={p}
+                            className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80"
+                            onClick={() => loginWith(p)}
+                        >
+                            {p === "GitHub" && <GitHubIcon className="size-4" />}
+                            {p}
+                        </Button>
+                    ),
+                )}
+            </div>
         </div>
     )
 }

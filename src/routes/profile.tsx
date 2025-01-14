@@ -34,7 +34,7 @@ export default function ProfilePage() {
             const [botName, authUrl] = redirectUrl.redirect!.split("---")
             const container = document.getElementById("telegram-bind-container")
             if (container) {
-                container.innerHTML = ''
+                container.innerHTML = ""
                 const widget = loadTelegramWidget(botName, authUrl)
                 container.appendChild(widget)
             }
@@ -50,7 +50,7 @@ export default function ProfilePage() {
     }, [settingData?.config?.oauth2_providers])
 
     const loadTelegramWidget = (botName: string, authUrl: string) => {
-        const script = document.createElement('script')
+        const script = document.createElement("script")
         script.src = "https://telegram.org/js/telegram-widget.js?22"
         script.async = true
         script.setAttribute("data-telegram-login", botName)
