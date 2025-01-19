@@ -57,6 +57,7 @@ const ddnsFormSchema = z.object({
     name: z.string().min(1),
     provider: z.string(),
     domains: z.array(z.string()),
+    domains_raw: z.string(),
     access_id: asOptionalField(z.string()),
     access_secret: asOptionalField(z.string()),
     webhook_url: asOptionalField(z.string().url()),
@@ -71,12 +72,16 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
     const form = useForm<z.infer<typeof ddnsFormSchema>>({
         resolver: zodResolver(ddnsFormSchema),
         defaultValues: data
-            ? data
+            ? {
+                  ...data,
+                  domains_raw: conv.arrToStr(data.domains),
+              }
             : {
                   max_retries: 3,
                   name: "",
                   provider: "dummy",
                   domains: [],
+                  domains_raw: "",
               },
         resetOptions: {
             keepDefaultValues: false,
@@ -87,6 +92,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
 
     const onSubmit = async (values: z.infer<typeof ddnsFormSchema>) => {
         try {
+            values.domains = conv.strToArr(values.domains_raw)
             data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values)
         } catch (e) {
             console.error(e)
@@ -156,22 +162,14 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="domains"
+                                    name="domains_raw"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
                                                 {t("Domains") + t("SeparateWithComma")}
                                             </FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="www.example.com"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={(e) => {
-                                                        const arr = conv.strToArr(e.target.value)
-                                                        field.onChange(arr)
-                                                    }}
-                                                />
+                                                <Input placeholder="www.example.com" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
