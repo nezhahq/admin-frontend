@@ -82,7 +82,9 @@ const alertRuleFormSchema = z.object({
     ),
     rules: z.array(ruleSchema),
     fail_trigger_tasks: z.array(z.number()),
+    fail_trigger_tasks_raw: z.string(),
     recover_trigger_tasks: z.array(z.number()),
+    recover_trigger_tasks_raw: z.string(),
     notification_group_id: z.coerce.number().int(),
     trigger_mode: z.coerce.number().int().min(0),
     enable: asOptionalField(z.boolean()),
@@ -96,13 +98,17 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
             ? {
                   ...data,
                   rules_raw: JSON.stringify(data.rules),
+                  fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
+                  recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
               }
             : {
                   name: "",
                   rules_raw: "",
                   rules: [],
                   fail_trigger_tasks: [],
+                  fail_trigger_tasks_raw: "",
                   recover_trigger_tasks: [],
+                  recover_trigger_tasks_raw: "",
                   notification_group_id: 0,
                   trigger_mode: 0,
               },
@@ -115,6 +121,8 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
 
     const onSubmit = async (values: z.infer<typeof alertRuleFormSchema>) => {
         values.rules = JSON.parse(values.rules_raw)
+        values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
+        values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)
         const { rules_raw, ...requiredFields } = values
         try {
             data?.id
@@ -227,7 +235,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="fail_trigger_tasks"
+                                    name="fail_trigger_tasks_raw"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
@@ -235,17 +243,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     t("SeparateWithComma")}
                                             </FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={(e) => {
-                                                        const arr = conv
-                                                            .strToArr(e.target.value)
-                                                            .map(Number)
-                                                        field.onChange(arr)
-                                                    }}
-                                                />
+                                                <Input placeholder="1,2,3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -253,7 +251,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="recover_trigger_tasks"
+                                    name="recover_trigger_tasks_raw"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
@@ -261,17 +259,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     t("SeparateWithComma")}
                                             </FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value ?? [])}
-                                                    onChange={(e) => {
-                                                        const arr = conv
-                                                            .strToArr(e.target.value)
-                                                            .map(Number)
-                                                        field.onChange(arr)
-                                                    }}
-                                                />
+                                                <Input placeholder="1,2,3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

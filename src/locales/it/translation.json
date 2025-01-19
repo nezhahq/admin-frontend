@@ -68,7 +68,7 @@
     "Interval": "Intervallo",
     "NotifierGroupID": "ID del gruppo di notifiche",
     "Trigger": "Grilletto",
-    "TasksToTriggerOnAlert": "L'attività che ha attivato l'avviso",
+    "TasksToTriggerOnAlert": "Attività da attivare in caso di allarme",
     "TasksToTriggerAfterRecovery": "Attività da attivare dopo il ripristino",
     "Confirm": "Confermo",
     "ConfirmDeletion": "Confermi l'eliminazione?",

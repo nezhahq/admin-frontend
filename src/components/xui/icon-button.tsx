@@ -6,6 +6,7 @@ import {
     Clipboard,
     Download,
     Edit2,
+    Expand,
     FolderClosed,
     Menu,
     Play,
@@ -31,6 +32,7 @@ export interface IconButtonProps extends ButtonProps {
         | "upload"
         | "menu"
         | "ban"
+        | "expand"
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
@@ -81,6 +83,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props,
                     }
                     case "ban": {
                         return <BanIcon />
+                    }
+                    case "expand": {
+                        return <Expand />
                     }
                 }
             })()}

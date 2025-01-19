@@ -78,6 +78,14 @@ export default function NotificationGroupPage() {
             header: t("Notifier") + "(ID)",
             accessorKey: "notifications",
             accessorFn: (row) => row.notifications,
+            cell: ({ row }) => {
+                const s = row.original
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        <span>{s.notifications.join(",")}</span>
+                    </div>
+                )
+            },
         },
         {
             id: "actions",

@@ -111,13 +111,13 @@ export default function CronPage() {
                         {(() => {
                             switch (s.cover) {
                                 case 0: {
-                                    return <span>Ignore All</span>
+                                    return <span>{t("IgnoreAll")}</span>
                                 }
                                 case 1: {
-                                    return <span>Cover All</span>
+                                    return <span>{t("CoverAll")}</span>
                                 }
                                 case 2: {
-                                    return <span>On alert</span>
+                                    return <span>{t("OnAlert")}</span>
                                 }
                             }
                         })()}
@@ -129,6 +129,14 @@ export default function CronPage() {
             header: t("SpecificServers"),
             accessorKey: "servers",
             accessorFn: (row) => row.servers,
+            cell: ({ row }) => {
+                const s = row.original
+                return (
+                    <div className="max-w-16 whitespace-normal break-words">
+                        <span>{s.servers.join(",")}</span>
+                    </div>
+                )
+            },
         },
         {
             header: t("LastExecution"),
