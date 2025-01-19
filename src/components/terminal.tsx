@@ -13,7 +13,7 @@ import { AttachAddon } from "@xterm/addon-attach"
 import { FitAddon } from "@xterm/addon-fit"
 import { Terminal } from "@xterm/xterm"
 import "@xterm/xterm/css/xterm.css"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 
@@ -26,119 +26,134 @@ interface XtermProps {
     setClose: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const XtermComponent: React.FC<XtermProps & JSX.IntrinsicElements["div"]> = ({
-    wsUrl,
-    setClose,
-    ...props
-}) => {
-    const terminalIdRef = useRef<HTMLDivElement>(null)
-    const terminalRef = useRef<Terminal | null>(null)
-    const wsRef = useRef<WebSocket | null>(null)
+const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.IntrinsicElements["div"]>(
+    ({ wsUrl, setClose, ...props }, ref) => {
+        const terminalIdRef = useRef<HTMLDivElement>(null)
+        const terminalRef = useRef<Terminal | null>(null)
+        const wsRef = useRef<WebSocket | null>(null)
 
-    useEffect(() => {
-        return () => {
-            wsRef.current?.close()
-            terminalRef.current?.dispose()
-        }
-    }, [])
+        useImperativeHandle(ref, () => {
+            return {
+                ...terminalIdRef.current!,
+                async requestFullscreen() {
+                    await terminalIdRef.current?.requestFullscreen()
+                },
+            }
+        }, [])
 
-    useEffect(() => {
-        terminalRef.current = new Terminal({
-            cursorBlink: true,
-            fontSize: 16,
-        })
-        const ws = new WebSocket(wsUrl)
-        wsRef.current = ws
-        ws.binaryType = "arraybuffer"
-        ws.onopen = () => {
-            onResize()
-        }
-        ws.onclose = () => {
-            terminalRef.current?.dispose()
-            setClose(true)
-        }
-        ws.onerror = (e) => {
-            console.error(e)
-            toast("Websocket error", {
-                description: "View console for details.",
+        useEffect(() => {
+            return () => {
+                wsRef.current?.close()
+                terminalRef.current?.dispose()
+            }
+        }, [])
+
+        useEffect(() => {
+            terminalRef.current = new Terminal({
+                cursorBlink: true,
+                fontSize: 16,
             })
-        }
-    }, [wsUrl])
+            const ws = new WebSocket(wsUrl)
+            wsRef.current = ws
+            ws.binaryType = "arraybuffer"
+            ws.onopen = () => {
+                onResize()
+            }
+            ws.onclose = () => {
+                terminalRef.current?.dispose()
+                setClose(true)
+            }
+            ws.onerror = (e) => {
+                console.error(e)
+                toast("Websocket error", {
+                    description: "View console for details.",
+                })
+            }
+        }, [wsUrl])
 
-    const fitAddon = useRef(new FitAddon()).current
-    const sendResize = useRef(false)
+        const fitAddon = useRef(new FitAddon()).current
+        const sendResize = useRef(false)
 
-    const doResize = () => {
-        if (!terminalIdRef.current) return
+        const doResize = () => {
+            if (!terminalIdRef.current) return
 
-        fitAddon.fit()
+            fitAddon.fit()
 
-        const dimensions = fitAddon.proposeDimensions()
+            const dimensions = fitAddon.proposeDimensions()
 
-        if (dimensions) {
-            const prefix = new Int8Array([1])
-            const resizeMessage = new TextEncoder().encode(
-                JSON.stringify({
-                    Rows: dimensions.rows,
-                    Cols: dimensions.cols,
-                }),
-            )
+            if (dimensions) {
+                const prefix = new Int8Array([1])
+                const resizeMessage = new TextEncoder().encode(
+                    JSON.stringify({
+                        Rows: dimensions.rows,
+                        Cols: dimensions.cols,
+                    }),
+                )
 
-            const msg = new Int8Array(prefix.length + resizeMessage.length)
-            msg.set(prefix)
-            msg.set(resizeMessage, prefix.length)
+                const msg = new Int8Array(prefix.length + resizeMessage.length)
+                msg.set(prefix)
+                msg.set(resizeMessage, prefix.length)
 
-            wsRef.current?.send(msg)
-        }
-    }
-
-    const onResize = async () => {
-        if (sendResize.current) return
-
-        sendResize.current = true
-        try {
-            await sleep(1500)
-            doResize()
-        } catch (error) {
-            console.error("resize error", error)
-        } finally {
-            sendResize.current = false
-        }
-    }
-
-    useEffect(() => {
-        if (!wsRef.current || !terminalIdRef.current || !terminalRef.current) return
-        const attachAddon = new AttachAddon(wsRef.current)
-        terminalRef.current.loadAddon(attachAddon)
-        terminalRef.current.loadAddon(fitAddon)
-        terminalRef.current.open(terminalIdRef.current)
-        window.addEventListener("resize", onResize)
-        return () => {
-            window.removeEventListener("resize", onResize)
-            if (wsRef.current) {
-                wsRef.current.close()
+                wsRef.current?.send(msg)
             }
         }
-    }, [wsRef.current, terminalRef.current, terminalIdRef.current])
 
-    return <div ref={terminalIdRef} {...props} />
-}
+        const onResize = async () => {
+            if (sendResize.current) return
+
+            sendResize.current = true
+            try {
+                await sleep(1500)
+                doResize()
+            } catch (error) {
+                console.error("resize error", error)
+            } finally {
+                sendResize.current = false
+            }
+        }
+
+        useEffect(() => {
+            if (!wsRef.current || !terminalIdRef.current || !terminalRef.current) return
+            const attachAddon = new AttachAddon(wsRef.current)
+            terminalRef.current.loadAddon(attachAddon)
+            terminalRef.current.loadAddon(fitAddon)
+            terminalRef.current.open(terminalIdRef.current)
+            window.addEventListener("resize", onResize)
+            return () => {
+                window.removeEventListener("resize", onResize)
+                if (wsRef.current) {
+                    wsRef.current.close()
+                }
+            }
+        }, [wsRef.current, terminalRef.current, terminalIdRef.current])
+
+        return <div ref={terminalIdRef} {...props} />
+    },
+)
 
 export const TerminalPage = () => {
     const { id } = useParams<{ id: string }>()
     const [open, setOpen] = useState(false)
     const terminal = useTerminal(id ? parseInt(id) : undefined)
+    const terminalIdRef = useRef<HTMLDivElement>(null)
     return (
         <div className="px-8">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">{`Terminal (${id})`}</h1>
                 <div className="flex-2 flex ml-auto gap-2">
+                    <IconButton
+                        icon="expand"
+                        onClick={async () => {
+                            await terminalIdRef.current?.requestFullscreen()
+                        }}
+                    />
                     <FMCard id={id} />
                 </div>
             </div>
             {terminal?.session_id ? (
                 <XtermComponent
-                    className="max-h-[60%] mb-5"
+                    ref={terminalIdRef}
+                    className="max-h-[60%] mb-5 overflow-auto"
                     wsUrl={`/api/v1/ws/terminal/${terminal?.session_id}`}
                     setClose={setOpen}
                 />

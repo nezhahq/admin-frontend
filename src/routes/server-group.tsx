@@ -78,6 +78,14 @@ export default function ServerGroupPage() {
             header: t("Server") + "(ID)",
             accessorKey: "servers",
             accessorFn: (row) => row.servers,
+            cell: ({ row }) => {
+                const s = row.original
+                return (
+                    <div className="max-w-48 whitespace-normal break-words">
+                        <span>{s.servers.join(",")}</span>
+                    </div>
+                )
+            },
         },
         {
             id: "actions",
