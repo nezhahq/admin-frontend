@@ -48,13 +48,17 @@ const serverFormSchema = z.object({
     hide_for_guest: asOptionalField(z.boolean()),
     enable_ddns: asOptionalField(z.boolean()),
     ddns_profiles: asOptionalField(z.array(z.number())),
+    ddns_profiles_raw: asOptionalField(z.string()),
 })
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
     const form = useForm<z.infer<typeof serverFormSchema>>({
         resolver: zodResolver(serverFormSchema),
-        defaultValues: data,
+        defaultValues: {
+            ...data,
+            ddns_profiles_raw: data.ddns_profiles ? conv.arrToStr(data.ddns_profiles) : undefined,
+        },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -64,6 +68,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
 
     const onSubmit = async (values: z.infer<typeof serverFormSchema>) => {
         try {
+            values.ddns_profiles = values.ddns_profiles_raw
+                ? conv.strToArr(values.ddns_profiles_raw).map(Number)
+                : undefined
             await updateServer(data!.id!, values)
         } catch (e) {
             console.error(e)
@@ -119,24 +126,14 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="ddns_profiles"
+                                    name="ddns_profiles_raw"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
                                                 {t("DDNSProfiles") + t("SeparateWithComma")}
                                             </FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="1,2,3"
-                                                    {...field}
-                                                    value={conv.arrToStr(field.value || [])}
-                                                    onChange={(e) => {
-                                                        const arr = conv
-                                                            .strToArr(e.target.value)
-                                                            .map(Number)
-                                                        field.onChange(arr)
-                                                    }}
-                                                />
+                                                <Input placeholder="1,2,3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
