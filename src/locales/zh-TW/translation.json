@@ -177,5 +177,7 @@
     "OnlineUser": "線上使用者",
     "Total": "總數",
     "ConfirmBlock": "確認封鎖",
-    "RejectPassword": "禁止密碼登入"
+    "RejectPassword": "禁止密碼登入",
+    "EmptyText": "空文字",
+    "EmptyNote": "您沒有任何備註。"
 }
