@@ -133,7 +133,7 @@ export default function CronPage() {
                 const s = row.original
                 return (
                     <div className="max-w-16 whitespace-normal break-words">
-                        <span>{s.servers.join(",")}</span>
+                        <span>{(s.servers || []).join(",")}</span>
                     </div>
                 )
             },
