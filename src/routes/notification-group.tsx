@@ -82,7 +82,7 @@ export default function NotificationGroupPage() {
                 const s = row.original
                 return (
                     <div className="max-w-48 whitespace-normal break-words">
-                        <span>{s.notifications.join(",")}</span>
+                        <span>{(s.notifications || []).join(",")}</span>
                     </div>
                 )
             },
