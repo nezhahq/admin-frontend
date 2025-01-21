@@ -401,6 +401,7 @@ export interface ModelLoginResponse {
 export interface ModelNAT {
     created_at: string
     domain: string
+    enabled: boolean
     host: string
     id: number
     name: string

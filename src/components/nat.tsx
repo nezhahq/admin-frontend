@@ -29,6 +29,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
+import { Checkbox } from "./ui/checkbox"
+import { Label } from "./ui/label"
 
 interface NATCardProps {
     data?: ModelNAT
@@ -37,6 +39,7 @@ interface NATCardProps {
 
 const natFormSchema = z.object({
     name: z.string().min(1),
+    enabled: z.boolean(),
     server_id: z.coerce.number().int(),
     host: z.string(),
     domain: z.string(),
@@ -50,6 +53,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
             ? data
             : {
                   name: "",
+                  enabled: false,
                   server_id: 0,
                   host: "",
                   domain: "",
@@ -143,6 +147,26 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                                     placeholder="router.app.yourdomain.com"
                                                     {...field}
                                                 />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="enabled"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                    <Label className="text-sm">
+                                                        {t("Enable")}
+                                                    </Label>
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

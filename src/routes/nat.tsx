@@ -62,6 +62,11 @@ export default function NATPage() {
             accessorFn: (row) => row.id,
         },
         {
+            header: t("Enabled"),
+            accessorKey: "enabled",
+            accessorFn: (row) => row.enabled,
+        },
+        {
             header: t("Name"),
             accessorKey: "name",
             accessorFn: (row) => row.name,
