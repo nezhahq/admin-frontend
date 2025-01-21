@@ -175,5 +175,9 @@
     "BlockByUser": "Vom Administrator blockiert",
     "UserInvalid": "Benutzer ist ungültig",
     "OnlineUser": "Online-Benutzer",
-    "RejectPassword": "Passwort Login verbieten"
+    "RejectPassword": "Passwort Login verbieten",
+    "EmptyNote": "Du hast noch keine Notizen.",
+    "BackToHome": "Zurück zur Startseite",
+    "OnAlert": "Server mit Warnung",
+    "EmptyText": "Text ist leer"
 }
