@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
+
 import { Checkbox } from "./ui/checkbox"
 import { Label } from "./ui/label"
 
@@ -163,9 +164,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />
-                                                    <Label className="text-sm">
-                                                        {t("Enable")}
-                                                    </Label>
+                                                    <Label className="text-sm">{t("Enable")}</Label>
                                                 </div>
                                             </FormControl>
                                             <FormMessage />

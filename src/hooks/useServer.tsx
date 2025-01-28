@@ -44,7 +44,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({
         if (withServer)
             (async () => {
                 try {
-                    const s = await getServers()
+                    const s = (await getServers()) || []
                     const serverData = s.map(({ id, name }) => ({ id, name }))
                     setServer(serverData)
                 } catch (error: any) {
