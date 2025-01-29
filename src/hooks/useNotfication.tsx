@@ -44,7 +44,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         if (withNotifier)
             (async () => {
                 try {
-                    const n = await getNotification()
+                    const n = (await getNotification()) || []
                     const nData = n.map(({ id, name }) => ({ id, name }))
                     setNotifier(nData)
                 } catch (error: any) {
