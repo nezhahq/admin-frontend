@@ -49,6 +49,22 @@ const serverFormSchema = z.object({
     enable_ddns: asOptionalField(z.boolean()),
     ddns_profiles: asOptionalField(z.array(z.number())),
     ddns_profiles_raw: asOptionalField(z.string()),
+    override_ddns_domains: asOptionalField(z.record(z.coerce.number().int(), z.array(z.string()))),
+    override_ddns_domains_raw: asOptionalField(
+        z.string().refine(
+            (val) => {
+                try {
+                    JSON.parse(val)
+                    return true
+                } catch (e) {
+                    return false
+                }
+            },
+            {
+                message: "Invalid JSON string",
+            },
+        ),
+    ),
 })
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
@@ -58,6 +74,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         defaultValues: {
             ...data,
             ddns_profiles_raw: data.ddns_profiles ? conv.arrToStr(data.ddns_profiles) : undefined,
+            override_ddns_domains_raw: data.override_ddns_domains
+                ? JSON.stringify(data.override_ddns_domains)
+                : undefined,
         },
         resetOptions: {
             keepDefaultValues: false,
@@ -70,6 +89,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         try {
             values.ddns_profiles = values.ddns_profiles_raw
                 ? conv.strToArr(values.ddns_profiles_raw).map(Number)
+                : undefined
+            values.override_ddns_domains = values.override_ddns_domains_raw
+                ? JSON.parse(values.override_ddns_domains_raw)
                 : undefined
             await updateServer(data!.id!, values)
         } catch (e) {
@@ -124,21 +146,43 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="ddns_profiles_raw"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                {t("DDNSProfiles") + t("SeparateWithComma")}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="1,2,3" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                {form.watch("enable_ddns") ? (
+                                    <>
+                                        <FormField
+                                            control={form.control}
+                                            name="ddns_profiles_raw"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {t("DDNSProfiles") + t("SeparateWithComma")}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="1,2,3" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="override_ddns_domains_raw"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {t("OverrideDDNSDomains")}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Textarea className="resize-y" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </>
+                                ) : (
+                                    <></>
+                                )}
+
                                 <FormField
                                     control={form.control}
                                     name="enable_ddns"

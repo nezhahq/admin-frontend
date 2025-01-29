@@ -17,7 +17,7 @@ export function asOptionalField<T extends z.ZodTypeAny>(schema: T) {
 }
 
 export const conv = {
-    recordToStr: (rec: Record<string, boolean>) => {
+    recordToStr: <T>(rec: Record<string, T>) => {
         const arr: string[] = []
         for (const key in rec) {
             arr.push(key)
