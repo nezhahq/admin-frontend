@@ -179,5 +179,6 @@
     "ConfirmBlock": "Confirm Block",
     "RejectPassword": "Reject Password Login",
     "EmptyText": "Text is empty",
-    "EmptyNote": "You didn't have any note."
+    "EmptyNote": "You didn't have any note.",
+    "OverrideDDNSDomains": "Override DDNS Domains (per configuration)"
 }

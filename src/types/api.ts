@@ -411,6 +411,7 @@ export interface ModelNAT {
 
 export interface ModelNATForm {
     domain: string
+    enabled: boolean
     host: string
     /** @minLength 1 */
     name: string
@@ -560,6 +561,7 @@ export interface ModelServer {
     name: string
     /** 管理员可见备注 */
     note: string
+    override_ddns_domains?: Record<string, string[]>
     /** 公开备注 */
     public_note: string
     state: ModelHostState
@@ -582,6 +584,7 @@ export interface ModelServerForm {
     name: string
     /** 管理员可见备注 */
     note?: string
+    override_ddns_domains?: Record<string, string[]>
     /** 公开备注 */
     public_note?: string
 }
