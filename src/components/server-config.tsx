@@ -56,7 +56,7 @@ const agentConfigSchema = z.object({
             },
         ),
     ),
-    ip_report_period: z.coerce.number(),
+    ip_report_period: z.coerce.number().int().min(30),
     nic_allowlist: asOptionalField(z.record(z.boolean())),
     nic_allowlist_raw: asOptionalField(
         z.string().refine(
@@ -73,7 +73,7 @@ const agentConfigSchema = z.object({
             },
         ),
     ),
-    report_delay: z.coerce.number(),
+    report_delay: z.coerce.number().int().min(1).max(4),
     skip_connection_count: asOptionalField(z.boolean()),
     skip_procs_count: asOptionalField(z.boolean()),
     temperature: asOptionalField(z.boolean()),
