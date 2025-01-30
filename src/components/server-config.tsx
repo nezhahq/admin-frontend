@@ -140,7 +140,13 @@ export const ServerConfigCard = ({ id }: { id: number }) => {
 
     useEffect(() => {
         if (data) {
-            form.reset(data)
+            form.reset({
+                ...data,
+                hard_drive_partition_allowlist_raw: JSON.stringify(
+                    data.hard_drive_partition_allowlist,
+                ),
+                nic_allowlist_raw: JSON.stringify(data.nic_allowlist),
+            })
         }
     }, [data, form])
 
