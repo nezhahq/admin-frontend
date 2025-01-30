@@ -123,6 +123,12 @@ export interface GithubComNezhahqNezhaModelCommonResponseModelServiceResponse {
     success: boolean
 }
 
+export interface GithubComNezhahqNezhaModelCommonResponseString {
+    data: string
+    error: string
+    success: boolean
+}
+
 export interface GithubComNezhahqNezhaModelCommonResponseUint64 {
     data: number
     error: string
@@ -203,6 +209,8 @@ export interface ModelConfig {
     enable_ip_change_notification: boolean
     /** 通知信息IP不打码 */
     enable_plain_ip_in_notification: boolean
+    /** 强制要求认证 */
+    force_auth: boolean
     /** 特定服务器IP（多个服务器用逗号分隔） */
     ignored_ip_notification: string
     /** [ServerID] -> bool(值为true代表当前ServerID在特定服务器列表内） */

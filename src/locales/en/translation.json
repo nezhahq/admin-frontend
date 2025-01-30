@@ -180,5 +180,6 @@
     "RejectPassword": "Reject Password Login",
     "EmptyText": "Text is empty",
     "EmptyNote": "You didn't have any note.",
-    "OverrideDDNSDomains": "Override DDNS Domains (per configuration)"
+    "OverrideDDNSDomains": "Override DDNS Domains (per configuration)",
+    "EditServerConfig": "Edit Server Config"
 }

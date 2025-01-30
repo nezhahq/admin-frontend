@@ -6,6 +6,7 @@ import { HeaderButtonGroup } from "@/components/header-button-group"
 import { InstallCommandsMenu } from "@/components/install-commands"
 import { NoteMenu } from "@/components/note-menu"
 import { ServerCard } from "@/components/server"
+import { ServerConfigCard } from "@/components/server-config"
 import { TerminalButton } from "@/components/terminal"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -143,6 +144,7 @@ export default function ServerPage() {
                         <>
                             <TerminalButton id={s.id} />
                             <ServerCard mutate={mutate} data={s} />
+                            <ServerConfigCard id={s.id} />
                         </>
                     </ActionButtonGroup>
                 )
