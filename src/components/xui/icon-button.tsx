@@ -4,6 +4,7 @@ import {
     Check,
     CircleArrowUp,
     Clipboard,
+    CogIcon,
     Download,
     Edit2,
     Expand,
@@ -33,6 +34,7 @@ export interface IconButtonProps extends ButtonProps {
         | "menu"
         | "ban"
         | "expand"
+        | "cog"
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
@@ -86,6 +88,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props,
                     }
                     case "expand": {
                         return <Expand />
+                    }
+                    case "cog": {
+                        return <CogIcon />
                     }
                 }
             })()}

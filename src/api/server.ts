@@ -17,3 +17,11 @@ export const forceUpdateServer = async (id: number[]): Promise<ModelForceUpdateR
 export const getServers = async (): Promise<ModelServer[]> => {
     return fetcher<ModelServer[]>(FetcherMethod.GET, "/api/v1/server", null)
 }
+
+export const getServerConfig = async (id: number): Promise<string> => {
+    return fetcher<string>(FetcherMethod.GET, `/api/v1/server/${id}/config`, null)
+}
+
+export const setServerConfig = async (id: number, data: string): Promise<void> => {
+    return fetcher<void>(FetcherMethod.POST, `/api/v1/server/${id}/config`, data)
+}
