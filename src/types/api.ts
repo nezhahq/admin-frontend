@@ -577,6 +577,11 @@ export interface ModelServer {
     uuid: string
 }
 
+export interface ModelServerConfigForm {
+    config: string
+    servers: number[]
+}
+
 export interface ModelServerForm {
     /** DDNS配置 */
     ddns_profiles?: number[]
