@@ -179,5 +179,7 @@
     "ConfirmBlock": "確認封鎖",
     "RejectPassword": "禁止密碼登入",
     "EmptyText": "空文字",
-    "EmptyNote": "您沒有任何備註。"
+    "EmptyNote": "您沒有任何備註。",
+    "OverrideDDNSDomains": "強制指定 DDNS 域名（每個配置）",
+    "EditServerConfig": "編輯伺服器配置"
 }
