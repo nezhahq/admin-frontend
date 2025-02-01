@@ -144,7 +144,7 @@ export default function ServerPage() {
                         <>
                             <TerminalButton id={s.id} />
                             <ServerCard mutate={mutate} data={s} />
-                            <ServerConfigCard id={s.id} />
+                            <ServerConfigCard sid={[s.id]} variant="outline" />
                         </>
                     </ActionButtonGroup>
                 )
@@ -211,6 +211,10 @@ export default function ServerPage() {
                                         : ""),
                             })
                         }}
+                    />
+                    <ServerConfigCard
+                        sid={selectedRows.map((r) => r.original.id)}
+                        className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-yellow-600 text-white hover:bg-yellow-500 dark:hover:bg-yellow-700 rounded-lg"
                     />
                     <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
                 </HeaderButtonGroup>
