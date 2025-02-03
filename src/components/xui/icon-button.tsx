@@ -10,12 +10,12 @@ import {
     Expand,
     FolderClosed,
     Menu,
+    Minus,
     Play,
     Plus,
     Terminal,
     Trash2,
     Upload,
-    Minus,
 } from "lucide-react"
 import { forwardRef } from "react"
 
