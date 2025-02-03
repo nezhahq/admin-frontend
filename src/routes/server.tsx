@@ -7,6 +7,7 @@ import { InstallCommandsMenu } from "@/components/install-commands"
 import { NoteMenu } from "@/components/note-menu"
 import { ServerCard } from "@/components/server"
 import { ServerConfigCard } from "@/components/server-config"
+import { ServerConfigCardBatch } from "@/components/server-config-batch"
 import { TerminalButton } from "@/components/terminal"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -212,7 +213,7 @@ export default function ServerPage() {
                             })
                         }}
                     />
-                    <ServerConfigCard
+                    <ServerConfigCardBatch
                         sid={selectedRows.map((r) => r.original.id)}
                         className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-yellow-600 text-white hover:bg-yellow-500 dark:hover:bg-yellow-700 rounded-lg"
                     />
