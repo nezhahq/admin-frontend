@@ -20,7 +20,7 @@ import {
 import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
 import { joinIP } from "@/lib/utils"
-import { ModelForceUpdateResponse, ModelServer as Server } from "@/types"
+import { ModelServerTaskResponse, ModelServer as Server } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -187,7 +187,7 @@ export default function ServerPage() {
                                 return
                             }
 
-                            let resp: ModelForceUpdateResponse = {}
+                            let resp: ModelServerTaskResponse = {}
                             try {
                                 resp = await forceUpdateServer(id)
                             } catch (e) {

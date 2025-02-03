@@ -99,12 +99,6 @@ export interface GithubComNezhahqNezhaModelCommonResponseGithubComNezhahqNezhaMo
     success: boolean
 }
 
-export interface GithubComNezhahqNezhaModelCommonResponseModelForceUpdateResponse {
-    data: ModelForceUpdateResponse
-    error: string
-    success: boolean
-}
-
 export interface GithubComNezhahqNezhaModelCommonResponseModelLoginResponse {
     data: ModelLoginResponse
     error: string
@@ -113,6 +107,12 @@ export interface GithubComNezhahqNezhaModelCommonResponseModelLoginResponse {
 
 export interface GithubComNezhahqNezhaModelCommonResponseModelProfile {
     data: ModelProfile
+    error: string
+    success: boolean
+}
+
+export interface GithubComNezhahqNezhaModelCommonResponseModelServerTaskResponse {
+    data: ModelServerTaskResponse
     error: string
     success: boolean
 }
@@ -334,12 +334,6 @@ export interface ModelDDNSProfile {
     webhook_request_body: string
     webhook_request_type: number
     webhook_url: string
-}
-
-export interface ModelForceUpdateResponse {
-    failure?: number[]
-    offline?: number[]
-    success?: number[]
 }
 
 export interface ModelFrontendTemplate {
@@ -618,6 +612,12 @@ export interface ModelServerGroupForm {
 export interface ModelServerGroupResponseItem {
     group: ModelServerGroup
     servers: number[]
+}
+
+export interface ModelServerTaskResponse {
+    failure?: number[]
+    offline?: number[]
+    success?: number[]
 }
 
 export interface ModelService {

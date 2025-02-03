@@ -25,6 +25,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
 import { asOptionalField } from "@/lib/utils"
+import { ModelServerTaskResponse } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -159,6 +160,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
     }, [data, form])
 
     const onSubmit = async (values: AgentConfig) => {
+        let resp: ModelServerTaskResponse = {}
         try {
             values.nic_allowlist = values.nic_allowlist_raw
                 ? JSON.parse(values.nic_allowlist_raw)
@@ -166,7 +168,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
             values.hard_drive_partition_allowlist = values.hard_drive_partition_allowlist_raw
                 ? JSON.parse(values.hard_drive_partition_allowlist_raw)
                 : undefined
-            await setServerConfig({ config: JSON.stringify(values), servers: sid })
+            resp = await setServerConfig({ config: JSON.stringify(values), servers: sid })
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -174,6 +176,13 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
             })
             return
         }
+        toast(t("Done"), {
+            description:
+                t("Results.ForceUpdate") +
+                (resp.success?.length ? t(`Success`) + ` [${resp.success.join(",")}]` : "") +
+                (resp.failure?.length ? t(`Failure`) + ` [${resp.failure.join(",")}]` : "") +
+                (resp.offline?.length ? t(`Offline`) + ` [${resp.offline.join(",")}]` : ""),
+        })
         setOpen(false)
         form.reset()
     }
