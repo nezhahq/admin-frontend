@@ -1,5 +1,5 @@
 import { getServerConfig, setServerConfig } from "@/api/server"
-import { Button } from "@/components/ui/button"
+import { Button, ButtonProps } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
@@ -25,6 +25,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
 import { asOptionalField } from "@/lib/utils"
+import { ModelServerTaskResponse } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -56,7 +57,7 @@ const agentConfigSchema = z.object({
             },
         ),
     ),
-    ip_report_period: z.coerce.number().int().min(30),
+    ip_report_period: asOptionalField(z.coerce.number().int().min(30)),
     nic_allowlist: asOptionalField(z.record(z.boolean())),
     nic_allowlist_raw: asOptionalField(
         z.string().refine(
@@ -73,7 +74,7 @@ const agentConfigSchema = z.object({
             },
         ),
     ),
-    report_delay: z.coerce.number().int().min(1).max(4),
+    report_delay: asOptionalField(z.coerce.number().int().min(1).max(4)),
     skip_connection_count: asOptionalField(z.boolean()),
     skip_procs_count: asOptionalField(z.boolean()),
     temperature: asOptionalField(z.boolean()),
@@ -99,7 +100,11 @@ for (let i = 0; i < boolFields.length; i += 2) {
     groupedBoolFields.push(boolFields.slice(i, i + 2))
 }
 
-export const ServerConfigCard = ({ id }: { id: number }) => {
+interface ServerConfigCardProps extends ButtonProps {
+    sid: number[]
+}
+
+export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
     const { t } = useTranslation()
     const [data, setData] = useState<AgentConfig | undefined>(undefined)
     const [loading, setLoading] = useState(true)
@@ -108,7 +113,11 @@ export const ServerConfigCard = ({ id }: { id: number }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await getServerConfig(id)
+                if (sid.length > 1) {
+                    setLoading(false)
+                    return
+                }
+                const result = await getServerConfig(sid[0])
                 setData(JSON.parse(result))
             } catch (error) {
                 console.error(error)
@@ -151,6 +160,7 @@ export const ServerConfigCard = ({ id }: { id: number }) => {
     }, [data, form])
 
     const onSubmit = async (values: AgentConfig) => {
+        let resp: ModelServerTaskResponse = {}
         try {
             values.nic_allowlist = values.nic_allowlist_raw
                 ? JSON.parse(values.nic_allowlist_raw)
@@ -158,7 +168,7 @@ export const ServerConfigCard = ({ id }: { id: number }) => {
             values.hard_drive_partition_allowlist = values.hard_drive_partition_allowlist_raw
                 ? JSON.parse(values.hard_drive_partition_allowlist_raw)
                 : undefined
-            await setServerConfig(id, JSON.stringify(values))
+            resp = await setServerConfig({ config: JSON.stringify(values), servers: sid })
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -166,14 +176,31 @@ export const ServerConfigCard = ({ id }: { id: number }) => {
             })
             return
         }
+        toast(t("Done"), {
+            description:
+                t("Results.ForceUpdate") +
+                (resp.success?.length ? t(`Success`) + ` [${resp.success.join(",")}]` : "") +
+                (resp.failure?.length ? t(`Failure`) + ` [${resp.failure.join(",")}]` : "") +
+                (resp.offline?.length ? t(`Offline`) + ` [${resp.offline.join(",")}]` : ""),
+        })
         setOpen(false)
         form.reset()
     }
 
-    return (
+    return sid.length < 1 ? (
+        <IconButton
+            {...props}
+            icon="cog"
+            onClick={() => {
+                toast(t("Error"), {
+                    description: t("Results.NoRowsAreSelected"),
+                })
+            }}
+        />
+    ) : (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <IconButton variant="outline" icon="cog" />
+                <IconButton {...props} icon="cog" />
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 {loading ? (

@@ -10,6 +10,7 @@ import {
     Expand,
     FolderClosed,
     Menu,
+    Minus,
     Play,
     Plus,
     Terminal,
@@ -35,6 +36,7 @@ export interface IconButtonProps extends ButtonProps {
         | "ban"
         | "expand"
         | "cog"
+        | "minus"
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
@@ -91,6 +93,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props,
                     }
                     case "cog": {
                         return <CogIcon />
+                    }
+                    case "minus": {
+                        return <Minus />
                     }
                 }
             })()}

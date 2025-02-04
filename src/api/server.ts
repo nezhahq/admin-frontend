@@ -1,4 +1,9 @@
-import { ModelForceUpdateResponse, ModelServer, ModelServerForm } from "@/types"
+import {
+    ModelServer,
+    ModelServerConfigForm,
+    ModelServerForm,
+    ModelServerTaskResponse,
+} from "@/types"
 
 import { FetcherMethod, fetcher } from "./api"
 
@@ -10,8 +15,8 @@ export const deleteServer = async (id: number[]): Promise<void> => {
     return fetcher<void>(FetcherMethod.POST, "/api/v1/batch-delete/server", id)
 }
 
-export const forceUpdateServer = async (id: number[]): Promise<ModelForceUpdateResponse> => {
-    return fetcher<ModelForceUpdateResponse>(FetcherMethod.POST, "/api/v1/force-update/server", id)
+export const forceUpdateServer = async (id: number[]): Promise<ModelServerTaskResponse> => {
+    return fetcher<ModelServerTaskResponse>(FetcherMethod.POST, "/api/v1/force-update/server", id)
 }
 
 export const getServers = async (): Promise<ModelServer[]> => {
@@ -19,9 +24,11 @@ export const getServers = async (): Promise<ModelServer[]> => {
 }
 
 export const getServerConfig = async (id: number): Promise<string> => {
-    return fetcher<string>(FetcherMethod.GET, `/api/v1/server/${id}/config`, null)
+    return fetcher<string>(FetcherMethod.GET, `/api/v1/server/config/${id}`, null)
 }
 
-export const setServerConfig = async (id: number, data: string): Promise<void> => {
-    return fetcher<void>(FetcherMethod.POST, `/api/v1/server/${id}/config`, data)
+export const setServerConfig = async (
+    data: ModelServerConfigForm,
+): Promise<ModelServerTaskResponse> => {
+    return fetcher<ModelServerTaskResponse>(FetcherMethod.POST, `/api/v1/server/config`, data)
 }
