@@ -53,7 +53,8 @@ const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.IntrinsicElem
                 cursorBlink: true,
                 fontSize: 16,
             })
-            const ws = new WebSocket(wsUrl)
+            const url = new URL(wsUrl, window.location.origin)
+            const ws = new WebSocket(url)
             wsRef.current = ws
             ws.binaryType = "arraybuffer"
             ws.onopen = () => {

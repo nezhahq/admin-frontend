@@ -145,7 +145,7 @@ export default function ServerPage() {
                         <>
                             <TerminalButton id={s.id} />
                             <ServerCard mutate={mutate} data={s} />
-                            <ServerConfigCard sid={[s.id]} variant="outline" />
+                            <ServerConfigCard sid={s.id} variant="outline" />
                         </>
                     </ActionButtonGroup>
                 )

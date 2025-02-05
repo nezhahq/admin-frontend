@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Label } from "../ui/label"
 import { Textarea } from "../ui/textarea"
@@ -13,6 +14,7 @@ interface PusherProps {
 
 export const Pusher: React.FC<PusherProps> = ({ property, setData }) => {
     const [cData, setCData] = useState<Record<string, any>>({})
+    const { t } = useTranslation()
 
     return (
         <div className="flex flex-col gap-3">
@@ -43,7 +45,7 @@ export const Pusher: React.FC<PusherProps> = ({ property, setData }) => {
                     }}
                 />
             </div>
-            <Label>Preview</Label>
+            <Label>{t("Preview")}</Label>
             <Textarea value={JSON.stringify(cData, null, 2)} readOnly />
         </div>
     )
