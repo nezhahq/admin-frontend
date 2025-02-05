@@ -67,9 +67,7 @@ export default function SettingsPage() {
         resolver: zodResolver(settingFormSchema),
         defaultValues: config
             ? {
-                  ...config,
-                  language: config?.config?.language,
-                  site_name: config.config?.site_name || "",
+                  ...config.config,
                   user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||

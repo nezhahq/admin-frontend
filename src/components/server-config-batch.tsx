@@ -54,7 +54,17 @@ export const ServerConfigCardBatch: React.FC<ServerConfigCardBatchProps> = ({ si
         setOpen(false)
     }
 
-    return (
+    return sid.length < 1 ? (
+        <IconButton
+            {...props}
+            icon="cog"
+            onClick={() => {
+                toast(t("Error"), {
+                    description: t("Results.NoRowsAreSelected"),
+                })
+            }}
+        />
+    ) : (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <IconButton {...props} icon="cog" />
@@ -67,7 +77,7 @@ export const ServerConfigCardBatch: React.FC<ServerConfigCardBatchProps> = ({ si
                             <DialogDescription />
                         </DialogHeader>
                         <div className="flex flex-col gap-3 mt-4">
-                            <Label>Option</Label>
+                            <Label>{t("Option")}</Label>
                             <Input
                                 type="text"
                                 placeholder="option"
@@ -76,7 +86,7 @@ export const ServerConfigCardBatch: React.FC<ServerConfigCardBatchProps> = ({ si
                                     setCurrentKey(e.target.value)
                                 }}
                             />
-                            <Label>Value</Label>
+                            <Label>{t("Value")}</Label>
                             <Textarea
                                 className="resize-y"
                                 value={currentVal}

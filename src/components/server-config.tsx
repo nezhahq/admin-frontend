@@ -101,7 +101,7 @@ for (let i = 0; i < boolFields.length; i += 2) {
 }
 
 interface ServerConfigCardProps extends ButtonProps {
-    sid: number[]
+    sid: number
 }
 
 export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
@@ -113,11 +113,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                if (sid.length > 1) {
-                    setLoading(false)
-                    return
-                }
-                const result = await getServerConfig(sid[0])
+                const result = await getServerConfig(sid)
                 setData(JSON.parse(result))
             } catch (error) {
                 console.error(error)
@@ -168,7 +164,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
             values.hard_drive_partition_allowlist = values.hard_drive_partition_allowlist_raw
                 ? JSON.parse(values.hard_drive_partition_allowlist_raw)
                 : undefined
-            resp = await setServerConfig({ config: JSON.stringify(values), servers: sid })
+            resp = await setServerConfig({ config: JSON.stringify(values), servers: [sid] })
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -187,17 +183,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
         form.reset()
     }
 
-    return sid.length < 1 ? (
-        <IconButton
-            {...props}
-            icon="cog"
-            onClick={() => {
-                toast(t("Error"), {
-                    description: t("Results.NoRowsAreSelected"),
-                })
-            }}
-        />
-    ) : (
+    return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <IconButton {...props} icon="cog" />

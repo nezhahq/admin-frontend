@@ -181,5 +181,8 @@
     "EmptyText": "Text is empty",
     "EmptyNote": "You didn't have any note.",
     "OverrideDDNSDomains": "Override DDNS Domains (per configuration)",
-    "EditServerConfig": "Edit Server Config"
+    "EditServerConfig": "Edit Server Config",
+    "Option": "Option",
+    "Value": "Value",
+    "Preview": "Preview"
 }
