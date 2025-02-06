@@ -54,6 +54,7 @@ const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.IntrinsicElem
                 fontSize: 16,
             })
             const url = new URL(wsUrl, window.location.origin)
+            url.protocol = url.protocol.replace("http", "ws")
             const ws = new WebSocket(url)
             wsRef.current = ws
             ws.binaryType = "arraybuffer"
