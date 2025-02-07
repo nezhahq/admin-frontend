@@ -162,6 +162,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
 
     useEffect(() => {
         const url = new URL(wsUrl, window.location.origin)
+        url.protocol = url.protocol.replace("http", "ws")
         const ws = new WebSocket(url)
         wsRef.current = ws
         ws.binaryType = "arraybuffer"
