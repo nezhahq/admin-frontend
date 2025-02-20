@@ -173,7 +173,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                             <FormLabel>{t("CronExpression")}</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="0 0 0 3 * * (At 3 AM)"
+                                                    placeholder="0 0 3 * * * (At 3 AM)"
                                                     {...field}
                                                 />
                                             </FormControl>
