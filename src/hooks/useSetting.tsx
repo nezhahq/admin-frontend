@@ -1,10 +1,7 @@
 import { swrFetcher } from "@/api/api"
-import { GithubComNezhahqNezhaModelSettingResponseModelConfig } from "@/types"
+import { ModelSettingResponse } from "@/types"
 import useSWR from "swr"
 
 export default function useSetting() {
-    return useSWR<GithubComNezhahqNezhaModelSettingResponseModelConfig>(
-        "/api/v1/setting",
-        swrFetcher,
-    )
+    return useSWR<ModelSettingResponse>("/api/v1/setting", swrFetcher)
 }

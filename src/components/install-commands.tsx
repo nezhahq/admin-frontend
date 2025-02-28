@@ -8,7 +8,7 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import useSettings from "@/hooks/useSetting"
 import { copyToClipboard } from "@/lib/utils"
-import { ModelConfig, ModelProfile } from "@/types"
+import { ModelSetting, ModelProfile } from "@/types"
 import i18next from "i18next"
 import { Check, Clipboard } from "lucide-react"
 import { forwardRef, useState } from "react"
@@ -88,7 +88,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
 
 const generateCommand = (
     type: number,
-    { agent_secret_key, install_host, tls }: ModelConfig,
+    { agent_secret_key, install_host, tls }: ModelSetting,
     { agent_secret, role }: ModelProfile,
 ) => {
     if (!install_host) throw new Error(i18next.t("Results.InstallHostRequired"))
