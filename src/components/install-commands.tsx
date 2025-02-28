@@ -8,7 +8,7 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import useSettings from "@/hooks/useSetting"
 import { copyToClipboard } from "@/lib/utils"
-import { ModelSetting, ModelProfile } from "@/types"
+import { ModelProfile, ModelSetting } from "@/types"
 import i18next from "i18next"
 import { Check, Clipboard } from "lucide-react"
 import { forwardRef, useState } from "react"
