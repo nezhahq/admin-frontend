@@ -88,22 +88,15 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, ButtonProps>((p
 
 const generateCommand = (
     type: number,
-    { agent_secret_key, install_host, tls }: ModelSetting,
-    { agent_secret, role }: ModelProfile,
+    { install_host, tls }: ModelSetting,
+    { agent_secret }: ModelProfile,
 ) => {
     if (!install_host) throw new Error(i18next.t("Results.InstallHostRequired"))
 
-    // 如果 agent_secret 为空且 role 为 0 ，则使用 agent_secret_key，否则如果 agent_secret 为空则报错
-    if (!agent_secret && role === 0) {
-        agent_secret = agent_secret_key
-    } else if (!agent_secret) {
-        throw new Error(i18next.t("Results.AgentSecretRequired"))
-    }
+    if (!agent_secret) throw new Error(i18next.t("Results.AgentSecretRequired"))
 
-    agent_secret_key = agent_secret
-
-    const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret_key}`
-    const env_win = `$env:NZ_SERVER=\"${install_host}\";$env:NZ_TLS=\"${tls || false}\";$env:NZ_CLIENT_SECRET=\"${agent_secret_key}\";`
+    const env = `NZ_SERVER=${install_host} NZ_TLS=${tls || false} NZ_CLIENT_SECRET=${agent_secret}`
+    const env_win = `$env:NZ_SERVER=\"${install_host}\";$env:NZ_TLS=\"${tls || false}\";$env:NZ_CLIENT_SECRET=\"${agent_secret}\";`
 
     switch (type) {
         case OSTypes.Linux:
