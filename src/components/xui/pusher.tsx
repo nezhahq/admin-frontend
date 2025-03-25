@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Label } from "../ui/label"
@@ -16,6 +16,10 @@ export const Pusher: React.FC<PusherProps> = ({ property, setData }) => {
     const [cData, setCData] = useState<Record<string, any>>({})
     const { t } = useTranslation()
 
+    useEffect(() => {
+        setData(cData)
+    }, [cData, setData])
+
     return (
         <div className="flex flex-col gap-3">
             <div className="flex gap-2 ml-auto">
@@ -27,7 +31,6 @@ export const Pusher: React.FC<PusherProps> = ({ property, setData }) => {
                             const temp = { ...cData }
                             temp[k] = JSON.parse(v)
                             setCData(temp)
-                            setData(cData)
                         }
                     }}
                 />
@@ -40,7 +43,6 @@ export const Pusher: React.FC<PusherProps> = ({ property, setData }) => {
                             const temp = { ...cData }
                             temp[k] = undefined
                             setCData(temp)
-                            setData(cData)
                         }
                     }}
                 />
