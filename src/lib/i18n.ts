@@ -12,7 +12,7 @@ const resources = {
     "en-US": {
         translation: enTranslation,
     },
-    'it-IT': {
+    "it-IT": {
         translation: itTranslation,
     },
     "ru-RU": {
