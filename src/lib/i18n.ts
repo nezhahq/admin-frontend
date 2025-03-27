@@ -7,25 +7,33 @@ import itTranslation from "../locales/it/translation.json"
 import ruTranslation from "../locales/ru/translation.json"
 import zhCNTranslation from "../locales/zh-CN/translation.json"
 import zhTWTranslation from "../locales/zh-TW/translation.json"
+import esTranslation from "../locales/es/translation.json"
+import taTranslation from "../locales/ta/translation.json"
 
 const resources = {
-    "en-US": {
-        translation: enTranslation,
-    },
-    "it-IT": {
-        translation: itTranslation,
-    },
-    "ru-RU": {
-        translation: ruTranslation,
-    },
     "zh-CN": {
         translation: zhCNTranslation,
     },
     "zh-TW": {
         translation: zhTWTranslation,
     },
+    "en-US": {
+        translation: enTranslation,
+    },
+    "ru-RU": {
+        translation: ruTranslation,
+    },
+    "es-ES": {
+        translation: esTranslation,
+    },
     "de-DE": {
         translation: deTranslation,
+    },
+    "ta-IN": {
+        translation: taTranslation,
+    },
+    "it-IT": {
+        translation: itTranslation,
     },
 }
 
