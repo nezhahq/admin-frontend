@@ -9,9 +9,11 @@ export const nezhaLang: Record<string, string> = {
     "zh-CN": "简体中文（中国大陆）",
     "zh-TW": "正體中文（台灣）",
     "en-US": "English",
-    "de-DE": "Deutsch",
-    "it-IT": "Italiano",
     "ru-RU": "Русский",
+    "es-ES": "Español",
+    "de-DE": "Deutsch",
+    "ta-IN": "தமிழ்",
+    "it-IT": "Italiano",
 }
 
 export const wafBlockReasons: Record<number, string> = {
