@@ -174,5 +174,8 @@
     "UserId": "ID de usuario",
     "OnlineUser": "Usuario en línea",
     "Total": "Total",
-    "ConfirmBlock": "Confirmar bloqueo"
+    "ConfirmBlock": "Confirmar bloqueo",
+    "BackToHome": "Volver al Inicio",
+    "OnAlert": "Servidores Alarmados",
+    "RejectPassword": "Rechazar contraseña de inicio de sesión"
 }
