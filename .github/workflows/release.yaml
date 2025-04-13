@@ -2,8 +2,7 @@ name: Build and release static export
 
 on:
     push:
-        tags:
-            - "v*"
+    workflow_dispatch:
 
 jobs:
     release:
