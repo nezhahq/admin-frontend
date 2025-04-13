@@ -44,7 +44,8 @@ const settingFormSchema = z.object({
     install_host: asOptionalField(z.string()),
     custom_code: asOptionalField(z.string()),
     custom_code_dashboard: asOptionalField(z.string()),
-    real_ip_header: asOptionalField(z.string()),
+    web_real_ip_header: asOptionalField(z.string()),
+    agent_real_ip_header: asOptionalField(z.string()),
 
     tls: asOptionalField(z.boolean()),
     enable_ip_change_notification: asOptionalField(z.boolean()),
@@ -315,10 +316,10 @@ export default function SettingsPage() {
                         />
                         <FormField
                             control={form.control}
-                            name="real_ip_header"
+                            name="web_real_ip_header"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("RealIPHeader")}</FormLabel>
+                                    <FormLabel>{t("WebRealIPHeader")}</FormLabel>
                                     <FormControl>
                                         <div className="flex items-center">
                                             <Input
@@ -334,12 +335,51 @@ export default function SettingsPage() {
                                                     if (checked) {
                                                         field.disabled = true
                                                         form.setValue(
-                                                            "real_ip_header",
+                                                            "web_real_ip_header",
                                                             "NZ::Use-Peer-IP",
                                                         )
                                                     } else {
                                                         field.disabled = false
-                                                        form.setValue("real_ip_header", "")
+                                                        form.setValue("web_real_ip_header", "")
+                                                    }
+                                                }}
+                                            />
+                                            <FormLabel className="font-normal ml-2">
+                                                {t("UseDirectConnectingIP")}
+                                            </FormLabel>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="agent_real_ip_header"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("AgentRealIPHeader")}</FormLabel>
+                                    <FormControl>
+                                        <div className="flex items-center">
+                                            <Input
+                                                disabled={field.value == "NZ::Use-Peer-IP"}
+                                                className="w-1/2"
+                                                placeholder="CF-Connecting-IP"
+                                                {...field}
+                                            />
+                                            <Checkbox
+                                                checked={field.value == "NZ::Use-Peer-IP"}
+                                                className="ml-2"
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        field.disabled = true
+                                                        form.setValue(
+                                                            "agent_real_ip_header",
+                                                            "NZ::Use-Peer-IP",
+                                                        )
+                                                    } else {
+                                                        field.disabled = false
+                                                        form.setValue("agent_real_ip_header", "")
                                                     }
                                                 }}
                                             />
