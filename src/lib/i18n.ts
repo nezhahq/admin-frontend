@@ -3,12 +3,12 @@ import { initReactI18next } from "react-i18next"
 
 import deTranslation from "../locales/de/translation.json"
 import enTranslation from "../locales/en/translation.json"
+import esTranslation from "../locales/es/translation.json"
 import itTranslation from "../locales/it/translation.json"
 import ruTranslation from "../locales/ru/translation.json"
+import taTranslation from "../locales/ta/translation.json"
 import zhCNTranslation from "../locales/zh-CN/translation.json"
 import zhTWTranslation from "../locales/zh-TW/translation.json"
-import esTranslation from "../locales/es/translation.json"
-import taTranslation from "../locales/ta/translation.json"
 
 const resources = {
     "zh-CN": {

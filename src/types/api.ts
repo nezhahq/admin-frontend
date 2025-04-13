@@ -648,8 +648,10 @@ export interface ModelSetting {
     /** 系统语言，默认 zh_CN */
     language: string
     oauth2_providers: string[]
-    /** 真实IP */
-    real_ip_header: string
+    /** 前端真实IP */
+    web_real_ip_header: string
+    /** Agent真实IP */
+    agent_real_ip_header: string
     site_name: string
     /** 用于前端判断生成的安装命令是否启用 TLS */
     tls: boolean
@@ -669,8 +671,10 @@ export interface ModelSettingForm {
     ip_change_notification_group_id: number
     /** @minLength 2 */
     language: string
-    /** 真实IP */
-    real_ip_header?: string
+    /** 前端真实IP */
+    web_real_ip_header?: string
+    /** Agent真实IP */
+    agent_real_ip_header?: string
     /** @minLength 1 */
     site_name: string
     tls?: boolean
