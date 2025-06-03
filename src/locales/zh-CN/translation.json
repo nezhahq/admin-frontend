@@ -182,5 +182,8 @@
     "EmptyText": "空文本",
     "EmptyNote": "您没有任何备注。",
     "EditServerConfig": "编辑服务器配置",
-    "OverrideDDNSDomains": "强制指定 DDNS 域名（每个配置）"
+    "OverrideDDNSDomains": "强制指定 DDNS 域名（每个配置）",
+    "Value": "值",
+    "Preview": "预览",
+    "Option": "选项"
 }
