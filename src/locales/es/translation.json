@@ -178,5 +178,12 @@
     "ConfirmBlock": "Confirmar bloqueo",
     "BackToHome": "Volver al Inicio",
     "OnAlert": "Servidores Alarmados",
-    "RejectPassword": "Rechazar contraseña de inicio de sesión"
+    "RejectPassword": "Rechazar contraseña de inicio de sesión",
+    "Option": "Opción",
+    "Value": "Valor",
+    "Preview": "Vista previa",
+    "OverrideDDNSDomains": "Sobrescribir dominios DDNS (por configuración)",
+    "EmptyText": "El texto está vacío",
+    "EmptyNote": "No tenías ninguna nota.",
+    "EditServerConfig": "Editar configuración del servidor"
 }
