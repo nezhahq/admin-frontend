@@ -1,4 +1,5 @@
 import {
+    ModelBatchMoveServerForm,
     ModelServer,
     ModelServerConfigForm,
     ModelServerForm,
@@ -13,6 +14,10 @@ export const updateServer = async (id: number, data: ModelServerForm): Promise<v
 
 export const deleteServer = async (id: number[]): Promise<void> => {
     return fetcher<void>(FetcherMethod.POST, "/api/v1/batch-delete/server", id)
+}
+
+export const batchMoveServer = async (data: ModelBatchMoveServerForm): Promise<void> => {
+    return fetcher<void>(FetcherMethod.POST, "/api/v1/batch-move/server", data)
 }
 
 export const forceUpdateServer = async (id: number[]): Promise<ModelServerTaskResponse> => {

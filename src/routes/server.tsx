@@ -1,6 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
 import { CopyButton } from "@/components/copy-button"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { InstallCommandsMenu } from "@/components/install-commands"
@@ -213,6 +214,7 @@ export default function ServerPage() {
                             })
                         }}
                     />
+                    <BatchMoveServerIcon serverIds={selectedRows.map((r) => r.original.id)} />
                     <ServerConfigCardBatch
                         sid={selectedRows.map((r) => r.original.id)}
                         className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-yellow-600 text-white hover:bg-yellow-500 dark:hover:bg-yellow-700 rounded-lg"
