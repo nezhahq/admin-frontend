@@ -188,6 +188,11 @@ export interface ModelAlertRuleForm {
     trigger_mode: number
 }
 
+export interface ModelBatchMoveServerForm {
+    ids: number[]
+    to_user: number
+}
+
 export interface ModelCreateFMResponse {
     session_id: string
 }
@@ -631,6 +636,8 @@ export interface ModelServiceResponseItem {
 
 export interface ModelSetting {
     admin_template: string
+    /** Agent真实IP */
+    agent_real_ip_header: string
     /** 覆盖范围（0:提醒未被 IgnoredIPNotification 包含的所有服务器; 1:仅提醒被 IgnoredIPNotification 包含的服务器;） */
     cover: number
     custom_code: string
@@ -648,17 +655,17 @@ export interface ModelSetting {
     /** 系统语言，默认 zh_CN */
     language: string
     oauth2_providers: string[]
-    /** 前端真实IP */
-    web_real_ip_header: string
-    /** Agent真实IP */
-    agent_real_ip_header: string
     site_name: string
     /** 用于前端判断生成的安装命令是否启用 TLS */
     tls: boolean
     user_template: string
+    /** 前端真实IP */
+    web_real_ip_header: string
 }
 
 export interface ModelSettingForm {
+    /** Agent真实IP */
+    agent_real_ip_header?: string
     cover: number
     custom_code?: string
     custom_code_dashboard?: string
@@ -671,14 +678,12 @@ export interface ModelSettingForm {
     ip_change_notification_group_id: number
     /** @minLength 2 */
     language: string
-    /** 前端真实IP */
-    web_real_ip_header?: string
-    /** Agent真实IP */
-    agent_real_ip_header?: string
     /** @minLength 1 */
     site_name: string
     tls?: boolean
     user_template?: string
+    /** 前端真实IP */
+    web_real_ip_header?: string
 }
 
 export interface ModelSettingResponse {

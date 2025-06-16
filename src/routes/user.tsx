@@ -75,6 +75,11 @@ export default function UserPage() {
             },
         },
         {
+            header: t("LastLogin"),
+            accessorKey: "updated_at",
+            accessorFn: (row) => row.updated_at ? new Date(row.updated_at).toLocaleString() : t("Never"),
+        },
+        {
             id: "actions",
             header: t("Actions"),
             cell: ({ row }) => {
