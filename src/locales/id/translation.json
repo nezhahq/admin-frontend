@@ -1,1 +1,24 @@
-{}
+{
+    "nezha": "Monitor Nezha",
+    "theme": {
+        "light": "Terang",
+        "dark": "Gelap",
+        "system": "Mengikuti sistem"
+    },
+    "Username": "Nama Pengguna",
+    "Password": "Kata Sandi",
+    "LoginFirst": "Mohon masuk terlebih dahulu",
+    "CurrentTime": "Waktu saat ini",
+    "Results": {
+        "UsernameMin": "Nama Pengguna setidak nya harus {{number}} karakter.",
+        "PasswordRequired": "Kata Sandi tidak boleh kosong.",
+        "ErrorFetchingResource": "Kesalahan mengambil sumber daya: {{error}}",
+        "SelectAtLeastOneServer": "Silahkan pilih setidaknya satu server.",
+        "UnExpectedError": "Kesalahan tidak terduga, Silahhkan lihat konsol untuk detailnya.",
+        "ForceUpdate": "Peningkatan Paksa:",
+        "NoRowsAreSelected": "Tidak ada baris yang dipilih",
+        "ThisOperationIsUnrecoverable": "Operasi tidak dapat dibatalkan!",
+        "TaskTriggeredSuccessfully": "Tugas berhasil dipicu",
+        "TheServerDoesNotOnline": "Server tidak ada atau masih belum terhubung"
+    }
+}
