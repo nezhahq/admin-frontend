@@ -9,6 +9,8 @@ import ruTranslation from "../locales/ru/translation.json"
 import taTranslation from "../locales/ta/translation.json"
 import zhCNTranslation from "../locales/zh-CN/translation.json"
 import zhTWTranslation from "../locales/zh-TW/translation.json"
+import frTranslation from "../locales/fr/translation.json"
+import idTranslation from "../locales/id/translation.json"
 
 const resources = {
     "zh-CN": {
@@ -34,6 +36,12 @@ const resources = {
     },
     "it-IT": {
         translation: itTranslation,
+    },
+    "fr-FR": {
+        translation: frTranslation,
+    },
+    "id-ID": {
+        translation: idTranslation,
     },
 }
 
