@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
     :root {
@@ -61,11 +59,12 @@
 
 @layer base {
     * {
-        @apply border-border;
+        border-color: var(--border);
     }
 
     body {
-        @apply bg-background text-foreground;
+        background-color: var(--background);
+        color: var(--foreground);
     }
 }
 
@@ -76,13 +75,17 @@ body,
 }
 
 ::-webkit-scrollbar {
-    @apply h-2.5 w-2.5;
+    height: 10px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply rounded-full border-[1px] border-solid border-transparent bg-border bg-clip-padding;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-color: hsl(var(--border));
+    background-clip: padding-box;
 }
