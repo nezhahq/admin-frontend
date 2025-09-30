@@ -111,7 +111,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
             <DialogTrigger asChild>
                 <IconButton variant="outline" icon="edit" />
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent
+                className="sm:max-w-xl"
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+            >
                 <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
                     <div className="items-center mx-1">
                         <DialogHeader>

@@ -31,7 +31,10 @@ import useSWR from "swr"
 
 export default function ServerPage() {
     const { t } = useTranslation()
-    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher)
+    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    })
     const { serverGroups } = useServer()
 
     useEffect(() => {
