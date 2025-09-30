@@ -22,7 +22,16 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
+import { Calendar } from "@/components/ui/calendar"
 import { IconButton } from "@/components/xui/icon-button"
 import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
@@ -85,6 +94,125 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
+    type PublicNote = {
+        billingDataMod: {
+            startDate: string
+            endDate: string
+            autoRenewal: string
+            cycle: string
+            amount: string
+        }
+        planDataMod: {
+            bandwidth: string
+            trafficVol: string
+            trafficType: string
+            IPv4: string
+            IPv6: string
+            networkRoute: string
+            extra: string
+        }
+    }
+
+    const defaultPublicNote: PublicNote = {
+        billingDataMod: {
+            startDate: "",
+            endDate: "",
+            autoRenewal: "",
+            cycle: "",
+            amount: "",
+        },
+        planDataMod: {
+            bandwidth: "",
+            trafficVol: "",
+            trafficType: "",
+            IPv4: "",
+            IPv6: "",
+            networkRoute: "",
+            extra: "",
+        },
+    }
+
+    const parsePublicNote = (s?: string): PublicNote => {
+        if (!s) return defaultPublicNote
+        try {
+            const obj = JSON.parse(s)
+            return {
+                billingDataMod: {
+                    startDate: obj?.billingDataMod?.startDate ?? "",
+                    endDate: obj?.billingDataMod?.endDate ?? "",
+                    autoRenewal: obj?.billingDataMod?.autoRenewal ?? "",
+                    cycle: obj?.billingDataMod?.cycle ?? "",
+                    amount: obj?.billingDataMod?.amount ?? "",
+                },
+                planDataMod: {
+                    bandwidth: obj?.planDataMod?.bandwidth ?? "",
+                    trafficVol: obj?.planDataMod?.trafficVol ?? "",
+                    trafficType: obj?.planDataMod?.trafficType ?? "",
+                    IPv4: obj?.planDataMod?.IPv4 ?? "",
+                    IPv6: obj?.planDataMod?.IPv6 ?? "",
+                    networkRoute: obj?.planDataMod?.networkRoute ?? "",
+                    extra: obj?.planDataMod?.extra ?? "",
+                },
+            }
+        } catch {
+            return defaultPublicNote
+        }
+    }
+
+    const [publicNoteObj, setPublicNoteObj] = useState<PublicNote>(parsePublicNote(data?.public_note))
+    const [publicNoteErrors, setPublicNoteErrors] = useState<Partial<Record<
+        | "billing.startDate"
+        | "billing.endDate"
+        | "billing.autoRenewal"
+        | "billing.cycle"
+        | "billing.amount"
+        | "plan.bandwidth"
+        | "plan.trafficVol"
+        | "plan.trafficType"
+        | "plan.IPv4"
+        | "plan.IPv6"
+        | "plan.networkRoute"
+        | "plan.extra", string>>>({})
+
+    const isValidISOLike = (v: string) => {
+        if (!v) return true
+        const d = new Date(v)
+        return !isNaN(d.getTime())
+    }
+    const isDigits = (v: string) => v === "" || /^[0-9]+$/.test(v)
+
+    const validatePublicNote = (pn: PublicNote) => {
+        const errs: Partial<Record<string, string>> = {}
+
+        if (pn.billingDataMod.startDate && !isValidISOLike(pn.billingDataMod.startDate)) {
+            errs["billing.startDate"] = t("Validation.InvalidDate")
+        }
+        if (pn.billingDataMod.endDate && !isValidISOLike(pn.billingDataMod.endDate)) {
+            errs["billing.endDate"] = t("Validation.InvalidDate")
+        }
+        if (pn.billingDataMod.autoRenewal && !/^(0|1)$/.test(pn.billingDataMod.autoRenewal)) {
+            errs["billing.autoRenewal"] = t("Validation.MustBe0Or1")
+        }
+        if (pn.billingDataMod.cycle && !/^(Day|Week|Month|Year)$/i.test(pn.billingDataMod.cycle)) {
+            errs["billing.cycle"] = t("Validation.MustBeDayWeekMonthYear")
+        }
+        // amount 允许任意非空字符串或空
+        if (pn.planDataMod.trafficType && !/^(1|2)$/.test(pn.planDataMod.trafficType)) {
+            errs["plan.trafficType"] = t("Validation.MustBe1Or2")
+        }
+        if (!isDigits(pn.planDataMod.IPv4)) {
+            errs["plan.IPv4"] = t("Validation.DigitsOnly")
+        }
+        if (!isDigits(pn.planDataMod.IPv6)) {
+            errs["plan.IPv6"] = t("Validation.DigitsOnly")
+        }
+        if (!isDigits(pn.planDataMod.networkRoute)) {
+            errs["plan.networkRoute"] = t("Validation.DigitsOnly")
+        }
+
+        return { errors: errs, valid: Object.keys(errs).length === 0 }
+    }
+
     const onSubmit = async (values: any) => {
         try {
             values.ddns_profiles = values.ddns_profiles_raw
@@ -93,6 +221,30 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
             values.override_ddns_domains = values.override_ddns_domains_raw
                 ? JSON.parse(values.override_ddns_domains_raw)
                 : undefined
+
+            // validate structured fields
+            const { errors, valid } = validatePublicNote(publicNoteObj)
+            if (!valid) {
+                setPublicNoteErrors(errors)
+                toast(t("Error"), { description: t("Validation.InvalidForm") })
+                return
+            }
+            setPublicNoteErrors({})
+
+            // normalize datetime-local to ISO string if provided
+            const normalizeISO = (v: string) => (v ? new Date(v).toISOString() : v)
+            const pnNormalized: PublicNote = {
+                billingDataMod: {
+                    ...publicNoteObj.billingDataMod,
+                    startDate: normalizeISO(publicNoteObj.billingDataMod.startDate),
+                    endDate: normalizeISO(publicNoteObj.billingDataMod.endDate),
+                    // keep others as-is
+                },
+                planDataMod: { ...publicNoteObj.planDataMod },
+            }
+
+            // serialize structured public note back to JSON string
+            values.public_note = JSON.stringify(pnNormalized)
             await updateServer(data!.id!, values)
         } catch (e) {
             console.error(e)
@@ -240,19 +392,306 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="public_note"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("Public") + t("Note")}</FormLabel>
-                                            <FormControl>
-                                                <Textarea className="resize-y" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                {/* Structured Public Note fields */}
+                                <div className="space-y-3">
+                                    <FormLabel>{t("Public") + t("Note")}</FormLabel>
+
+                                    <div className="rounded-md border p-3 space-y-3">
+                                        <div className="text-sm font-medium opacity-80">{t("PublicNote.Billing")}</div>
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.StartDate")}</Label>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            className="w-full justify-start text-left font-normal"
+                                                        >
+                                                            {publicNoteObj.billingDataMod.startDate
+                                                                ? new Date(publicNoteObj.billingDataMod.startDate).toLocaleDateString()
+                                                                : "YYYY-MM-DD"}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="p-0" align="start">
+                                                        <Calendar
+                                                            className="w-full"
+                                                            mode="single"
+                                                            selected={
+                                                                publicNoteObj.billingDataMod.startDate
+                                                                    ? new Date(publicNoteObj.billingDataMod.startDate)
+                                                                    : undefined
+                                                            }
+                                                            onSelect={(d) => {
+                                                                if (!d) return
+                                                                setPublicNoteObj((prev) => {
+                                                                    const prevDateStr = prev.billingDataMod.startDate
+                                                                    if (prevDateStr) {
+                                                                        const pd = new Date(prevDateStr)
+                                                                        d.setHours(pd.getHours(), pd.getMinutes(), pd.getSeconds(), 0)
+                                                                    }
+                                                                    return {
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            startDate: d.toISOString(),
+                                                                        },
+                                                                    }
+                                                                })
+                                                            }}
+                                                            initialFocus
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                {publicNoteErrors["billing.startDate"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["billing.startDate"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.EndDate")}</Label>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            className="w-full justify-start text-left font-normal"
+                                                        >
+                                                            {publicNoteObj.billingDataMod.endDate
+                                                                ? new Date(publicNoteObj.billingDataMod.endDate).toLocaleDateString()
+                                                                : "YYYY-MM-DD"}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="p-0" align="start">
+                                                        <Calendar
+                                                            className="w-full"
+                                                            mode="single"
+                                                            selected={
+                                                                publicNoteObj.billingDataMod.endDate
+                                                                    ? new Date(publicNoteObj.billingDataMod.endDate)
+                                                                    : undefined
+                                                            }
+                                                            onSelect={(d) => {
+                                                                if (!d) return
+                                                                setPublicNoteObj((prev) => {
+                                                                    const prevDateStr = prev.billingDataMod.endDate
+                                                                    if (prevDateStr) {
+                                                                        const pd = new Date(prevDateStr)
+                                                                        d.setHours(pd.getHours(), pd.getMinutes(), pd.getSeconds(), 0)
+                                                                    }
+                                                                    return {
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            endDate: d.toISOString(),
+                                                                        },
+                                                                    }
+                                                                })
+                                                            }}
+                                                            initialFocus
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                {publicNoteErrors["billing.endDate"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["billing.endDate"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.AutoRenewal")}</Label>
+                                                <Select
+                                                    onValueChange={(val) =>
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            billingDataMod: {
+                                                                ...prev.billingDataMod,
+                                                                autoRenewal: val,
+                                                            },
+                                                        }))
+                                                    }
+                                                    defaultValue={publicNoteObj.billingDataMod.autoRenewal || "0"}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="1">{t("PublicNote.Enabled")}</SelectItem>
+                                                        <SelectItem value="0">{t("PublicNote.Disabled")}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {publicNoteErrors["billing.autoRenewal"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["billing.autoRenewal"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.Cycle")}</Label>
+                                                <Select
+                                                    onValueChange={(val) =>
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            billingDataMod: { ...prev.billingDataMod, cycle: val },
+                                                        }))
+                                                    }
+                                                    defaultValue={publicNoteObj.billingDataMod.cycle || "Month"}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select cycle" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Day">{t("PublicNote.Day")}</SelectItem>
+                                                        <SelectItem value="Week">{t("PublicNote.Week")}</SelectItem>
+                                                        <SelectItem value="Month">{t("PublicNote.Month")}</SelectItem>
+                                                        <SelectItem value="Year">{t("PublicNote.Year")}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {publicNoteErrors["billing.cycle"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["billing.cycle"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1 sm:col-span-2">
+                                                <Label className="text-xs">{t("PublicNote.Amount")}</Label>
+                                                <Input
+                                                    placeholder="200EUR"
+                                                    value={publicNoteObj.billingDataMod.amount}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        billingDataMod: { ...prev.billingDataMod, amount: e.target.value },
+                    }))
+                }
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="rounded-md border p-3 space-y-3">
+                                        <div className="text-sm font-medium opacity-80">{t("PublicNote.Plan")}</div>
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.Bandwidth")}</Label>
+                                                <Input
+                                                    placeholder="30Mbps"
+                                                    value={publicNoteObj.planDataMod.bandwidth}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        planDataMod: { ...prev.planDataMod, bandwidth: e.target.value },
+                    }))
+                }
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.TrafficVolume")}</Label>
+                                                <Input
+                                                    placeholder="1TB/Month"
+                                                    value={publicNoteObj.planDataMod.trafficVol}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        planDataMod: { ...prev.planDataMod, trafficVol: e.target.value },
+                    }))
+                }
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.TrafficType")}</Label>
+                                                <Select
+                                                    onValueChange={(val) =>
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, trafficType: val },
+                                                        }))
+                                                    }
+                                                    defaultValue={publicNoteObj.planDataMod.trafficType || "2"}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="1">{t("PublicNote.Inbound")}</SelectItem>
+                                                        <SelectItem value="2">{t("PublicNote.Both")}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {publicNoteErrors["plan.trafficType"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["plan.trafficType"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.IPv4")}</Label>
+                                                <Input
+                                                    placeholder="1"
+                                                    value={publicNoteObj.planDataMod.IPv4}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        planDataMod: { ...prev.planDataMod, IPv4: e.target.value },
+                    }))
+                }
+                                                />
+                                                {publicNoteErrors["plan.IPv4"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["plan.IPv4"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.IPv6")}</Label>
+                                                <Input
+                                                    placeholder="1"
+                                                    value={publicNoteObj.planDataMod.IPv6}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        planDataMod: { ...prev.planDataMod, IPv6: e.target.value },
+                    }))
+                }
+                                                />
+                                                {publicNoteErrors["plan.IPv6"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["plan.IPv6"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-xs">{t("PublicNote.NetworkRoute")}</Label>
+                                                <Input
+                                                    placeholder="4837"
+                                                    value={publicNoteObj.planDataMod.networkRoute}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        planDataMod: { ...prev.planDataMod, networkRoute: e.target.value },
+                    }))
+                }
+                                                />
+                                                {publicNoteErrors["plan.networkRoute"] && (
+                                                    <p className="text-xs text-destructive mt-1">
+                                                        {publicNoteErrors["plan.networkRoute"]}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1 sm:col-span-2">
+                                                <Label className="text-xs">{t("PublicNote.Extra")}</Label>
+                                                <Input
+                                                    placeholder="Einstein"
+                                                    value={publicNoteObj.planDataMod.extra}
+                                                    onChange={(e) =>
+                    setPublicNoteObj((prev) => ({
+                        ...prev,
+                        planDataMod: { ...prev.planDataMod, extra: e.target.value },
+                    }))
+                }
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">

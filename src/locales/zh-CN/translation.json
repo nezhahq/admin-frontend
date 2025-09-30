@@ -185,5 +185,37 @@
     "OverrideDDNSDomains": "强制指定 DDNS 域名（每个配置）",
     "Value": "值",
     "Preview": "预览",
-    "Option": "选项"
+    "Option": "选项",
+    "PublicNote": {
+        "Billing": "账单信息",
+        "Plan": "套餐配置",
+        "StartDate": "开始时间",
+        "EndDate": "结束时间",
+        "AutoRenewal": "自动续费",
+        "Cycle": "周期",
+        "Amount": "金额",
+        "Bandwidth": "带宽",
+        "TrafficVolume": "流量配额",
+        "TrafficType": "流量类型",
+        "IPv4": "IPv4 数量",
+        "IPv6": "IPv6 数量",
+        "NetworkRoute": "网络路由",
+        "Extra": "额外备注",
+        "Enabled": "启用",
+        "Disabled": "禁用",
+        "Inbound": "入站",
+        "Both": "双向",
+        "Day": "天",
+        "Week": "周",
+        "Month": "月",
+        "Year": "年"
+    },
+    "Validation": {
+        "InvalidDate": "无效的日期格式",
+        "MustBe0Or1": "只能为 0 或 1",
+        "MustBeDayWeekMonthYear": "必须为 Day/Week/Month/Year",
+        "MustBe1Or2": "只能为 1 或 2",
+        "DigitsOnly": "仅允许数字",
+        "InvalidForm": "表单校验失败"
+    }
 }

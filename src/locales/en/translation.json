@@ -185,5 +185,37 @@
     "EditServerConfig": "Edit Server Config",
     "Option": "Option",
     "Value": "Value",
-    "Preview": "Preview"
+    "Preview": "Preview",
+    "PublicNote": {
+        "Billing": "Billing",
+        "Plan": "Plan",
+        "StartDate": "Start Date",
+        "EndDate": "End Date",
+        "AutoRenewal": "Auto Renewal",
+        "Cycle": "Cycle",
+        "Amount": "Amount",
+        "Bandwidth": "Bandwidth",
+        "TrafficVolume": "Traffic Volume",
+        "TrafficType": "Traffic Type",
+        "IPv4": "IPv4",
+        "IPv6": "IPv6",
+        "NetworkRoute": "Network Route",
+        "Extra": "Extra",
+        "Enabled": "Enabled",
+        "Disabled": "Disabled",
+        "Inbound": "Inbound",
+        "Both": "Both",
+        "Day": "Day",
+        "Week": "Week",
+        "Month": "Month",
+        "Year": "Year"
+    },
+    "Validation": {
+        "InvalidDate": "Invalid date",
+        "MustBe0Or1": "Must be 0 or 1",
+        "MustBeDayWeekMonthYear": "Must be Day/Week/Month/Year",
+        "MustBe1Or2": "Must be 1 or 2",
+        "DigitsOnly": "Digits only",
+        "InvalidForm": "Invalid form"
+    }
 }
