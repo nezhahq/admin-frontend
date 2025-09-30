@@ -558,11 +558,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="200EUR"
                                                     value={publicNoteObj.billingDataMod.amount}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        billingDataMod: { ...prev.billingDataMod, amount: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            billingDataMod: { ...prev.billingDataMod, amount: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                             </div>
                                         </div>
@@ -577,11 +577,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="30Mbps"
                                                     value={publicNoteObj.planDataMod.bandwidth}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        planDataMod: { ...prev.planDataMod, bandwidth: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, bandwidth: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                             </div>
                                             <div className="space-y-1">
@@ -590,11 +590,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="1TB/Month"
                                                     value={publicNoteObj.planDataMod.trafficVol}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        planDataMod: { ...prev.planDataMod, trafficVol: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, trafficVol: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                             </div>
                                             <div className="space-y-1">
@@ -628,11 +628,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="1"
                                                     value={publicNoteObj.planDataMod.IPv4}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        planDataMod: { ...prev.planDataMod, IPv4: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, IPv4: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                                 {publicNoteErrors["plan.IPv4"] && (
                                                     <p className="text-xs text-destructive mt-1">
@@ -646,11 +646,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="1"
                                                     value={publicNoteObj.planDataMod.IPv6}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        planDataMod: { ...prev.planDataMod, IPv6: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, IPv6: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                                 {publicNoteErrors["plan.IPv6"] && (
                                                     <p className="text-xs text-destructive mt-1">
@@ -664,11 +664,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="4837"
                                                     value={publicNoteObj.planDataMod.networkRoute}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        planDataMod: { ...prev.planDataMod, networkRoute: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, networkRoute: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                                 {publicNoteErrors["plan.networkRoute"] && (
                                                     <p className="text-xs text-destructive mt-1">
@@ -682,11 +682,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     placeholder="Einstein"
                                                     value={publicNoteObj.planDataMod.extra}
                                                     onChange={(e) =>
-                    setPublicNoteObj((prev) => ({
-                        ...prev,
-                        planDataMod: { ...prev.planDataMod, extra: e.target.value },
-                    }))
-                }
+                                                        setPublicNoteObj((prev) => ({
+                                                            ...prev,
+                                                            planDataMod: { ...prev.planDataMod, extra: e.target.value },
+                                                        }))
+                                                    }
                                                 />
                                             </div>
                                         </div>

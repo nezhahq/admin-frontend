@@ -51,6 +51,7 @@ export function HeaderButtonGroup<E, U>({
                     <IconButton
                         variant="destructive"
                         icon="trash"
+                        className="text-white"
                         onClick={() => {
                             toast(t("Error"), {
                                 description: t("Results.NoRowsAreSelected"),
@@ -63,7 +64,7 @@ export function HeaderButtonGroup<E, U>({
                 <>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <IconButton variant="destructive" icon="trash" />
+                            <IconButton variant="destructive" icon="trash" className="text-white" />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="sm:max-w-lg">
                             <AlertDialogHeader>
@@ -114,6 +115,7 @@ export function HeaderBlockButtonGroup<E, U>({
                     <IconButton
                         variant="destructive"
                         icon="ban"
+                        className="text-white"
                         onClick={() => {
                             toast(t("Error"), {
                                 description: t("Results.NoRowsAreSelected"),
@@ -126,7 +128,7 @@ export function HeaderBlockButtonGroup<E, U>({
                 <>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <IconButton variant="destructive" icon="ban" />
+                            <IconButton variant="destructive" icon="ban" className="text-white" />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="sm:max-w-lg">
                             <AlertDialogHeader>
