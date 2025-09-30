@@ -142,7 +142,7 @@ export const TerminalPage = () => {
         <div className="px-8">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">{`Terminal (${id})`}</h1>
-                <div className="flex-2 flex ml-auto gap-2">
+                <div className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0">
                     <IconButton
                         icon="expand"
                         onClick={async () => {

@@ -167,11 +167,11 @@ export default function ServerPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3">
-            <div className="flex mt-6 mb-4">
+        <div className="px-3 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 mt-6 mb-4">
                 <h1 className="text-3xl font-bold tracking-tight">{t("Server")}</h1>
                 <HeaderButtonGroup
-                    className="flex-2 flex ml-auto gap-2"
+                    className="flex gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteServer,
                         id: selectedRows.map((r) => r.original.id),
@@ -222,8 +222,9 @@ export default function ServerPage() {
                     <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
                 </HeaderButtonGroup>
             </div>
-            <Table>
-                <TableHeader>
+            <div className="rounded-md border overflow-x-auto">
+                <Table className="min-w-[960px]">
+                <TableHeader className="sticky top-0 bg-background z-10">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
@@ -266,7 +267,8 @@ export default function ServerPage() {
                         </TableRow>
                     )}
                 </TableBody>
-            </Table>
+                </Table>
+            </div>
         </div>
     )
 }
