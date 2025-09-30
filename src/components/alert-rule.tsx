@@ -32,7 +32,6 @@ import {
 import { IconButton } from "@/components/xui/icon-button"
 import { useNotification } from "@/hooks/useNotfication"
 import { conv } from "@/lib/utils"
-import { asOptionalField } from "@/lib/utils"
 import { ModelAlertRule } from "@/types"
 import { triggerModes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -53,16 +52,16 @@ interface AlertRuleCardProps {
 
 const ruleSchema = z.object({
     type: z.string(),
-    min: asOptionalField(z.number()),
-    max: asOptionalField(z.number()),
-    cycle_start: asOptionalField(z.string()),
-    cycle_interval: asOptionalField(z.number()),
-    cycle_unit: asOptionalField(z.enum(["hour", "day", "week", "month", "year"])),
-    duration: asOptionalField(z.number()),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    cycle_start: z.string().optional(),
+    cycle_interval: z.number().optional(),
+    cycle_unit: z.enum(["hour", "day", "week", "month", "year"]).optional(),
+    duration: z.number().optional(),
     cover: z.number().int().min(0),
-    ignore: asOptionalField(z.record(z.boolean())),
-    next_transfer_at: asOptionalField(z.record(z.string())),
-    last_cycle_status: asOptionalField(z.boolean()),
+    ignore: z.record(z.string(), z.boolean()).optional(),
+    next_transfer_at: z.record(z.string(), z.string()).optional(),
+    last_cycle_status: z.boolean().optional(),
 })
 
 const alertRuleFormSchema = z.object({
@@ -87,13 +86,16 @@ const alertRuleFormSchema = z.object({
     recover_trigger_tasks_raw: z.string(),
     notification_group_id: z.coerce.number().int(),
     trigger_mode: z.coerce.number().int().min(0),
-    enable: asOptionalField(z.boolean()),
+    enable: z.boolean().optional(),
 })
 
 export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof alertRuleFormSchema>>({
-        resolver: zodResolver(alertRuleFormSchema),
+    
+    type AlertRuleFormData = z.infer<typeof alertRuleFormSchema>
+    
+    const form = useForm({
+        resolver: zodResolver(alertRuleFormSchema) as any,
         defaultValues: data
             ? {
                   ...data,
@@ -119,7 +121,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof alertRuleFormSchema>) => {
+    const onSubmit = async (values: AlertRuleFormData) => {
         values.rules = JSON.parse(values.rules_raw)
         values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
         values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)
@@ -161,7 +163,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
+                            <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-2 my-2">
                                 <FormField
                                     control={form.control}
                                     name="name"

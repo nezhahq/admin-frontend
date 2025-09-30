@@ -49,7 +49,7 @@ const serverFormSchema = z.object({
     enable_ddns: asOptionalField(z.boolean()),
     ddns_profiles: asOptionalField(z.array(z.number())),
     ddns_profiles_raw: asOptionalField(z.string()),
-    override_ddns_domains: asOptionalField(z.record(z.coerce.number().int(), z.array(z.string()))),
+    override_ddns_domains: asOptionalField(z.record(z.string(), z.array(z.string()))),
     override_ddns_domains_raw: asOptionalField(
         z.string().refine(
             (val) => {
@@ -69,8 +69,8 @@ const serverFormSchema = z.object({
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof serverFormSchema>>({
-        resolver: zodResolver(serverFormSchema),
+    const form = useForm({
+        resolver: zodResolver(serverFormSchema) as any,
         defaultValues: {
             ...data,
             ddns_profiles_raw: data.ddns_profiles ? conv.arrToStr(data.ddns_profiles) : undefined,
@@ -85,7 +85,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof serverFormSchema>) => {
+    const onSubmit = async (values: any) => {
         try {
             values.ddns_profiles = values.ddns_profiles_raw
                 ? conv.strToArr(values.ddns_profiles_raw).map(Number)

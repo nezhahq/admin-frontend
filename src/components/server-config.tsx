@@ -58,7 +58,7 @@ const agentConfigSchema = z.object({
         ),
     ),
     ip_report_period: asOptionalField(z.coerce.number().int().min(30)),
-    nic_allowlist: asOptionalField(z.record(z.boolean())),
+    nic_allowlist: asOptionalField(z.record(z.string(), z.boolean())),
     nic_allowlist_raw: asOptionalField(
         z.string().refine(
             (val) => {
@@ -129,8 +129,8 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
         if (open) fetchData()
     }, [open])
 
-    const form = useForm<AgentConfig>({
-        resolver: zodResolver(agentConfigSchema),
+    const form = useForm({
+        resolver: zodResolver(agentConfigSchema) as any,
         defaultValues: {
             ...data,
             hard_drive_partition_allowlist_raw: JSON.stringify(
@@ -155,7 +155,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
         }
     }, [data, form])
 
-    const onSubmit = async (values: AgentConfig) => {
+    const onSubmit = async (values: any) => {
         let resp: ModelServerTaskResponse = {}
         try {
             values.nic_allowlist = values.nic_allowlist_raw

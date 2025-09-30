@@ -13,7 +13,7 @@ import { AttachAddon } from "@xterm/addon-attach"
 import { FitAddon } from "@xterm/addon-fit"
 import { Terminal } from "@xterm/xterm"
 import "@xterm/xterm/css/xterm.css"
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { forwardRef, JSX, useEffect, useImperativeHandle, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 

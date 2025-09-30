@@ -42,8 +42,8 @@ export const ProfileCard = ({ className }: { className: string }) => {
     const { t } = useTranslation()
     const { profile, setProfile } = useMainStore()
 
-    const form = useForm<z.infer<typeof profileFormSchema>>({
-        resolver: zodResolver(profileFormSchema),
+    const form = useForm({
+        resolver: zodResolver(profileFormSchema) as any,
         defaultValues: {
             original_password: "",
             new_password: "",
@@ -57,7 +57,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+    const onSubmit = async (values: any) => {
         try {
             await updateProfile(values)
         } catch (e) {

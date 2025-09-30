@@ -14,7 +14,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { HTMLAttributes, forwardRef, useEffect, useRef, useState } from "react"
+import { HTMLAttributes, JSX, forwardRef, useEffect, useRef, useState } from "react"
 import { TableVirtuoso } from "react-virtuoso"
 
 // Original Table is wrapped with a <div> (see https://ui.shadcn.com/docs/components/table#radix-:r24:-content-manual),

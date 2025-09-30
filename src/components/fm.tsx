@@ -37,7 +37,7 @@ import {
 import { ColumnDef } from "@tanstack/react-table"
 import { Row, flexRender } from "@tanstack/react-table"
 import { File, Folder } from "lucide-react"
-import { HTMLAttributes, useEffect, useRef, useState } from "react"
+import { HTMLAttributes, JSX, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
