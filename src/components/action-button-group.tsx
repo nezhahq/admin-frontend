@@ -49,7 +49,7 @@ export function ActionButtonGroup<E, U>({
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="destructive" icon="trash" />
+                    <IconButton variant="destructive" icon="trash" className="text-white" />
                 </AlertDialogTrigger>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>

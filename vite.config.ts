@@ -24,12 +24,63 @@ export default defineConfig({
         },
     },
     build: {
+        cssCodeSplit: true,
+        sourcemap: false,
+        chunkSizeWarningLimit: 1500,
         rollupOptions: {
             output: {
-                manualChunks(id) {
-                    if (id.includes("node_modules")) {
-                        return id.toString().split("node_modules/")[1].split("/")[0].toString()
+                manualChunks(id: string) {
+                    if (!id.includes("node_modules")) return
+
+                    // 提取顶级包名，例如 node_modules/react/ 或 node_modules/@radix-ui/react-popover/
+                    const m = id.match(/node_modules\/(@?[^/]+)/)
+                    const pkg = m ? m[1] : null
+                    if (!pkg) return "vendor"
+
+                    // React 生态统一到一个分组，避免拆散 runtime/scheduler 导致 undefined
+                    if (
+                        pkg === "react" ||
+                        pkg === "react-dom" ||
+                        pkg === "scheduler" ||
+                        pkg === "react-router" ||
+                        pkg === "react-router-dom" ||
+                        pkg === "history"
+                    ) {
+                        return "react"
                     }
+
+                    // Radix UI / shadcn 生态
+                    if (
+                        pkg.startsWith("@radix-ui") ||
+                        pkg === "class-variance-authority" ||
+                        pkg === "clsx" ||
+                        pkg === "tailwind-merge"
+                    ) {
+                        return "ui"
+                    }
+
+                    // 表单与校验
+                    if (
+                        pkg === "react-hook-form" ||
+                        pkg === "@hookform" ||
+                        pkg === "@hookform/resolvers" ||
+                        pkg === "zod"
+                    ) {
+                        return "form"
+                    }
+
+                    // i18n
+                    if (pkg === "i18next" || pkg === "react-i18next") {
+                        return "i18n"
+                    }
+
+                    // 数据获取
+                    if (pkg === "swr") {
+                        return "swr"
+                    }
+
+                    // 其它第三方按包名切分，避免合成一个过大的 vendor
+                    return `vendor-${pkg}`
                 },
             },
         },
