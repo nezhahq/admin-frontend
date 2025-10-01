@@ -243,11 +243,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
 
             // normalize datetime-local to ISO string if provided
             const normalizeISO = (v: string) => {
-                if (!v) return v;
+                if (!v) return v
                 // keep special "no expiry" value as-is
-                if (v === "0000-00-00T23:59:59+08:00") return v;
-                const date = new Date(v);
-                return isNaN(date.getTime()) ? v : date.toISOString();
+                if (v === "0000-00-00T23:59:59+08:00") return v
+                const date = new Date(v)
+                return isNaN(date.getTime()) ? v : date.toISOString()
             }
             const pnNormalized: PublicNote = {
                 billingDataMod: {
@@ -413,7 +413,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     <div className="space-y-1">
                                         <FormLabel>{t("Public") + t("Note")}</FormLabel>
                                         <p className="text-xs text-muted-foreground">
-                                            {t?.("PublicNote.DropdownHint") ?? "下拉项需要重新选择才能生效"}
+                                            {t?.("PublicNote.DropdownHint") ??
+                                                "下拉项需要重新选择才能生效"}
                                         </p>
                                     </div>
 
@@ -461,7 +462,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         prev.billingDataMod
                                                                             .startDate
                                                                     if (prevDateStr) {
-                                                                        const pd = new Date(prevDateStr)
+                                                                        const pd = new Date(
+                                                                            prevDateStr,
+                                                                        )
                                                                         // 仅在有效日期时复制时分秒
                                                                         if (!isNaN(pd.getTime())) {
                                                                             d.setHours(
@@ -476,7 +479,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         ...prev,
                                                                         billingDataMod: {
                                                                             ...prev.billingDataMod,
-                                                                            startDate: d.toISOString(),
+                                                                            startDate:
+                                                                                d.toISOString(),
                                                                         },
                                                                     }
                                                                 })
@@ -506,7 +510,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 billingDataMod: {
                                                                     ...prev.billingDataMod,
                                                                     endDate:
-                                                                        prev.billingDataMod.endDate ===
+                                                                        prev.billingDataMod
+                                                                            .endDate ===
                                                                         "0000-00-00T23:59:59+08:00"
                                                                             ? ""
                                                                             : "0000-00-00T23:59:59+08:00",
@@ -516,8 +521,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     >
                                                         {publicNoteObj.billingDataMod.endDate ===
                                                         "0000-00-00T23:59:59+08:00"
-                                                            ? t?.("PublicNote.CancelNoExpiry") ?? "Cancel No Expiry"
-                                                            : t?.("PublicNote.SetNoExpiry") ?? "Set No Expiry"}
+                                                            ? (t?.("PublicNote.CancelNoExpiry") ??
+                                                              "Cancel No Expiry")
+                                                            : (t?.("PublicNote.SetNoExpiry") ??
+                                                              "Set No Expiry")}
                                                     </Button>
                                                 </div>
                                                 <Popover>
@@ -527,14 +534,13 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             className="w-full justify-start text-left font-normal"
                                                         >
                                                             {publicNoteObj.billingDataMod.endDate
-                                                                ? publicNoteObj.billingDataMod.endDate ===
+                                                                ? publicNoteObj.billingDataMod
+                                                                      .endDate ===
                                                                   "0000-00-00T23:59:59+08:00"
-                                                                    ? t?.("PublicNote.NoExpiry") ??
-                                                                      "No Expiry"
+                                                                    ? (t?.("PublicNote.NoExpiry") ??
+                                                                      "No Expiry")
                                                                     : new Date(
-                                                                          publicNoteObj
-                                                                              .billingDataMod
-                                                                              .endDate,
+                                                                          publicNoteObj.billingDataMod.endDate,
                                                                       ).toLocaleDateString()
                                                                 : "YYYY-MM-DD"}
                                                         </Button>
@@ -547,13 +553,13 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             startMonth={new Date(2000, 0)}
                                                             endMonth={new Date(2050, 11)}
                                                             selected={
-                                                                publicNoteObj.billingDataMod.endDate &&
-                                                                publicNoteObj.billingDataMod.endDate !==
+                                                                publicNoteObj.billingDataMod
+                                                                    .endDate &&
+                                                                publicNoteObj.billingDataMod
+                                                                    .endDate !==
                                                                     "0000-00-00T23:59:59+08:00"
                                                                     ? new Date(
-                                                                          publicNoteObj
-                                                                              .billingDataMod
-                                                                              .endDate,
+                                                                          publicNoteObj.billingDataMod.endDate,
                                                                       )
                                                                     : undefined
                                                             }
@@ -563,7 +569,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     const prevDateStr =
                                                                         prev.billingDataMod.endDate
                                                                     if (prevDateStr) {
-                                                                        const pd = new Date(prevDateStr)
+                                                                        const pd = new Date(
+                                                                            prevDateStr,
+                                                                        )
                                                                         // 仅在有效日期时复制时分秒（特殊“不过期”值不会影响）
                                                                         if (!isNaN(pd.getTime())) {
                                                                             d.setHours(
@@ -578,7 +586,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         ...prev,
                                                                         billingDataMod: {
                                                                             ...prev.billingDataMod,
-                                                                            endDate: d.toISOString(),
+                                                                            endDate:
+                                                                                d.toISOString(),
                                                                         },
                                                                     }
                                                                 })
