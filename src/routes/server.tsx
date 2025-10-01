@@ -1,5 +1,4 @@
 import { swrFetcher } from "@/api/api"
-import { Clipboard, CogIcon, Terminal } from "lucide-react"
 import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
