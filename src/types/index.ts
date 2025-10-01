@@ -12,4 +12,3 @@ export * from "./notificationStore"
 export * from "./notificationContext"
 export * from "./fm"
 export * from "./settings"
-export type ModelOnlineUserApi = import("./api").GithubComNezhahqNezhaModelValueArrayModelOnlineUser
