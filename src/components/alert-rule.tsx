@@ -322,7 +322,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                         </div>
                                                         <div>
                                                             <Label className="text-sm">
-                                                                duration (s)
+                                                                duration
                                                             </Label>
                                                             <Input
                                                                 type="number"

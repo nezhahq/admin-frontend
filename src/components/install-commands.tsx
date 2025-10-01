@@ -63,7 +63,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                     {menuItem ? (
                         <button
                             type="button"
-                            className="flex w-full items-center text-sm px-2 py-2"
+                            className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
                             title={i18next.t("InstallCommands")}
                         >
                             {copy ? (

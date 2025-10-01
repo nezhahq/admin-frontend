@@ -194,7 +194,7 @@ export const TerminalButton = ({ id, menuItem = false }: { id: number; menuItem?
             <button
                 type="button"
                 onClick={handleOpenNewTab}
-                className="flex w-full items-center text-sm px-2 py-2"
+                className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
             >
                 <TerminalIcon className="h-4 w-4 mr-2" />
                 <span>{t("Terminal")}</span>

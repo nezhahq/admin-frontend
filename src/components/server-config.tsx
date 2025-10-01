@@ -191,7 +191,7 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                 {menuItem ? (
                     <button
                         type="button"
-                        className="flex w-full items-center text-sm px-2 py-2"
+                        className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
                         onClick={() => setOpen(true)}
                     >
                         <CogIcon className="h-4 w-4 mr-2" />

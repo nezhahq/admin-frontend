@@ -413,8 +413,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     <div className="space-y-1">
                                         <FormLabel>{t("Public") + t("Note")}</FormLabel>
                                         <p className="text-xs text-muted-foreground">
-                                            {t?.("PublicNote.DropdownHint") ??
-                                                "下拉项需要重新选择才能生效"}
+                                            {t("PublicNote.DropdownHint")}
                                         </p>
                                     </div>
 
@@ -521,10 +520,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     >
                                                         {publicNoteObj.billingDataMod.endDate ===
                                                         "0000-00-00T23:59:59+08:00"
-                                                            ? (t?.("PublicNote.CancelNoExpiry") ??
-                                                              "Cancel No Expiry")
-                                                            : (t?.("PublicNote.SetNoExpiry") ??
-                                                              "Set No Expiry")}
+                                                            ? (t("PublicNote.CancelNoExpiry"))
+                                                            : (t("PublicNote.SetNoExpiry"))}
                                                     </Button>
                                                 </div>
                                                 <Popover>
@@ -537,8 +534,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 ? publicNoteObj.billingDataMod
                                                                       .endDate ===
                                                                   "0000-00-00T23:59:59+08:00"
-                                                                    ? (t?.("PublicNote.NoExpiry") ??
-                                                                      "No Expiry")
+                                                                    ? (t("PublicNote.NoExpiry"))
                                                                     : new Date(
                                                                           publicNoteObj.billingDataMod.endDate,
                                                                       ).toLocaleDateString()
@@ -702,7 +698,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             }))
                                                         }
                                                     >
-                                                        {t?.("PublicNote.Free") ?? "Free"}
+                                                        {t("PublicNote.Free")}
                                                     </Button>
                                                 </div>
                                                 <Input
