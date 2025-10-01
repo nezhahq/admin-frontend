@@ -7,6 +7,8 @@
     },
     "Username": "Username",
     "Password": "Password",
+    "InvalidUsernameOrPassword": "Invalid Username Or Password",
+    "NetworkError": "Network Error",
     "LoginFirst": "Please Log in first",
     "CurrentTime": "Current Time",
     "Results": {

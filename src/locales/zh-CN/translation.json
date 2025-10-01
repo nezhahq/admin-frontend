@@ -7,6 +7,8 @@
     },
     "Username": "用户名",
     "Password": "密码",
+    "InvalidUsernameOrPassword": "用户名或密码错误",
+    "NetworkError": "网络错误",
     "LoginFirst": "请先登录",
     "CurrentTime": "当前时间",
     "Results": {

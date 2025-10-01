@@ -403,7 +403,7 @@ function Overview() {
             {!profile && <p className="text-sm font-semibold">{t("LoginFirst")}</p>}
             <div className="flex items-center gap-1.5">
                 <p className="text-[13px] font-medium opacity-50">{t("CurrentTime")}</p>
-                <p className="opacity-1 text-[13px] font-medium">{timeString}</p>
+                <p className="opacity-100 text-[13px] font-medium">{timeString}</p>
             </div>
         </section>
     )
