@@ -76,7 +76,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                         </Button>
                     )}
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent side={menuItem ? "right" : undefined} align={menuItem ? "start" : undefined}>
                     <DropdownMenuItem
                         className="nezha-copy"
                         onClick={async () => {
