@@ -175,7 +175,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 | "plan.trafficType"
                 | "plan.IPv4"
                 | "plan.IPv6"
-                | "plan.networkRoute"
                 | "plan.extra",
                 string
             >
@@ -215,9 +214,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         }
         if (!isDigits(pn.planDataMod.IPv6)) {
             errs["plan.IPv6"] = t("Validation.DigitsOnly")
-        }
-        if (!isDigits(pn.planDataMod.networkRoute)) {
-            errs["plan.networkRoute"] = t("Validation.DigitsOnly")
         }
 
         return { errors: errs, valid: Object.keys(errs).length === 0 }
@@ -860,11 +856,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         }))
                                                     }
                                                 />
-                                                {publicNoteErrors["plan.networkRoute"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["plan.networkRoute"]}
-                                                    </p>
-                                                )}
                                             </div>
                                             <div className="space-y-1 sm:col-span-2">
                                                 <Label className="text-xs">
