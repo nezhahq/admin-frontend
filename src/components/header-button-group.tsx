@@ -76,7 +76,7 @@ export function HeaderButtonGroup<E, U>({
                             <AlertDialogFooter>
                                 <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
                                 <AlertDialogAction
-                                    className={buttonVariants({ variant: "destructive" })}
+                                    className={buttonVariants({ variant: "destructive", className: "text-white"})}
                                     onClick={handleDelete}
                                 >
                                     {t("Confirm")}
@@ -140,7 +140,7 @@ export function HeaderBlockButtonGroup<E, U>({
                             <AlertDialogFooter>
                                 <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
                                 <AlertDialogAction
-                                    className={buttonVariants({ variant: "destructive" })}
+                                    className={buttonVariants({ variant: "destructive", className: "text-white"})}
                                     onClick={handleBlock}
                                 >
                                     {t("Confirm")}
