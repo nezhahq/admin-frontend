@@ -220,7 +220,8 @@
         "NoExpiry": "No Expiry",
         "SetNoExpiry": "Set No Expiry",
         "CancelNoExpiry": "Cancel No Expiry",
-        "Free": "Free"
+        "Free": "Free",
+        "DropdownHint": "You may need to reselect for dropdown changes to take effect"
     },
     "Validation": {
         "InvalidDate": "Invalid date",

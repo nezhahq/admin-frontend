@@ -410,7 +410,12 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                 />
                                 {/* Structured Public Note fields */}
                                 <div className="space-y-3">
-                                    <FormLabel>{t("Public") + t("Note")}</FormLabel>
+                                    <div className="space-y-1">
+                                        <FormLabel>{t("Public") + t("Note")}</FormLabel>
+                                        <p className="text-xs text-muted-foreground">
+                                            {t?.("PublicNote.DropdownHint") ?? "下拉项需要重新选择才能生效"}
+                                        </p>
+                                    </div>
 
                                     <div className="rounded-md border p-3 space-y-3">
                                         <div className="text-sm font-medium opacity-80">
@@ -438,6 +443,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Calendar
                                                             className="w-full"
                                                             mode="single"
+                                                            captionLayout="dropdown"
+                                                            startMonth={new Date(2000, 0)}
+                                                            endMonth={new Date(2050, 11)}
                                                             selected={
                                                                 publicNoteObj.billingDataMod
                                                                     .startDate
@@ -473,7 +481,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     }
                                                                 })
                                                             }}
-                                                            initialFocus
+                                                            autoFocus
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
@@ -535,6 +543,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Calendar
                                                             className="w-full"
                                                             mode="single"
+                                                            captionLayout="dropdown"
+                                                            startMonth={new Date(2000, 0)}
+                                                            endMonth={new Date(2050, 11)}
                                                             selected={
                                                                 publicNoteObj.billingDataMod.endDate &&
                                                                 publicNoteObj.billingDataMod.endDate !==
@@ -572,7 +583,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     }
                                                                 })
                                                             }}
-                                                            initialFocus
+                                                            autoFocus
                                                         />
                                                     </PopoverContent>
                                                 </Popover>

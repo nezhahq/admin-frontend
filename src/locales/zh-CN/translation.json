@@ -220,7 +220,8 @@
         "NoExpiry": "不过期",
         "SetNoExpiry": "设置为不过期",
         "CancelNoExpiry": "取消不过期",
-        "Free": "免费"
+        "Free": "免费",
+        "DropdownHint": "下拉项需要重新选择才能生效"
     },
     "Validation": {
         "InvalidDate": "无效的日期格式",
