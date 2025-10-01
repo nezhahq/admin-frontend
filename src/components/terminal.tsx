@@ -13,7 +13,9 @@ import { AttachAddon } from "@xterm/addon-attach"
 import { FitAddon } from "@xterm/addon-fit"
 import { Terminal } from "@xterm/xterm"
 import "@xterm/xterm/css/xterm.css"
-import { forwardRef, JSX, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { Terminal as TerminalIcon } from "lucide-react"
+import { JSX, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 
@@ -180,9 +182,6 @@ export const TerminalPage = () => {
         </div>
     )
 }
-
-import { Terminal as TerminalIcon } from "lucide-react"
-import { useTranslation } from "react-i18next"
 
 export const TerminalButton = ({ id, menuItem = false }: { id: number; menuItem?: boolean }) => {
     const { t } = useTranslation()

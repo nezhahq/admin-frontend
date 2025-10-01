@@ -27,6 +27,7 @@ import { IconButton } from "@/components/xui/icon-button"
 import { asOptionalField } from "@/lib/utils"
 import { ModelServerTaskResponse } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { CogIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -105,7 +106,6 @@ interface ServerConfigCardProps extends ButtonProps {
     menuItem?: boolean
 }
 
-import { CogIcon } from "lucide-react"
 export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConfigCardProps) => {
     const { t } = useTranslation()
     const [data, setData] = useState<AgentConfig | undefined>(undefined)

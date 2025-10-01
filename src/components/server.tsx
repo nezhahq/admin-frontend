@@ -1,5 +1,6 @@
 import { updateServer } from "@/api/server"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
@@ -29,9 +31,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
 import { IconButton } from "@/components/xui/icon-button"
 import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
@@ -159,20 +159,28 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         }
     }
 
-    const [publicNoteObj, setPublicNoteObj] = useState<PublicNote>(parsePublicNote(data?.public_note))
-    const [publicNoteErrors, setPublicNoteErrors] = useState<Partial<Record<
-        | "billing.startDate"
-        | "billing.endDate"
-        | "billing.autoRenewal"
-        | "billing.cycle"
-        | "billing.amount"
-        | "plan.bandwidth"
-        | "plan.trafficVol"
-        | "plan.trafficType"
-        | "plan.IPv4"
-        | "plan.IPv6"
-        | "plan.networkRoute"
-        | "plan.extra", string>>>({})
+    const [publicNoteObj, setPublicNoteObj] = useState<PublicNote>(
+        parsePublicNote(data?.public_note),
+    )
+    const [publicNoteErrors, setPublicNoteErrors] = useState<
+        Partial<
+            Record<
+                | "billing.startDate"
+                | "billing.endDate"
+                | "billing.autoRenewal"
+                | "billing.cycle"
+                | "billing.amount"
+                | "plan.bandwidth"
+                | "plan.trafficVol"
+                | "plan.trafficType"
+                | "plan.IPv4"
+                | "plan.IPv6"
+                | "plan.networkRoute"
+                | "plan.extra",
+                string
+            >
+        >
+    >({})
 
     const isValidISOLike = (v: string) => {
         if (!v) return true
@@ -397,10 +405,14 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     <FormLabel>{t("Public") + t("Note")}</FormLabel>
 
                                     <div className="rounded-md border p-3 space-y-3">
-                                        <div className="text-sm font-medium opacity-80">{t("PublicNote.Billing")}</div>
+                                        <div className="text-sm font-medium opacity-80">
+                                            {t("PublicNote.Billing")}
+                                        </div>
                                         <div className="grid gap-3 sm:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.StartDate")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.StartDate")}
+                                                </Label>
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <Button
@@ -408,7 +420,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             className="w-full justify-start text-left font-normal"
                                                         >
                                                             {publicNoteObj.billingDataMod.startDate
-                                                                ? new Date(publicNoteObj.billingDataMod.startDate).toLocaleDateString()
+                                                                ? new Date(
+                                                                      publicNoteObj.billingDataMod.startDate,
+                                                                  ).toLocaleDateString()
                                                                 : "YYYY-MM-DD"}
                                                         </Button>
                                                     </PopoverTrigger>
@@ -417,23 +431,36 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             className="w-full"
                                                             mode="single"
                                                             selected={
-                                                                publicNoteObj.billingDataMod.startDate
-                                                                    ? new Date(publicNoteObj.billingDataMod.startDate)
+                                                                publicNoteObj.billingDataMod
+                                                                    .startDate
+                                                                    ? new Date(
+                                                                          publicNoteObj.billingDataMod.startDate,
+                                                                      )
                                                                     : undefined
                                                             }
                                                             onSelect={(d) => {
                                                                 if (!d) return
                                                                 setPublicNoteObj((prev) => {
-                                                                    const prevDateStr = prev.billingDataMod.startDate
+                                                                    const prevDateStr =
+                                                                        prev.billingDataMod
+                                                                            .startDate
                                                                     if (prevDateStr) {
-                                                                        const pd = new Date(prevDateStr)
-                                                                        d.setHours(pd.getHours(), pd.getMinutes(), pd.getSeconds(), 0)
+                                                                        const pd = new Date(
+                                                                            prevDateStr,
+                                                                        )
+                                                                        d.setHours(
+                                                                            pd.getHours(),
+                                                                            pd.getMinutes(),
+                                                                            pd.getSeconds(),
+                                                                            0,
+                                                                        )
                                                                     }
                                                                     return {
                                                                         ...prev,
                                                                         billingDataMod: {
                                                                             ...prev.billingDataMod,
-                                                                            startDate: d.toISOString(),
+                                                                            startDate:
+                                                                                d.toISOString(),
                                                                         },
                                                                     }
                                                                 })
@@ -449,7 +476,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.EndDate")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.EndDate")}
+                                                </Label>
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <Button
@@ -457,7 +486,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             className="w-full justify-start text-left font-normal"
                                                         >
                                                             {publicNoteObj.billingDataMod.endDate
-                                                                ? new Date(publicNoteObj.billingDataMod.endDate).toLocaleDateString()
+                                                                ? new Date(
+                                                                      publicNoteObj.billingDataMod.endDate,
+                                                                  ).toLocaleDateString()
                                                                 : "YYYY-MM-DD"}
                                                         </Button>
                                                     </PopoverTrigger>
@@ -467,22 +498,33 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             mode="single"
                                                             selected={
                                                                 publicNoteObj.billingDataMod.endDate
-                                                                    ? new Date(publicNoteObj.billingDataMod.endDate)
+                                                                    ? new Date(
+                                                                          publicNoteObj.billingDataMod.endDate,
+                                                                      )
                                                                     : undefined
                                                             }
                                                             onSelect={(d) => {
                                                                 if (!d) return
                                                                 setPublicNoteObj((prev) => {
-                                                                    const prevDateStr = prev.billingDataMod.endDate
+                                                                    const prevDateStr =
+                                                                        prev.billingDataMod.endDate
                                                                     if (prevDateStr) {
-                                                                        const pd = new Date(prevDateStr)
-                                                                        d.setHours(pd.getHours(), pd.getMinutes(), pd.getSeconds(), 0)
+                                                                        const pd = new Date(
+                                                                            prevDateStr,
+                                                                        )
+                                                                        d.setHours(
+                                                                            pd.getHours(),
+                                                                            pd.getMinutes(),
+                                                                            pd.getSeconds(),
+                                                                            0,
+                                                                        )
                                                                     }
                                                                     return {
                                                                         ...prev,
                                                                         billingDataMod: {
                                                                             ...prev.billingDataMod,
-                                                                            endDate: d.toISOString(),
+                                                                            endDate:
+                                                                                d.toISOString(),
                                                                         },
                                                                     }
                                                                 })
@@ -498,7 +540,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.AutoRenewal")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.AutoRenewal")}
+                                                </Label>
                                                 <Select
                                                     onValueChange={(val) =>
                                                         setPublicNoteObj((prev) => ({
@@ -509,14 +553,21 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             },
                                                         }))
                                                     }
-                                                    defaultValue={publicNoteObj.billingDataMod.autoRenewal || "0"}
+                                                    defaultValue={
+                                                        publicNoteObj.billingDataMod.autoRenewal ||
+                                                        "0"
+                                                    }
                                                 >
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="1">{t("PublicNote.Enabled")}</SelectItem>
-                                                        <SelectItem value="0">{t("PublicNote.Disabled")}</SelectItem>
+                                                        <SelectItem value="1">
+                                                            {t("PublicNote.Enabled")}
+                                                        </SelectItem>
+                                                        <SelectItem value="0">
+                                                            {t("PublicNote.Disabled")}
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 {publicNoteErrors["billing.autoRenewal"] && (
@@ -526,24 +577,40 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.Cycle")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.Cycle")}
+                                                </Label>
                                                 <Select
                                                     onValueChange={(val) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            billingDataMod: { ...prev.billingDataMod, cycle: val },
+                                                            billingDataMod: {
+                                                                ...prev.billingDataMod,
+                                                                cycle: val,
+                                                            },
                                                         }))
                                                     }
-                                                    defaultValue={publicNoteObj.billingDataMod.cycle || "Month"}
+                                                    defaultValue={
+                                                        publicNoteObj.billingDataMod.cycle ||
+                                                        "Month"
+                                                    }
                                                 >
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select cycle" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Day">{t("PublicNote.Day")}</SelectItem>
-                                                        <SelectItem value="Week">{t("PublicNote.Week")}</SelectItem>
-                                                        <SelectItem value="Month">{t("PublicNote.Month")}</SelectItem>
-                                                        <SelectItem value="Year">{t("PublicNote.Year")}</SelectItem>
+                                                        <SelectItem value="Day">
+                                                            {t("PublicNote.Day")}
+                                                        </SelectItem>
+                                                        <SelectItem value="Week">
+                                                            {t("PublicNote.Week")}
+                                                        </SelectItem>
+                                                        <SelectItem value="Month">
+                                                            {t("PublicNote.Month")}
+                                                        </SelectItem>
+                                                        <SelectItem value="Year">
+                                                            {t("PublicNote.Year")}
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 {publicNoteErrors["billing.cycle"] && (
@@ -553,14 +620,19 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1 sm:col-span-2">
-                                                <Label className="text-xs">{t("PublicNote.Amount")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.Amount")}
+                                                </Label>
                                                 <Input
                                                     placeholder="200EUR"
                                                     value={publicNoteObj.billingDataMod.amount}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            billingDataMod: { ...prev.billingDataMod, amount: e.target.value },
+                                                            billingDataMod: {
+                                                                ...prev.billingDataMod,
+                                                                amount: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />
@@ -569,51 +641,74 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     </div>
 
                                     <div className="rounded-md border p-3 space-y-3">
-                                        <div className="text-sm font-medium opacity-80">{t("PublicNote.Plan")}</div>
+                                        <div className="text-sm font-medium opacity-80">
+                                            {t("PublicNote.Plan")}
+                                        </div>
                                         <div className="grid gap-3 sm:grid-cols-2">
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.Bandwidth")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.Bandwidth")}
+                                                </Label>
                                                 <Input
                                                     placeholder="30Mbps"
                                                     value={publicNoteObj.planDataMod.bandwidth}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, bandwidth: e.target.value },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                bandwidth: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.TrafficVolume")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.TrafficVolume")}
+                                                </Label>
                                                 <Input
                                                     placeholder="1TB/Month"
                                                     value={publicNoteObj.planDataMod.trafficVol}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, trafficVol: e.target.value },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                trafficVol: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.TrafficType")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.TrafficType")}
+                                                </Label>
                                                 <Select
                                                     onValueChange={(val) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, trafficType: val },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                trafficType: val,
+                                                            },
                                                         }))
                                                     }
-                                                    defaultValue={publicNoteObj.planDataMod.trafficType || "2"}
+                                                    defaultValue={
+                                                        publicNoteObj.planDataMod.trafficType || "2"
+                                                    }
                                                 >
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="1">{t("PublicNote.Inbound")}</SelectItem>
-                                                        <SelectItem value="2">{t("PublicNote.Both")}</SelectItem>
+                                                        <SelectItem value="1">
+                                                            {t("PublicNote.Inbound")}
+                                                        </SelectItem>
+                                                        <SelectItem value="2">
+                                                            {t("PublicNote.Both")}
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 {publicNoteErrors["plan.trafficType"] && (
@@ -623,7 +718,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.IPv4")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.IPv4")}
+                                                </Label>
                                                 <Input
                                                     type="number"
                                                     placeholder="1"
@@ -631,7 +728,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, IPv4: e.target.value },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                IPv4: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />
@@ -642,7 +742,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.IPv6")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.IPv6")}
+                                                </Label>
                                                 <Input
                                                     type="number"
                                                     placeholder="1"
@@ -650,7 +752,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, IPv6: e.target.value },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                IPv6: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />
@@ -661,14 +766,19 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">{t("PublicNote.NetworkRoute")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.NetworkRoute")}
+                                                </Label>
                                                 <Input
                                                     placeholder=""
                                                     value={publicNoteObj.planDataMod.networkRoute}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, networkRoute: e.target.value },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                networkRoute: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />
@@ -679,14 +789,19 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 )}
                                             </div>
                                             <div className="space-y-1 sm:col-span-2">
-                                                <Label className="text-xs">{t("PublicNote.Extra")}</Label>
+                                                <Label className="text-xs">
+                                                    {t("PublicNote.Extra")}
+                                                </Label>
                                                 <Input
                                                     placeholder=""
                                                     value={publicNoteObj.planDataMod.extra}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
                                                             ...prev,
-                                                            planDataMod: { ...prev.planDataMod, extra: e.target.value },
+                                                            planDataMod: {
+                                                                ...prev.planDataMod,
+                                                                extra: e.target.value,
+                                                            },
                                                         }))
                                                     }
                                                 />

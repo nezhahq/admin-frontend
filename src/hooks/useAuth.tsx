@@ -1,9 +1,9 @@
 import { getProfile, login as loginRequest } from "@/api/user"
 import { AuthContextProps } from "@/types"
 import { createContext, useContext, useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
-import { useTranslation } from "react-i18next"
 
 import { useMainStore } from "./useMainStore"
 

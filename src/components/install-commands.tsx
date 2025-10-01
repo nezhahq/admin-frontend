@@ -21,7 +21,11 @@ enum OSTypes {
     Windows,
 }
 
-type InstallCommandsMenuProps = ButtonProps & { uuid?: string; iconOnly?: boolean; menuItem?: boolean }
+type InstallCommandsMenuProps = ButtonProps & {
+    uuid?: string
+    iconOnly?: boolean
+    menuItem?: boolean
+}
 
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommandsMenuProps>(
     ({ uuid, iconOnly = false, menuItem = false, ...props }, ref) => {
@@ -62,12 +66,25 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                             className="flex w-full items-center text-sm px-2 py-2"
                             title={i18next.t("InstallCommands")}
                         >
-                            {copy ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                            {copy ? (
+                                <Check className="h-4 w-4 mr-2" />
+                            ) : (
+                                <Copy className="h-4 w-4 mr-2" />
+                            )}
                             <span>{i18next.t("InstallCommands")}</span>
                         </button>
                     ) : iconOnly ? (
-                        <Button ref={ref} title={i18next.t("InstallCommands")} size="icon" {...props}>
-                            {copy ? <Check className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+                        <Button
+                            ref={ref}
+                            title={i18next.t("InstallCommands")}
+                            size="icon"
+                            {...props}
+                        >
+                            {copy ? (
+                                <Check className="h-4 w-4" />
+                            ) : (
+                                <Download className="h-4 w-4" />
+                            )}
                         </Button>
                     ) : (
                         <Button ref={ref} title={i18next.t("InstallCommands")} {...props}>
@@ -76,7 +93,10 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                         </Button>
                     )}
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side={menuItem ? "right" : undefined} align={menuItem ? "start" : undefined}>
+                <DropdownMenuContent
+                    side={menuItem ? "right" : undefined}
+                    align={menuItem ? "start" : undefined}
+                >
                     <DropdownMenuItem
                         className="nezha-copy"
                         onClick={async () => {
@@ -104,7 +124,8 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                 </DropdownMenuContent>
             </DropdownMenu>
         )
-    })
+    },
+)
 
 const generateCommand = (
     type: number,

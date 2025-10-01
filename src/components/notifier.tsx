@@ -61,9 +61,9 @@ const notificationFormSchema = z.object({
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-     type notificationFormData = z.infer<typeof notificationFormSchema>
-    
-     const form = useForm({
+    type notificationFormData = z.infer<typeof notificationFormSchema>
+
+    const form = useForm({
         resolver: zodResolver(notificationFormSchema) as any,
         defaultValues: data
             ? {
@@ -123,7 +123,10 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-2 my-2">
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit as any)}
+                                className="space-y-2 my-2"
+                            >
                                 <FormField
                                     control={form.control}
                                     name="name"

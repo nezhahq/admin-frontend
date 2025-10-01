@@ -434,8 +434,8 @@ export interface ModelOnlineUser {
 export interface ModelOnlineUserApi {
     value: ModelOnlineUser[]
     pagination: {
-        total: number,
-        offset: number,
+        total: number
+        offset: number
         limit: number
     }
 }

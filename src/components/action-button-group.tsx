@@ -61,7 +61,10 @@ export function ActionButtonGroup<E, U>({
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
                         <AlertDialogAction
-                            className={buttonVariants({ variant: "destructive", className: "text-white"})}
+                            className={buttonVariants({
+                                variant: "destructive",
+                                className: "text-white",
+                            })}
                             onClick={handleDelete}
                         >
                             {t("Confirm")}
@@ -107,7 +110,10 @@ export function BlockButtonGroup<E, U>({
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
                         <AlertDialogAction
-                            className={buttonVariants({ variant: "destructive", className: "text-white"})}
+                            className={buttonVariants({
+                                variant: "destructive",
+                                className: "text-white",
+                            })}
                             onClick={handleBlock}
                         >
                             {t("Confirm")}
