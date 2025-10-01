@@ -216,7 +216,11 @@
         "Day": "Day",
         "Week": "Week",
         "Month": "Month",
-        "Year": "Year"
+        "Year": "Year",
+        "NoExpiry": "No Expiry",
+        "SetNoExpiry": "Set No Expiry",
+        "CancelNoExpiry": "Cancel No Expiry",
+        "Free": "Free"
     },
     "Validation": {
         "InvalidDate": "Invalid date",

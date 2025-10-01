@@ -41,7 +41,6 @@ export interface IconButtonProps extends ButtonProps {
         | "minus"
         | "user-pen"
         | "more"
-        | "more"
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {

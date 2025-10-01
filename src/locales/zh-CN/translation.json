@@ -216,7 +216,11 @@
         "Day": "天",
         "Week": "周",
         "Month": "月",
-        "Year": "年"
+        "Year": "年",
+        "NoExpiry": "不过期",
+        "SetNoExpiry": "设置为不过期",
+        "CancelNoExpiry": "取消不过期",
+        "Free": "免费"
     },
     "Validation": {
         "InvalidDate": "无效的日期格式",
