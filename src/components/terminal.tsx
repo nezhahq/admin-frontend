@@ -181,9 +181,26 @@ export const TerminalPage = () => {
     )
 }
 
-export const TerminalButton = ({ id }: { id: number }) => {
+import { Terminal as TerminalIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
+
+export const TerminalButton = ({ id, menuItem = false }: { id: number; menuItem?: boolean }) => {
+    const { t } = useTranslation()
     const handleOpenNewTab = () => {
         window.open(`/dashboard/terminal/${id}`, "_blank")
+    }
+
+    if (menuItem) {
+        return (
+            <button
+                type="button"
+                onClick={handleOpenNewTab}
+                className="flex w-full items-center text-sm px-2 py-2"
+            >
+                <TerminalIcon className="h-4 w-4 mr-2" />
+                <span>{t("Terminal")}</span>
+            </button>
+        )
     }
 
     return <IconButton variant="outline" icon="terminal" onClick={handleOpenNewTab} />

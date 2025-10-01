@@ -1,4 +1,5 @@
 import { swrFetcher } from "@/api/api"
+import { Clipboard, CogIcon, Terminal } from "lucide-react"
 import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
@@ -19,6 +20,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
 import { joinIP } from "@/lib/utils"
@@ -147,10 +154,23 @@ export default function ServerPage() {
                         delete={{ fn: deleteServer, id: s.id, mutate: mutate }}
                     >
                         <>
-                            <TerminalButton id={s.id} />
                             <ServerCard mutate={mutate} data={s} />
-                            <ServerConfigCard sid={s.id} variant="outline" />
-                            <InstallCommandsMenu uuid={s.uuid} variant="outline" iconOnly />
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <IconButton icon="more" variant="outline" aria-label="More actions" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <TerminalButton id={s.id} menuItem />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <ServerConfigCard sid={s.id} variant="ghost" menuItem />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <InstallCommandsMenu uuid={s.uuid} menuItem />
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </>
                     </ActionButtonGroup>
                 )

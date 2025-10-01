@@ -47,6 +47,8 @@
     "Enable": "Enable",
     "HideForGuest": "Hidden from Visitors",
     "InstallCommands": "Installation command",
+    "Terminal": "Terminal",
+    "Config": "Config",
     "Note": "Note",
     "Success": "Success",
     "Done": "Finish",

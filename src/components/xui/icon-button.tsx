@@ -17,6 +17,7 @@ import {
     Trash2,
     Upload,
     UserPen,
+    MoreHorizontal,
 } from "lucide-react"
 import { forwardRef } from "react"
 
@@ -39,6 +40,8 @@ export interface IconButtonProps extends ButtonProps {
         | "cog"
         | "minus"
         | "user-pen"
+        | "more"
+        | "more"
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
@@ -101,6 +104,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props,
                     }
                     case "user-pen": {
                         return <UserPen />
+                    }
+                    case "more": {
+                        return <MoreHorizontal />
                     }
                 }
             })()}

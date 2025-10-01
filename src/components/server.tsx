@@ -625,6 +625,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             <div className="space-y-1">
                                                 <Label className="text-xs">{t("PublicNote.IPv4")}</Label>
                                                 <Input
+                                                    type="number"
                                                     placeholder="1"
                                                     value={publicNoteObj.planDataMod.IPv4}
                                                     onChange={(e) =>
@@ -643,6 +644,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             <div className="space-y-1">
                                                 <Label className="text-xs">{t("PublicNote.IPv6")}</Label>
                                                 <Input
+                                                    type="number"
                                                     placeholder="1"
                                                     value={publicNoteObj.planDataMod.IPv6}
                                                     onChange={(e) =>
@@ -661,7 +663,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             <div className="space-y-1">
                                                 <Label className="text-xs">{t("PublicNote.NetworkRoute")}</Label>
                                                 <Input
-                                                    placeholder="4837"
+                                                    placeholder=""
                                                     value={publicNoteObj.planDataMod.networkRoute}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
@@ -679,7 +681,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             <div className="space-y-1 sm:col-span-2">
                                                 <Label className="text-xs">{t("PublicNote.Extra")}</Label>
                                                 <Input
-                                                    placeholder="Einstein"
+                                                    placeholder=""
                                                     value={publicNoteObj.planDataMod.extra}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({

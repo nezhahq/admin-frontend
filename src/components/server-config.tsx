@@ -102,9 +102,11 @@ for (let i = 0; i < boolFields.length; i += 2) {
 
 interface ServerConfigCardProps extends ButtonProps {
     sid: number
+    menuItem?: boolean
 }
 
-export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
+import { CogIcon } from "lucide-react"
+export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConfigCardProps) => {
     const { t } = useTranslation()
     const [data, setData] = useState<AgentConfig | undefined>(undefined)
     const [loading, setLoading] = useState(true)
@@ -186,7 +188,18 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <IconButton {...props} icon="cog" />
+                {menuItem ? (
+                    <button
+                        type="button"
+                        className="flex w-full items-center text-sm px-2 py-2"
+                        onClick={() => setOpen(true)}
+                    >
+                        <CogIcon className="h-4 w-4 mr-2" />
+                        <span>{t("Config")}</span>
+                    </button>
+                ) : (
+                    <IconButton {...props} icon="cog" />
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 {loading ? (

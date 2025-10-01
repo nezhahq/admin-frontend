@@ -21,10 +21,10 @@ enum OSTypes {
     Windows,
 }
 
-type InstallCommandsMenuProps = ButtonProps & { uuid?: string; iconOnly?: boolean }
+type InstallCommandsMenuProps = ButtonProps & { uuid?: string; iconOnly?: boolean; menuItem?: boolean }
 
 export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommandsMenuProps>(
-    ({ uuid, iconOnly = false, ...props }, ref) => {
+    ({ uuid, iconOnly = false, menuItem = false, ...props }, ref) => {
         const [copy, setCopy] = useState(false)
         const { data: settings } = useSettings()
         const { profile } = useAuth()
@@ -56,7 +56,16 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
         return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    {iconOnly ? (
+                    {menuItem ? (
+                        <button
+                            type="button"
+                            className="flex w-full items-center text-sm px-2 py-2"
+                            title={i18next.t("InstallCommands")}
+                        >
+                            {copy ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                            <span>{i18next.t("InstallCommands")}</span>
+                        </button>
+                    ) : iconOnly ? (
                         <Button ref={ref} title={i18next.t("InstallCommands")} size="icon" {...props}>
                             {copy ? <Check className="h-4 w-4" /> : <Download className="h-4 w-4" />}
                         </Button>
