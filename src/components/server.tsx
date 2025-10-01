@@ -516,8 +516,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     >
                                                         {publicNoteObj.billingDataMod.endDate ===
                                                         "0000-00-00T23:59:59+08:00"
-                                                            ? (t("PublicNote.CancelNoExpiry"))
-                                                            : (t("PublicNote.SetNoExpiry"))}
+                                                            ? t("PublicNote.CancelNoExpiry")
+                                                            : t("PublicNote.SetNoExpiry")}
                                                     </Button>
                                                 </div>
                                                 <Popover>
@@ -530,7 +530,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 ? publicNoteObj.billingDataMod
                                                                       .endDate ===
                                                                   "0000-00-00T23:59:59+08:00"
-                                                                    ? (t("PublicNote.NoExpiry"))
+                                                                    ? t("PublicNote.NoExpiry")
                                                                     : new Date(
                                                                           publicNoteObj.billingDataMod.endDate,
                                                                       ).toLocaleDateString()
