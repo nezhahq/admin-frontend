@@ -430,58 +430,60 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         >
                                                             {publicNoteObj.billingDataMod.startDate
                                                                 ? new Date(
-                                                                      publicNoteObj.billingDataMod.startDate,
-                                                                  ).toLocaleDateString()
+                                                                    publicNoteObj.billingDataMod.startDate,
+                                                                ).toLocaleDateString()
                                                                 : "YYYY-MM-DD"}
                                                         </Button>
                                                     </PopoverTrigger>
-                                                    <PopoverContent className="p-0" align="start">
-                                                        <Calendar
-                                                            className="w-full"
-                                                            mode="single"
-                                                            captionLayout="dropdown"
-                                                            startMonth={new Date(2000, 0)}
-                                                            endMonth={new Date(2050, 11)}
-                                                            selected={
-                                                                publicNoteObj.billingDataMod
-                                                                    .startDate
-                                                                    ? new Date(
-                                                                          publicNoteObj.billingDataMod.startDate,
-                                                                      )
-                                                                    : undefined
-                                                            }
-                                                            onSelect={(d) => {
-                                                                if (!d) return
-                                                                setPublicNoteObj((prev) => {
-                                                                    const prevDateStr =
-                                                                        prev.billingDataMod
-                                                                            .startDate
-                                                                    if (prevDateStr) {
-                                                                        const pd = new Date(
-                                                                            prevDateStr,
+                                                    <PopoverContent className="p-0 w-[300px] max-h-[60dvh] overflow-hidden" align="start">
+                                                        <div className="max-h-[500px] overflow-y-auto">
+                                                            <Calendar
+                                                                className="w-full min-h-[320px]"
+                                                                mode="single"
+                                                                captionLayout="dropdown"
+                                                                startMonth={new Date(2000, 0)}
+                                                                endMonth={new Date(2050, 11)}
+                                                                selected={
+                                                                    publicNoteObj.billingDataMod
+                                                                        .startDate
+                                                                        ? new Date(
+                                                                            publicNoteObj.billingDataMod.startDate,
                                                                         )
-                                                                        // 仅在有效日期时复制时分秒
-                                                                        if (!isNaN(pd.getTime())) {
-                                                                            d.setHours(
-                                                                                pd.getHours(),
-                                                                                pd.getMinutes(),
-                                                                                pd.getSeconds(),
-                                                                                0,
+                                                                        : undefined
+                                                                }
+                                                                onSelect={(d) => {
+                                                                    if (!d) return
+                                                                    setPublicNoteObj((prev) => {
+                                                                        const prevDateStr =
+                                                                            prev.billingDataMod
+                                                                                .startDate
+                                                                        if (prevDateStr) {
+                                                                            const pd = new Date(
+                                                                                prevDateStr,
                                                                             )
+                                                                            // 仅在有效日期时复制时分秒
+                                                                            if (!isNaN(pd.getTime())) {
+                                                                                d.setHours(
+                                                                                    pd.getHours(),
+                                                                                    pd.getMinutes(),
+                                                                                    pd.getSeconds(),
+                                                                                    0,
+                                                                                )
+                                                                            }
                                                                         }
-                                                                    }
-                                                                    return {
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            startDate:
-                                                                                d.toISOString(),
-                                                                        },
-                                                                    }
-                                                                })
-                                                            }}
-                                                            autoFocus
-                                                        />
+                                                                        return {
+                                                                            ...prev,
+                                                                            billingDataMod: {
+                                                                                ...prev.billingDataMod,
+                                                                                startDate:
+                                                                                    d.toISOString(),
+                                                                            },
+                                                                        }
+                                                                    })
+                                                                }}
+                                                                autoFocus
+                                                            />
+                                                        </div>
                                                     </PopoverContent>
                                                 </Popover>
                                                 {publicNoteErrors["billing.startDate"] && (
@@ -507,7 +509,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     endDate:
                                                                         prev.billingDataMod
                                                                             .endDate ===
-                                                                        "0000-00-00T23:59:59+08:00"
+                                                                            "0000-00-00T23:59:59+08:00"
                                                                             ? ""
                                                                             : "0000-00-00T23:59:59+08:00",
                                                                 },
@@ -515,7 +517,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         }
                                                     >
                                                         {publicNoteObj.billingDataMod.endDate ===
-                                                        "0000-00-00T23:59:59+08:00"
+                                                            "0000-00-00T23:59:59+08:00"
                                                             ? t("PublicNote.CancelNoExpiry")
                                                             : t("PublicNote.SetNoExpiry")}
                                                     </Button>
@@ -528,64 +530,66 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         >
                                                             {publicNoteObj.billingDataMod.endDate
                                                                 ? publicNoteObj.billingDataMod
-                                                                      .endDate ===
-                                                                  "0000-00-00T23:59:59+08:00"
+                                                                    .endDate ===
+                                                                    "0000-00-00T23:59:59+08:00"
                                                                     ? t("PublicNote.NoExpiry")
                                                                     : new Date(
-                                                                          publicNoteObj.billingDataMod.endDate,
-                                                                      ).toLocaleDateString()
+                                                                        publicNoteObj.billingDataMod.endDate,
+                                                                    ).toLocaleDateString()
                                                                 : "YYYY-MM-DD"}
                                                         </Button>
                                                     </PopoverTrigger>
-                                                    <PopoverContent className="p-0" align="start">
-                                                        <Calendar
-                                                            className="w-full"
-                                                            mode="single"
-                                                            captionLayout="dropdown"
-                                                            startMonth={new Date(2000, 0)}
-                                                            endMonth={new Date(2050, 11)}
-                                                            selected={
-                                                                publicNoteObj.billingDataMod
-                                                                    .endDate &&
-                                                                publicNoteObj.billingDataMod
-                                                                    .endDate !==
-                                                                    "0000-00-00T23:59:59+08:00"
-                                                                    ? new Date(
-                                                                          publicNoteObj.billingDataMod.endDate,
-                                                                      )
-                                                                    : undefined
-                                                            }
-                                                            onSelect={(d) => {
-                                                                if (!d) return
-                                                                setPublicNoteObj((prev) => {
-                                                                    const prevDateStr =
-                                                                        prev.billingDataMod.endDate
-                                                                    if (prevDateStr) {
-                                                                        const pd = new Date(
-                                                                            prevDateStr,
+                                                    <PopoverContent className="p-0 w-[300px] max-h-[60dvh] overflow-hidden" align="start">
+                                                        <div className="max-h-[500px] overflow-y-auto">
+                                                            <Calendar
+                                                                className="w-full min-h-[320px]"
+                                                                mode="single"
+                                                                captionLayout="dropdown"
+                                                                startMonth={new Date(2000, 0)}
+                                                                endMonth={new Date(2050, 11)}
+                                                                selected={
+                                                                    publicNoteObj.billingDataMod
+                                                                        .endDate &&
+                                                                        publicNoteObj.billingDataMod
+                                                                            .endDate !==
+                                                                        "0000-00-00T23:59:59+08:00"
+                                                                        ? new Date(
+                                                                            publicNoteObj.billingDataMod.endDate,
                                                                         )
-                                                                        // 仅在有效日期时复制时分秒（特殊“不过期”值不会影响）
-                                                                        if (!isNaN(pd.getTime())) {
-                                                                            d.setHours(
-                                                                                pd.getHours(),
-                                                                                pd.getMinutes(),
-                                                                                pd.getSeconds(),
-                                                                                0,
+                                                                        : undefined
+                                                                }
+                                                                onSelect={(d) => {
+                                                                    if (!d) return
+                                                                    setPublicNoteObj((prev) => {
+                                                                        const prevDateStr =
+                                                                            prev.billingDataMod.endDate
+                                                                        if (prevDateStr) {
+                                                                            const pd = new Date(
+                                                                                prevDateStr,
                                                                             )
+                                                                            // 仅在有效日期时复制时分秒（特殊“不过期”值不会影响）
+                                                                            if (!isNaN(pd.getTime())) {
+                                                                                d.setHours(
+                                                                                    pd.getHours(),
+                                                                                    pd.getMinutes(),
+                                                                                    pd.getSeconds(),
+                                                                                    0,
+                                                                                )
+                                                                            }
                                                                         }
-                                                                    }
-                                                                    return {
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            endDate:
-                                                                                d.toISOString(),
-                                                                        },
-                                                                    }
-                                                                })
-                                                            }}
-                                                            autoFocus
-                                                        />
+                                                                        return {
+                                                                            ...prev,
+                                                                            billingDataMod: {
+                                                                                ...prev.billingDataMod,
+                                                                                endDate:
+                                                                                    d.toISOString(),
+                                                                            },
+                                                                        }
+                                                                    })
+                                                                }}
+                                                                autoFocus
+                                                            />
+                                                        </div>
                                                     </PopoverContent>
                                                 </Popover>
 
