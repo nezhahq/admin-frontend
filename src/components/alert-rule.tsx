@@ -416,17 +416,27 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectItem value="0">
-                                                                        0（{t("AlertRules.CoverAllServers")}）
+                                                                        0（
+                                                                        {t(
+                                                                            "AlertRules.CoverAllServers",
+                                                                        )}
+                                                                        ）
                                                                     </SelectItem>
                                                                     <SelectItem value="1">
-                                                                        1（{t("AlertRules.IgnoreAllSelectSpecific")}）
+                                                                        1（
+                                                                        {t(
+                                                                            "AlertRules.IgnoreAllSelectSpecific",
+                                                                        )}
+                                                                        ）
                                                                     </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
                                                         <div>
                                                             <Label className="text-sm">
-                                                                {t("AlertRules.IgnoreHint", { server: t("Server") })}
+                                                                {t("AlertRules.IgnoreHint", {
+                                                                    server: t("Server"),
+                                                                })}
                                                             </Label>
                                                             {/* 简化：以 JSON 对象输入 */}
                                                             <Textarea
@@ -459,7 +469,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                     }
                                                                     setRulesUI(next)
                                                                 }}
-                                                                placeholder={t("AlertRules.IgnoreExample")}
+                                                                placeholder={t(
+                                                                    "AlertRules.IgnoreExample",
+                                                                )}
                                                             />
                                                         </div>
                                                     </div>
