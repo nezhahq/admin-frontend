@@ -21,6 +21,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -125,8 +126,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
             bandwidth: "",
             trafficVol: "",
             trafficType: "",
-            IPv4: "",
-            IPv6: "",
+            IPv4: "0",
+            IPv6: "0",
             networkRoute: "",
             extra: "",
         },
@@ -148,8 +149,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                     bandwidth: obj?.planDataMod?.bandwidth ?? "",
                     trafficVol: obj?.planDataMod?.trafficVol ?? "",
                     trafficType: obj?.planDataMod?.trafficType ?? "",
-                    IPv4: obj?.planDataMod?.IPv4 ?? "",
-                    IPv6: obj?.planDataMod?.IPv6 ?? "",
+                    IPv4: obj?.planDataMod?.IPv4 === "1" ? "1" : "0",
+                    IPv6: obj?.planDataMod?.IPv6 === "1" ? "1" : "0",
                     networkRoute: obj?.planDataMod?.networkRoute ?? "",
                     extra: obj?.planDataMod?.extra ?? "",
                 },
@@ -188,7 +189,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         const d = new Date(v)
         return !isNaN(d.getTime())
     }
-    const isDigits = (v: string) => v === "" || /^[0-9]+$/.test(v)
 
     const validatePublicNote = (pn: PublicNote) => {
         const errs: Partial<Record<string, string>> = {}
@@ -209,11 +209,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         if (pn.planDataMod.trafficType && !/^(1|2)$/.test(pn.planDataMod.trafficType)) {
             errs["plan.trafficType"] = t("Validation.MustBe1Or2")
         }
-        if (!isDigits(pn.planDataMod.IPv4)) {
-            errs["plan.IPv4"] = t("Validation.DigitsOnly")
+        if (!/^(0|1)$/.test(pn.planDataMod.IPv4)) {
+            errs["plan.IPv4"] = t("Validation.MustBe0Or1")
         }
-        if (!isDigits(pn.planDataMod.IPv6)) {
-            errs["plan.IPv6"] = t("Validation.DigitsOnly")
+        if (!/^(0|1)$/.test(pn.planDataMod.IPv6)) {
+            errs["plan.IPv6"] = t("Validation.MustBe0Or1")
         }
 
         return { errors: errs, valid: Object.keys(errs).length === 0 }
@@ -498,7 +498,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     <Button
                                                         type="button"
                                                         variant="outline"
-                                                        className="text-xs px-2 py-0 h-auto bg-gray-200"
+                                                        className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                         onClick={() =>
                                                             setPublicNoteObj((prev) => ({
                                                                 ...prev,
@@ -683,7 +683,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     <Button
                                                         type="button"
                                                         variant="outline"
-                                                        className="text-xs px-2 py-0 h-auto bg-gray-200"
+                                                        className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                         onClick={() =>
                                                             setPublicNoteObj((prev) => ({
                                                                 ...prev,
@@ -695,6 +695,22 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         }
                                                     >
                                                         {t("PublicNote.Free")}
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                        onClick={() =>
+                                                            setPublicNoteObj((prev) => ({
+                                                                ...prev,
+                                                                billingDataMod: {
+                                                                    ...prev.billingDataMod,
+                                                                    amount: "-1",
+                                                                },
+                                                            }))
+                                                        }
+                                                    >
+                                                        {t("PublicNote.PayAsYouGo")}
                                                     </Button>
                                                 </div>
                                                 <Input
@@ -795,20 +811,22 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 <Label className="text-xs">
                                                     {t("PublicNote.IPv4")}
                                                 </Label>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="1"
-                                                    value={publicNoteObj.planDataMod.IPv4}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                IPv4: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <span className="text-xs">{t("PublicNote.None")}</span>
+                                                    <Switch
+                                                        checked={publicNoteObj.planDataMod.IPv4 === "1"}
+                                                        onCheckedChange={(checked) =>
+                                                            setPublicNoteObj((prev) => ({
+                                                                ...prev,
+                                                                planDataMod: {
+                                                                    ...prev.planDataMod,
+                                                                    IPv4: checked ? "1" : "0",
+                                                                },
+                                                            }))
+                                                        }
+                                                    />
+                                                    <span className="text-xs">{t("PublicNote.Has")}</span>
+                                                </div>
                                                 {publicNoteErrors["plan.IPv4"] && (
                                                     <p className="text-xs text-destructive mt-1">
                                                         {publicNoteErrors["plan.IPv4"]}
@@ -819,20 +837,22 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 <Label className="text-xs">
                                                     {t("PublicNote.IPv6")}
                                                 </Label>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="1"
-                                                    value={publicNoteObj.planDataMod.IPv6}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                IPv6: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <span className="text-xs">{t("PublicNote.None")}</span>
+                                                    <Switch
+                                                        checked={publicNoteObj.planDataMod.IPv6 === "1"}
+                                                        onCheckedChange={(checked) =>
+                                                            setPublicNoteObj((prev) => ({
+                                                                ...prev,
+                                                                planDataMod: {
+                                                                    ...prev.planDataMod,
+                                                                    IPv6: checked ? "1" : "0",
+                                                                },
+                                                            }))
+                                                        }
+                                                    />
+                                                    <span className="text-xs">{t("PublicNote.Has")}</span>
+                                                </div>
                                                 {publicNoteErrors["plan.IPv6"] && (
                                                     <p className="text-xs text-destructive mt-1">
                                                         {publicNoteErrors["plan.IPv6"]}
@@ -844,7 +864,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     {t("PublicNote.NetworkRoute")}
                                                 </Label>
                                                 <Input
-                                                    placeholder=""
+                                                    placeholder={t("PublicNote.CommaSeparated")}
                                                     value={publicNoteObj.planDataMod.networkRoute}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({
@@ -862,7 +882,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     {t("PublicNote.Extra")}
                                                 </Label>
                                                 <Input
-                                                    placeholder=""
+                                                    placeholder={t("PublicNote.CommaSeparated")}
                                                     value={publicNoteObj.planDataMod.extra}
                                                     onChange={(e) =>
                                                         setPublicNoteObj((prev) => ({

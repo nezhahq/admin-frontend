@@ -205,8 +205,8 @@
         "Bandwidth": "带宽",
         "TrafficVolume": "流量配额",
         "TrafficType": "流量类型",
-        "IPv4": "IPv4 数量",
-        "IPv6": "IPv6 数量",
+        "IPv4": "IPv4",
+        "IPv6": "IPv6",
         "NetworkRoute": "网络路由",
         "Extra": "额外备注",
         "Enabled": "启用",
@@ -221,7 +221,11 @@
         "SetNoExpiry": "设置为不过期",
         "CancelNoExpiry": "取消不过期",
         "Free": "免费",
-        "DropdownHint": "下拉项需要重新选择才能生效"
+        "PayAsYouGo": "按量付费",
+        "DropdownHint": "下拉项需要重新选择才能生效",
+        "CommaSeparated": "以英文逗号分隔多个",
+        "Has": "有",
+        "None": "无"
     },
     "Validation": {
         "InvalidDate": "无效的日期格式",
