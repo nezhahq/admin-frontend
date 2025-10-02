@@ -67,7 +67,7 @@ const serviceFormSchema = z.object({
     notify: asOptionalField(z.boolean()),
     recover_trigger_tasks: z.array(z.number()),
     recover_trigger_tasks_raw: z.string(),
-    skip_servers: z.record(z.boolean()),
+    skip_servers: z.record(z.string(), z.boolean()),
     skip_servers_raw: z.array(z.string()),
     target: z.string(),
     type: z.coerce.number().int().min(0),
@@ -75,8 +75,8 @@ const serviceFormSchema = z.object({
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof serviceFormSchema>>({
-        resolver: zodResolver(serviceFormSchema),
+    const form = useForm({
+        resolver: zodResolver(serviceFormSchema) as any,
         defaultValues: data
             ? {
                   ...data,
@@ -107,7 +107,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
+    const onSubmit = async (values: any) => {
         values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
         values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
         values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)

@@ -140,7 +140,7 @@ export default function NotificationPage() {
             <div className="flex mt-6 mb-4">
                 <NotificationTab className="flex-1 mr-4 sm:max-w-[40%]" />
                 <HeaderButtonGroup
-                    className="flex-2 flex gap-2 ml-auto"
+                    className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteNotification,
                         id: selectedRows.map((r) => r.original.id),

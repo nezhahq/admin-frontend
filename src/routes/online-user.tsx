@@ -40,7 +40,7 @@ export default function OnlineUserPage() {
     // 计算 offset
     const offset = (page - 1) * pageSize
 
-    const { data, mutate, error, isLoading } = useSWR<ModelOnlineUserApi>(
+    const { data, mutate, error, isLoading } = useSWR<ModelOnlineUserApi, Error>(
         `/api/v1/online-user?offset=${offset}&limit=${pageSize}`,
         swrFetcher,
     )
@@ -128,7 +128,7 @@ export default function OnlineUserPage() {
         return data?.value ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useReactTable<ModelOnlineUser>({
         data: dataCache,
         columns,
         getCoreRowModel: getCoreRowModel(),

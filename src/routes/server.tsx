@@ -12,6 +12,12 @@ import { ServerConfigCardBatch } from "@/components/server-config-batch"
 import { TerminalButton } from "@/components/terminal"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
     Table,
     TableBody,
     TableCell,
@@ -31,7 +37,10 @@ import useSWR from "swr"
 
 export default function ServerPage() {
     const { t } = useTranslation()
-    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher)
+    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    })
     const { serverGroups } = useServer()
 
     useEffect(() => {
@@ -144,9 +153,27 @@ export default function ServerPage() {
                         delete={{ fn: deleteServer, id: s.id, mutate: mutate }}
                     >
                         <>
-                            <TerminalButton id={s.id} />
                             <ServerCard mutate={mutate} data={s} />
-                            <ServerConfigCard sid={s.id} variant="outline" />
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <IconButton
+                                        icon="more"
+                                        variant="outline"
+                                        aria-label="More actions"
+                                    />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <TerminalButton id={s.id} menuItem />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <ServerConfigCard sid={s.id} variant="ghost" menuItem />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <InstallCommandsMenu uuid={s.uuid} menuItem />
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </>
                     </ActionButtonGroup>
                 )
@@ -167,11 +194,11 @@ export default function ServerPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3">
-            <div className="flex mt-6 mb-4">
+        <div className="px-3 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 mt-6 mb-4">
                 <h1 className="text-3xl font-bold tracking-tight">{t("Server")}</h1>
                 <HeaderButtonGroup
-                    className="flex-2 flex ml-auto gap-2"
+                    className="flex gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteServer,
                         id: selectedRows.map((r) => r.original.id),
@@ -222,51 +249,59 @@ export default function ServerPage() {
                     <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
                 </HeaderButtonGroup>
             </div>
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id} className="text-sm">
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
-                            </TableCell>
-                        </TableRow>
-                    ) : table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
+            <div className="rounded-md border overflow-x-auto">
+                <Table className="min-w-[960px]">
+                    <TableHeader className="sticky top-0 bg-background z-10">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id} className="text-sm">
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef.header,
+                                                      header.getContext(),
+                                                  )}
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    {t("Loading")}...
+                                </TableCell>
+                            </TableRow>
+                        ) : table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className="text-xsm">
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    {t("NoResults")}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }

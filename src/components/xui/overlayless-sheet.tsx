@@ -36,7 +36,7 @@ interface SheetContentProps
 }
 
 const SheetContent = React.forwardRef<
-    React.ElementRef<typeof SheetPrimitive.Content>,
+    React.ComponentRef<typeof SheetPrimitive.Content>,
     SheetContentProps
 >(({ side = "right", className, children, setOpen, ...props }, ref) => (
     <SheetPortal>
@@ -74,7 +74,7 @@ const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 SheetFooter.displayName = "SheetFooter"
 
 const SheetTitle = React.forwardRef<
-    React.ElementRef<typeof SheetPrimitive.Title>,
+    React.ComponentRef<typeof SheetPrimitive.Title>,
     React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
     <SheetPrimitive.Title
@@ -86,7 +86,7 @@ const SheetTitle = React.forwardRef<
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
 const SheetDescription = React.forwardRef<
-    React.ElementRef<typeof SheetPrimitive.Description>,
+    React.ComponentRef<typeof SheetPrimitive.Description>,
     React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
 >(({ className, ...props }, ref) => (
     <SheetPrimitive.Description

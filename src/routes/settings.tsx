@@ -64,8 +64,8 @@ export default function SettingsPage() {
         navigate("/dashboard/settings/online-user")
     }
 
-    const form = useForm<z.infer<typeof settingFormSchema>>({
-        resolver: zodResolver(settingFormSchema),
+    const form = useForm({
+        resolver: zodResolver(settingFormSchema) as any,
         defaultValues: config
             ? {
                   ...config.config,
@@ -92,7 +92,7 @@ export default function SettingsPage() {
         }
     }, [config?.config, form])
 
-    const onSubmit = async (values: z.infer<typeof settingFormSchema>) => {
+    const onSubmit = async (values: any) => {
         try {
             await updateSettings(values)
             form.reset()

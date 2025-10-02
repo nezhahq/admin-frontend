@@ -208,11 +208,11 @@ export default function CronPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3">
-            <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("Task")}</h1>
+        <div className="px-3 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 mt-6 mb-4">
+                <h1 className="text-3xl font-bold tracking-tight">{t("Task")}</h1>
                 <HeaderButtonGroup
-                    className="flex-2 flex ml-auto gap-2"
+                    className="flex gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteCron,
                         id: selectedRows.map((r) => r.original.id),

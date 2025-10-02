@@ -431,6 +431,15 @@ export interface ModelOnlineUser {
     user_id: number
 }
 
+export interface ModelOnlineUserApi {
+    value: ModelOnlineUser[]
+    pagination: {
+        total: number
+        offset: number
+        limit: number
+    }
+}
+
 export interface ModelPagination {
     limit: number
     offset: number
