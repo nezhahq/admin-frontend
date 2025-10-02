@@ -234,5 +234,12 @@
         "MustBe1Or2": "只能为 1 或 2",
         "DigitsOnly": "仅允许数字",
         "InvalidForm": "表单校验失败"
-    }
+    },
+    "AlertRules": {
+        "CoverAllServers": "监控所有服务器",
+        "IgnoreAllSelectSpecific": "忽略所有，选择特定服务器",
+        "IgnoreHint": "{{server}}ID: true/false",
+        "IgnoreExample": "例如：{\"1\": true, \"2\": false}"
+    },
+    "Search": "搜索..."
 }

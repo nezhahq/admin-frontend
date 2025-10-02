@@ -234,5 +234,12 @@
         "MustBe1Or2": "Must be 1 or 2",
         "DigitsOnly": "Digits only",
         "InvalidForm": "Invalid form"
-    }
+    },
+    "AlertRules": {
+        "CoverAllServers": "Monitor all servers",
+        "IgnoreAllSelectSpecific": "Ignore all, select specific servers",
+        "IgnoreHint": "{{server}} ID: true/false",
+        "IgnoreExample": "e.g., {\"1\": true, \"2\": false}"
+    },
+    "Search": "Search..."
 }
