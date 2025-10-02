@@ -295,9 +295,7 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                                                             <FormControl>
                                                                 <div className="flex items-center gap-2">
                                                                     <Checkbox
-                                                                        checked={
-                                                                            controllerField.value as boolean
-                                                                        }
+                                                                        checked={!!controllerField.value}
                                                                         onCheckedChange={
                                                                             controllerField.onChange
                                                                         }
