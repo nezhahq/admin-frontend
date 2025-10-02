@@ -17,13 +17,17 @@ import { IconButton } from "@/components/xui/icon-button"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+
 import { Textarea } from "./ui/textarea"
 
 interface BatchMoveServerIconProps extends ButtonProps {
     serverIds: number[]
 }
 
-export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({ serverIds, ...props }) => {
+export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({
+    serverIds,
+    ...props
+}) => {
     const { t } = useTranslation()
     const [open, setOpen] = useState(false)
     const [toUserId, setToUserId] = useState<number | undefined>(undefined)
@@ -32,7 +36,7 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({ server
         try {
             await batchMoveServer({
                 ids: serverIds,
-                to_user: toUserId!
+                to_user: toUserId!,
             })
         } catch (e) {
             console.error(e)
@@ -69,9 +73,7 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({ server
                         </DialogHeader>
                         <div className="flex flex-col gap-3 mt-4">
                             <Label>{t("Servers")}</Label>
-                            <Textarea disabled>
-                                {serverIds.join(", ")}
-                            </Textarea>
+                            <Textarea disabled>{serverIds.join(", ")}</Textarea>
                             <Label>{t("ToUser")}</Label>
                             <Input
                                 type="number"
@@ -87,7 +89,12 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({ server
                                         {t("Cancel")}
                                     </Button>
                                 </DialogClose>
-                                <Button disabled={!toUserId || toUserId == 0} type="submit" className="my-2" onClick={onSubmit}>
+                                <Button
+                                    disabled={!toUserId || toUserId == 0}
+                                    type="submit"
+                                    className="my-2"
+                                    onClick={onSubmit}
+                                >
                                     {t("Move")}
                                 </Button>
                             </DialogFooter>

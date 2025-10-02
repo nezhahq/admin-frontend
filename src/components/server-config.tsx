@@ -27,6 +27,7 @@ import { IconButton } from "@/components/xui/icon-button"
 import { asOptionalField } from "@/lib/utils"
 import { ModelServerTaskResponse } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { CogIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -58,7 +59,7 @@ const agentConfigSchema = z.object({
         ),
     ),
     ip_report_period: asOptionalField(z.coerce.number().int().min(30)),
-    nic_allowlist: asOptionalField(z.record(z.boolean())),
+    nic_allowlist: asOptionalField(z.record(z.string(), z.boolean())),
     nic_allowlist_raw: asOptionalField(
         z.string().refine(
             (val) => {
@@ -102,9 +103,10 @@ for (let i = 0; i < boolFields.length; i += 2) {
 
 interface ServerConfigCardProps extends ButtonProps {
     sid: number
+    menuItem?: boolean
 }
 
-export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
+export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConfigCardProps) => {
     const { t } = useTranslation()
     const [data, setData] = useState<AgentConfig | undefined>(undefined)
     const [loading, setLoading] = useState(true)
@@ -129,8 +131,8 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
         if (open) fetchData()
     }, [open])
 
-    const form = useForm<AgentConfig>({
-        resolver: zodResolver(agentConfigSchema),
+    const form = useForm({
+        resolver: zodResolver(agentConfigSchema) as any,
         defaultValues: {
             ...data,
             hard_drive_partition_allowlist_raw: JSON.stringify(
@@ -155,7 +157,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
         }
     }, [data, form])
 
-    const onSubmit = async (values: AgentConfig) => {
+    const onSubmit = async (values: any) => {
         let resp: ModelServerTaskResponse = {}
         try {
             values.nic_allowlist = values.nic_allowlist_raw
@@ -186,7 +188,18 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <IconButton {...props} icon="cog" />
+                {menuItem ? (
+                    <button
+                        type="button"
+                        className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
+                        onClick={() => setOpen(true)}
+                    >
+                        <CogIcon className="h-4 w-4 mr-2" />
+                        <span>{t("Config")}</span>
+                    </button>
+                ) : (
+                    <IconButton {...props} icon="cog" />
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 {loading ? (
@@ -283,7 +296,7 @@ export const ServerConfigCard = ({ sid, ...props }: ServerConfigCardProps) => {
                                                                 <div className="flex items-center gap-2">
                                                                     <Checkbox
                                                                         checked={
-                                                                            controllerField.value as boolean
+                                                                            !!controllerField.value
                                                                         }
                                                                         onCheckedChange={
                                                                             controllerField.onChange

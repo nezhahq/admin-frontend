@@ -61,10 +61,21 @@ const notificationFormSchema = z.object({
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof notificationFormSchema>>({
-        resolver: zodResolver(notificationFormSchema),
+    type notificationFormData = z.infer<typeof notificationFormSchema>
+
+    const form = useForm({
+        resolver: zodResolver(notificationFormSchema) as any,
         defaultValues: data
-            ? data
+            ? {
+                  name: data.name ?? "",
+                  url: data.url ?? "",
+                  request_method: data.request_method ?? 1,
+                  request_type: data.request_type ?? 1,
+                  request_header: data.request_header ?? "",
+                  request_body: data.request_body ?? "",
+                  verify_tls: (data as any).verify_tls ?? false,
+                  skip_check: (data as any).skip_check ?? false,
+              }
             : {
                   name: "",
                   url: "",
@@ -72,6 +83,8 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_type: 1,
                   request_header: "",
                   request_body: "",
+                  verify_tls: false,
+                  skip_check: false,
               },
         resetOptions: {
             keepDefaultValues: false,
@@ -80,7 +93,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof notificationFormSchema>) => {
+    const onSubmit = async (values: notificationFormData) => {
         try {
             data?.id ? await updateNotification(data.id, values) : await createNotification(values)
         } catch (e) {
@@ -110,7 +123,10 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit as any)}
+                                className="space-y-2 my-2"
+                            >
                                 <FormField
                                     control={form.control}
                                     name="name"

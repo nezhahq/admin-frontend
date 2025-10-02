@@ -1,6 +1,7 @@
 import { getProfile, login as loginRequest } from "@/api/user"
 import { AuthContextProps } from "@/types"
 import { createContext, useContext, useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextProps>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const profile = useMainStore((store) => store.profile)
     const setProfile = useMainStore((store) => store.setProfile)
+    const { t } = useTranslation()
 
     useEffect(() => {
         ;(async () => {
@@ -25,7 +27,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setProfile(user)
             } catch (error: any) {
                 setProfile(undefined)
-                console.error("Error fetching profile", error)
             }
         })()
     }, [])
@@ -40,7 +41,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setProfile(user)
             navigate("/dashboard")
         } catch (error: any) {
-            toast(error.message)
+            const msg = error?.message
+            if (msg === "ApiErrorUnauthorized" || msg === "Unauthorized") {
+                toast(t("InvalidUsernameOrPassword"))
+            } else {
+                toast(msg || t("NetworkError"))
+            }
         }
     }
 

@@ -132,7 +132,7 @@ export default function NATPage() {
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight"> {t("NATT")}</h1>
                 <HeaderButtonGroup
-                    className="flex-2 flex ml-auto gap-2"
+                    className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteNAT,
                         id: selectedRows.map((r) => r.original.id),

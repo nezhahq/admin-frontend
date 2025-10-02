@@ -13,7 +13,9 @@ import { AttachAddon } from "@xterm/addon-attach"
 import { FitAddon } from "@xterm/addon-fit"
 import { Terminal } from "@xterm/xterm"
 import "@xterm/xterm/css/xterm.css"
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { Terminal as TerminalIcon } from "lucide-react"
+import { JSX, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 
@@ -142,7 +144,7 @@ export const TerminalPage = () => {
         <div className="px-8">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">{`Terminal (${id})`}</h1>
-                <div className="flex-2 flex ml-auto gap-2">
+                <div className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0">
                     <IconButton
                         icon="expand"
                         onClick={async () => {
@@ -181,9 +183,23 @@ export const TerminalPage = () => {
     )
 }
 
-export const TerminalButton = ({ id }: { id: number }) => {
+export const TerminalButton = ({ id, menuItem = false }: { id: number; menuItem?: boolean }) => {
+    const { t } = useTranslation()
     const handleOpenNewTab = () => {
         window.open(`/dashboard/terminal/${id}`, "_blank")
+    }
+
+    if (menuItem) {
+        return (
+            <button
+                type="button"
+                onClick={handleOpenNewTab}
+                className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
+            >
+                <TerminalIcon className="h-4 w-4 mr-2" />
+                <span>{t("Terminal")}</span>
+            </button>
+        )
     }
 
     return <IconButton variant="outline" icon="terminal" onClick={handleOpenNewTab} />

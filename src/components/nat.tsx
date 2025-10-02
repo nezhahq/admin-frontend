@@ -46,12 +46,20 @@ const natFormSchema = z.object({
     domain: z.string(),
 })
 
+type NatFormData = z.infer<typeof natFormSchema>
+
 export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof natFormSchema>>({
-        resolver: zodResolver(natFormSchema),
+    const form = useForm<NatFormData>({
+        resolver: zodResolver(natFormSchema as any),
         defaultValues: data
-            ? data
+            ? {
+                  name: data.name ?? "",
+                  enabled: (data as any).enabled ?? false,
+                  server_id: data.server_id ?? 0,
+                  host: data.host ?? "",
+                  domain: data.domain ?? "",
+              }
             : {
                   name: "",
                   enabled: false,
@@ -66,7 +74,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof natFormSchema>) => {
+    const onSubmit = async (values: NatFormData) => {
         try {
             data?.id ? await updateNAT(data.id, values) : await createNAT(values)
         } catch (e) {

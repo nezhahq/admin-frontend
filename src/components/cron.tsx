@@ -63,18 +63,31 @@ const cronFormSchema = z.object({
     notification_group_id: z.coerce.number().int(),
 })
 
+type CronFormData = z.infer<typeof cronFormSchema>
+
 export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof cronFormSchema>>({
-        resolver: zodResolver(cronFormSchema),
+    const form = useForm<CronFormData>({
+        resolver: zodResolver(cronFormSchema as any),
         defaultValues: data
-            ? data
+            ? {
+                  task_type: data.task_type ?? 0,
+                  name: data.name ?? "",
+                  scheduler: data.scheduler ?? "",
+                  command: (data as any).command ?? "",
+                  servers: data.servers ?? [],
+                  cover: data.cover ?? 0,
+                  push_successful: (data as any).push_successful ?? false,
+                  notification_group_id: data.notification_group_id ?? 0,
+              }
             : {
-                  name: "",
                   task_type: 0,
+                  name: "",
                   scheduler: "",
+                  command: "",
                   servers: [],
                   cover: 0,
+                  push_successful: false,
                   notification_group_id: 0,
               },
         resetOptions: {
@@ -84,7 +97,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof cronFormSchema>) => {
+    const onSubmit = async (values: CronFormData) => {
         try {
             data?.id ? await updateCron(data.id, values) : await createCron(values)
         } catch (e) {

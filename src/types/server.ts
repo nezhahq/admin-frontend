@@ -26,7 +26,7 @@ export const AgentConfigSchema = z.object({
         ),
     ),
     ip_report_period: asOptionalField(z.coerce.number().int().min(30)),
-    nic_allowlist: asOptionalField(z.record(z.boolean())),
+    nic_allowlist: asOptionalField(z.record(z.string(), z.boolean())),
     nic_allowlist_raw: asOptionalField(
         z.string().refine(
             (val) => {
