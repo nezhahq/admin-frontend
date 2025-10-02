@@ -98,7 +98,7 @@ export function BlockButtonGroup<E, U>({
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="destructive" icon="ban" />
+                    <IconButton variant="destructive" icon="ban" className="text-white" />
                 </AlertDialogTrigger>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>
