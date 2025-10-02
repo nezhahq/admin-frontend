@@ -12,9 +12,9 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { Check, ChevronDown } from "lucide-react"
-import * as React from "react"
+import { forwardRef, ButtonHTMLAttributes, useState } from "react"
 
-interface ComboboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ComboboxProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     options: {
         label: string
         value: string
@@ -26,10 +26,10 @@ interface ComboboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     onValueChange: (value: string) => void
 }
 
-export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
+export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     ({ options, placeholder, defaultValue, className, onValueChange, ...props }, ref) => {
-        const [open, setOpen] = React.useState(false)
-        const [value, setValue] = React.useState(defaultValue)
+        const [open, setOpen] = useState(false)
+        const [value, setValue] = useState(defaultValue)
 
         return (
             <Popover open={open} onOpenChange={setOpen}>
