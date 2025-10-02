@@ -38,7 +38,7 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { type VariantProps, cva } from "class-variance-authority"
 import { CheckIcon, ChevronDown, WandSparkles, XIcon } from "lucide-react"
-import * as React from "react"
+import { useState, forwardRef, KeyboardEvent } from "react"
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -129,7 +129,7 @@ interface MultiSelectProps
     className?: string
 }
 
-export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
+export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
     (
         {
             options,
@@ -146,11 +146,11 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         },
         ref,
     ) => {
-        const [selectedValues, setSelectedValues] = React.useState<string[]>(defaultValue)
-        const [isPopoverOpen, setIsPopoverOpen] = React.useState(false)
-        const [isAnimating, setIsAnimating] = React.useState(false)
+        const [selectedValues, setSelectedValues] = useState<string[]>(defaultValue)
+        const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+        const [isAnimating, setIsAnimating] = useState(false)
 
-        const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
             if (event.key === "Enter") {
                 setIsPopoverOpen(true)
             } else if (event.key === "Backspace" && !event.currentTarget.value) {

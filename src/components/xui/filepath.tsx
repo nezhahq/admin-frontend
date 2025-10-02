@@ -15,13 +15,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { formatPath } from "@/lib/utils"
-import * as React from "react"
+import { Dispatch, SetStateAction, FC, useState, Fragment } from "react"
 
 const ITEMS_TO_DISPLAY = 3
 
 interface FilepathProps {
     path: string
-    setPath: React.Dispatch<React.SetStateAction<string>>
+    setPath: Dispatch<SetStateAction<string>>
 }
 
 function pathToItems(path: string) {
@@ -38,8 +38,8 @@ function pathToItems(path: string) {
     return result
 }
 
-export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
-    const [open, setOpen] = React.useState(false)
+export const Filepath: FC<FilepathProps> = ({ path, setPath }) => {
+    const [open, setOpen] = useState(false)
     const items = pathToItems(formatPath(path))
 
     return (
@@ -87,7 +87,7 @@ export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
                     </>
                 ) : null}
                 {items.slice(-ITEMS_TO_DISPLAY).map((item, index, slicedItems) => (
-                    <React.Fragment key={index}>
+                    <Fragment key={index}>
                         <BreadcrumbItem className="overflow-auto">
                             {item.href ? (
                                 <>
@@ -107,7 +107,7 @@ export const Filepath: React.FC<FilepathProps> = ({ path, setPath }) => {
                             )}
                         </BreadcrumbItem>
                         {index !== slicedItems.length - 1 ? <BreadcrumbSeparator /> : null}
-                    </React.Fragment>
+                    </Fragment>
                 ))}
             </BreadcrumbList>
         </Breadcrumb>
