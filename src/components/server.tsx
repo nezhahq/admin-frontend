@@ -21,7 +21,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -32,6 +31,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
 import { conv } from "@/lib/utils"
@@ -812,9 +812,13 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     {t("PublicNote.IPv4")}
                                                 </Label>
                                                 <div className="flex items-center gap-2 mt-2">
-                                                    <span className="text-xs">{t("PublicNote.None")}</span>
+                                                    <span className="text-xs">
+                                                        {t("PublicNote.None")}
+                                                    </span>
                                                     <Switch
-                                                        checked={publicNoteObj.planDataMod.IPv4 === "1"}
+                                                        checked={
+                                                            publicNoteObj.planDataMod.IPv4 === "1"
+                                                        }
                                                         onCheckedChange={(checked) =>
                                                             setPublicNoteObj((prev) => ({
                                                                 ...prev,
@@ -825,7 +829,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             }))
                                                         }
                                                     />
-                                                    <span className="text-xs">{t("PublicNote.Has")}</span>
+                                                    <span className="text-xs">
+                                                        {t("PublicNote.Has")}
+                                                    </span>
                                                 </div>
                                                 {publicNoteErrors["plan.IPv4"] && (
                                                     <p className="text-xs text-destructive mt-1">
@@ -838,9 +844,13 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     {t("PublicNote.IPv6")}
                                                 </Label>
                                                 <div className="flex items-center gap-2 mt-2">
-                                                    <span className="text-xs">{t("PublicNote.None")}</span>
+                                                    <span className="text-xs">
+                                                        {t("PublicNote.None")}
+                                                    </span>
                                                     <Switch
-                                                        checked={publicNoteObj.planDataMod.IPv6 === "1"}
+                                                        checked={
+                                                            publicNoteObj.planDataMod.IPv6 === "1"
+                                                        }
                                                         onCheckedChange={(checked) =>
                                                             setPublicNoteObj((prev) => ({
                                                                 ...prev,
@@ -851,7 +861,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             }))
                                                         }
                                                     />
-                                                    <span className="text-xs">{t("PublicNote.Has")}</span>
+                                                    <span className="text-xs">
+                                                        {t("PublicNote.Has")}
+                                                    </span>
                                                 </div>
                                                 {publicNoteErrors["plan.IPv6"] && (
                                                     <p className="text-xs text-destructive mt-1">
