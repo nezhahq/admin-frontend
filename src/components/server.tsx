@@ -43,10 +43,10 @@ import {
     normalizeISO,
     parsePublicNote,
     pruneEmpty,
+    readClipboard,
     toggleEndNoExpiry,
     validatePublicNote,
     writeClipboard,
-    readClipboard,
 } from "@/lib/public-note"
 import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
