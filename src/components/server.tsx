@@ -66,21 +66,19 @@ const serverFormSchema = z.object({
     name: z.string().min(1),
     note: asOptionalField(z.string()),
     public_note: asOptionalField(
-        z
-            .string()
-            .refine(
-                (val) => {
-                    const s = (val ?? "").trim()
-                    if (s.length === 0) return true
-                    try {
-                        const obj = JSON.parse(s)
-                        return PublicNoteSchema.safeParse(obj).success
-                    } catch {
-                        return false
-                    }
-                },
-                { message: "Invalid Public Note JSON" },
-            ),
+        z.string().refine(
+            (val) => {
+                const s = (val ?? "").trim()
+                if (s.length === 0) return true
+                try {
+                    const obj = JSON.parse(s)
+                    return PublicNoteSchema.safeParse(obj).success
+                } catch {
+                    return false
+                }
+            },
+            { message: "Invalid Public Note JSON" },
+        ),
     ),
     display_index: z.coerce.number().int(),
     hide_for_guest: asOptionalField(z.boolean()),
@@ -213,23 +211,23 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 const pnNormalized: PublicNote = {
                     billingDataMod: bd
                         ? {
-                            autoRenewal: bd.autoRenewal ?? "",
-                            cycle: bd.cycle ?? "",
-                            amount: bd.amount ?? "",
-                            startDate: normalizeISO(bd.startDate),
-                            endDate: normalizeISO(bd.endDate),
-                        }
+                              autoRenewal: bd.autoRenewal ?? "",
+                              cycle: bd.cycle ?? "",
+                              amount: bd.amount ?? "",
+                              startDate: normalizeISO(bd.startDate),
+                              endDate: normalizeISO(bd.endDate),
+                          }
                         : undefined,
                     planDataMod: pd
                         ? {
-                            bandwidth: pd.bandwidth ?? "",
-                            trafficVol: pd.trafficVol ?? "",
-                            trafficType: pd.trafficType ?? "",
-                            IPv4: pd.IPv4 ?? "0",
-                            IPv6: pd.IPv6 ?? "0",
-                            networkRoute: pd.networkRoute ?? "",
-                            extra: pd.extra ?? "",
-                        }
+                              bandwidth: pd.bandwidth ?? "",
+                              trafficVol: pd.trafficVol ?? "",
+                              trafficType: pd.trafficType ?? "",
+                              IPv4: pd.IPv4 ?? "0",
+                              IPv6: pd.IPv6 ?? "0",
+                              networkRoute: pd.networkRoute ?? "",
+                              extra: pd.extra ?? "",
+                          }
                         : undefined,
                 }
                 const jsonStr = JSON.stringify(pnNormalized)
@@ -493,10 +491,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     variant="outline"
                                                                     className="w-full justify-start text-left font-normal"
                                                                 >
-                                                                    {publicNoteObj.billingDataMod?.startDate
+                                                                    {publicNoteObj.billingDataMod
+                                                                        ?.startDate
                                                                         ? new Date(
-                                                                            publicNoteObj.billingDataMod!.startDate!,
-                                                                        ).toLocaleDateString()
+                                                                              publicNoteObj.billingDataMod!.startDate!,
+                                                                          ).toLocaleDateString()
                                                                         : "YYYY-MM-DD"}
                                                                 </Button>
                                                             </PopoverTrigger>
@@ -520,8 +519,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                                 .billingDataMod
                                                                                 ?.startDate
                                                                                 ? new Date(
-                                                                                    publicNoteObj.billingDataMod!.startDate!,
-                                                                                )
+                                                                                      publicNoteObj.billingDataMod!.startDate!,
+                                                                                  )
                                                                                 : undefined
                                                                         }
                                                                         onSelect={(d) => {
@@ -540,7 +539,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <p className="text-xs text-destructive mt-1">
                                                                 {
                                                                     publicNoteErrors[
-                                                                    "billing.startDate"
+                                                                        "billing.startDate"
                                                                     ]
                                                                 }
                                                             </p>
@@ -557,8 +556,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={toggleEndNoExpiryLocal}
                                                             >
-                                                                {publicNoteObj.billingDataMod?.endDate ===
-                                                                    "0000-00-00T23:59:59+08:00"
+                                                                {publicNoteObj.billingDataMod
+                                                                    ?.endDate ===
+                                                                "0000-00-00T23:59:59+08:00"
                                                                     ? t("PublicNote.CancelNoExpiry")
                                                                     : t("PublicNote.SetNoExpiry")}
                                                             </Button>
@@ -584,15 +584,20 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     variant="outline"
                                                                     className="w-full justify-start text-left font-normal"
                                                                 >
-                                                                    {publicNoteObj.billingDataMod?.endDate
+                                                                    {publicNoteObj.billingDataMod
+                                                                        ?.endDate
                                                                         ? publicNoteObj
-                                                                            .billingDataMod
-                                                                            ?.endDate ===
-                                                                            "0000-00-00T23:59:59+08:00"
-                                                                            ? t("PublicNote.NoExpiry")
+                                                                              .billingDataMod
+                                                                              ?.endDate ===
+                                                                          "0000-00-00T23:59:59+08:00"
+                                                                            ? t(
+                                                                                  "PublicNote.NoExpiry",
+                                                                              )
                                                                             : new Date(
-                                                                                publicNoteObj.billingDataMod?.endDate as string,
-                                                                            ).toLocaleDateString()
+                                                                                  publicNoteObj
+                                                                                      .billingDataMod
+                                                                                      ?.endDate as string,
+                                                                              ).toLocaleDateString()
                                                                         : "YYYY-MM-DD"}
                                                                 </Button>
                                                             </PopoverTrigger>
@@ -615,13 +620,15 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                             publicNoteObj
                                                                                 .billingDataMod
                                                                                 ?.endDate &&
-                                                                                publicNoteObj
-                                                                                    .billingDataMod
-                                                                                    ?.endDate !==
+                                                                            publicNoteObj
+                                                                                .billingDataMod
+                                                                                ?.endDate !==
                                                                                 "0000-00-00T23:59:59+08:00"
                                                                                 ? new Date(
-                                                                                    publicNoteObj.billingDataMod?.endDate as string,
-                                                                                )
+                                                                                      publicNoteObj
+                                                                                          .billingDataMod
+                                                                                          ?.endDate as string,
+                                                                                  )
                                                                                 : undefined
                                                                         }
                                                                         onSelect={(d) => {
@@ -641,7 +648,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <p className="text-xs text-destructive mt-1">
                                                                 {
                                                                     publicNoteErrors[
-                                                                    "billing.endDate"
+                                                                        "billing.endDate"
                                                                     ]
                                                                 }
                                                             </p>
@@ -658,7 +665,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 {t("PublicNote.Disabled")}
                                                             </span>
                                                             <Switch
-                                                                checked={publicNoteObj.billingDataMod?.autoRenewal === "1"}
+                                                                checked={
+                                                                    publicNoteObj.billingDataMod
+                                                                        ?.autoRenewal === "1"
+                                                                }
                                                                 onCheckedChange={(checked) =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.autoRenewal",
@@ -674,14 +684,14 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         {publicNoteErrors[
                                                             "billing.autoRenewal"
                                                         ] && (
-                                                                <p className="text-xs text-destructive mt-1">
-                                                                    {
-                                                                        publicNoteErrors[
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {
+                                                                    publicNoteErrors[
                                                                         "billing.autoRenewal"
-                                                                        ]
-                                                                    }
-                                                                </p>
-                                                            )}
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     <div className="space-y-1">
                                                         <div className="flex items-center gap-2">
@@ -710,7 +720,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 )
                                                             }
                                                             value={
-                                                                publicNoteObj.billingDataMod?.cycle ?? ""
+                                                                publicNoteObj.billingDataMod
+                                                                    ?.cycle ?? ""
                                                             }
                                                         >
                                                             <SelectTrigger>
@@ -772,7 +783,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Input
                                                             placeholder="200EUR"
                                                             value={
-                                                                publicNoteObj.billingDataMod?.amount ?? ""
+                                                                publicNoteObj.billingDataMod
+                                                                    ?.amount ?? ""
                                                             }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
@@ -797,7 +809,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Input
                                                             placeholder="30Mbps"
                                                             value={
-                                                                publicNoteObj.planDataMod?.bandwidth ?? ""
+                                                                publicNoteObj.planDataMod
+                                                                    ?.bandwidth ?? ""
                                                             }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
@@ -814,7 +827,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Input
                                                             placeholder="1TB/Month"
                                                             value={
-                                                                publicNoteObj.planDataMod?.trafficVol ?? ""
+                                                                publicNoteObj.planDataMod
+                                                                    ?.trafficVol ?? ""
                                                             }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
@@ -851,7 +865,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 )
                                                             }
                                                             value={
-                                                                publicNoteObj.planDataMod?.trafficType ?? ""
+                                                                publicNoteObj.planDataMod
+                                                                    ?.trafficType ?? ""
                                                             }
                                                         >
                                                             <SelectTrigger>
@@ -870,7 +885,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <p className="text-xs text-destructive mt-1">
                                                                 {
                                                                     publicNoteErrors[
-                                                                    "plan.trafficType"
+                                                                        "plan.trafficType"
                                                                     ]
                                                                 }
                                                             </p>
@@ -964,7 +979,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             placeholder={t(
                                                                 "PublicNote.CommaSeparated",
                                                             )}
-                                                            value={publicNoteObj.planDataMod?.extra ?? ""}
+                                                            value={
+                                                                publicNoteObj.planDataMod?.extra ??
+                                                                ""
+                                                            }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
                                                                     "planDataMod.extra",

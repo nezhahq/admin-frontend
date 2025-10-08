@@ -11,22 +11,26 @@ import i18n from "./i18n"
  * - Date fields can be empty, ISO-like, or the special value "0000-00-00T23:59:59+08:00"
  */
 export const PublicNoteSchema = z.object({
-    billingDataMod: z.object({
-        startDate: z.string().optional(),
-        endDate: z.string().optional(),
-        autoRenewal: z.string().optional().default(""),
-        cycle: z.string().optional().default(""),
-        amount: z.string().optional().default(""),
-    }).optional(),
-    planDataMod: z.object({
-        bandwidth: z.string().optional().default(""),
-        trafficVol: z.string().optional().default(""),
-        trafficType: z.string().optional().default(""),
-        IPv4: z.string().optional().default("0"),
-        IPv6: z.string().optional().default("0"),
-        networkRoute: z.string().optional().default(""),
-        extra: z.string().optional().default(""),
-    }).optional(),
+    billingDataMod: z
+        .object({
+            startDate: z.string().optional(),
+            endDate: z.string().optional(),
+            autoRenewal: z.string().optional().default(""),
+            cycle: z.string().optional().default(""),
+            amount: z.string().optional().default(""),
+        })
+        .optional(),
+    planDataMod: z
+        .object({
+            bandwidth: z.string().optional().default(""),
+            trafficVol: z.string().optional().default(""),
+            trafficType: z.string().optional().default(""),
+            IPv4: z.string().optional().default("0"),
+            IPv6: z.string().optional().default("0"),
+            networkRoute: z.string().optional().default(""),
+            extra: z.string().optional().default(""),
+        })
+        .optional(),
 })
 
 export type PublicNote = z.infer<typeof PublicNoteSchema>
@@ -152,7 +156,11 @@ export const detectPublicNoteMode = (s?: string): "structured" | "raw" => {
  * Immutable patch by path, for use in component wrappers around setPublicNoteObj.
  * Example path: "billingDataMod.startDate"
  */
-export const applyPublicNotePatch = (obj: PublicNote, path: string, value: string | undefined): PublicNote => {
+export const applyPublicNotePatch = (
+    obj: PublicNote,
+    path: string,
+    value: string | undefined,
+): PublicNote => {
     const keys = path.split(".")
     const draft: any = structuredClone ? structuredClone(obj) : JSON.parse(JSON.stringify(obj))
     let cur: any = draft
