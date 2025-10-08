@@ -38,6 +38,7 @@ import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
 import { ModelServer } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { HelpCircle } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -182,6 +183,16 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         >
     >({})
 
+    // Public note toggle: default disabled for new entries; auto-enabled when editing if existing content is present
+    const [publicNoteEnabled, setPublicNoteEnabled] = useState<boolean>(
+        !!(data?.public_note && data.public_note.trim().length > 0),
+    )
+    // Edit mode: default to raw text
+    const [publicNoteMode, setPublicNoteMode] = useState<"structured" | "raw">("structured")
+    // Raw text content: when enabled, submission always uses this string
+    const [publicNoteRaw, setPublicNoteRaw] = useState<string>(data?.public_note ?? "")
+    const [publicNoteRawError, setPublicNoteRawError] = useState<string | undefined>(undefined)
+
     const isValidISOLike = (v: string) => {
         if (!v) return true
         // special marker for "no expiry"
@@ -205,7 +216,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         if (pn.billingDataMod.cycle && !/^(Day|Week|Month|Year)$/i.test(pn.billingDataMod.cycle)) {
             errs["billing.cycle"] = t("Validation.MustBeDayWeekMonthYear")
         }
-        // amount 允许任意非空字符串或空
+        // amount: allow any non-empty string or empty
         if (pn.planDataMod.trafficType && !/^(1|2)$/.test(pn.planDataMod.trafficType)) {
             errs["plan.trafficType"] = t("Validation.MustBe1Or2")
         }
@@ -228,35 +239,96 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 ? JSON.parse(values.override_ddns_domains_raw)
                 : undefined
 
-            // validate structured fields
-            const { errors, valid } = validatePublicNote(publicNoteObj)
-            if (!valid) {
-                setPublicNoteErrors(errors)
-                toast(t("Error"), { description: t("Validation.InvalidForm") })
-                return
-            }
-            setPublicNoteErrors({})
+            // Public note submission strategy:
+            // - Disabled: submit undefined to avoid default values causing frontend rendering issues
+            // - Enabled: always rely on raw string; if in structured mode, serialize to string before submitting
+            if (!publicNoteEnabled) {
+                values.public_note = undefined
+            } else {
+                if (publicNoteMode === "raw") {
+                    const raw = (publicNoteRaw ?? "").trim()
+                    if (raw.length === 0) {
+                        values.public_note = undefined
+                        setPublicNoteRawError(undefined)
+                    } else {
+                        try {
+                            const parsed = JSON.parse(raw)
+                            // Require an object; reject numbers, strings, booleans, null, arrays (if you also want to reject arrays, keep the check below)
+                            if (
+                                typeof parsed !== "object" ||
+                                parsed === null ||
+                                Array.isArray(parsed)
+                            ) {
+                                throw new Error("Public note must be a JSON object")
+                            }
+                            // Normalize JSON before submit
+                            values.public_note = JSON.stringify(parsed)
+                            setPublicNoteRawError(undefined)
+                        } catch {
+                            setPublicNoteRawError(t("Validation.InvalidJSON"))
+                            toast(t("Error"), { description: t("Validation.InvalidJSON") })
+                            return
+                        }
+                    }
+                } else {
+                    // Validation and normalization in structured mode, used only to produce the final raw string
+                    const { errors, valid } = validatePublicNote(publicNoteObj)
+                    if (!valid) {
+                        setPublicNoteErrors(errors)
+                        toast(t("Error"), { description: t("Validation.InvalidForm") })
+                        return
+                    }
+                    setPublicNoteErrors({})
 
-            // normalize datetime-local to ISO string if provided
-            const normalizeISO = (v: string) => {
-                if (!v) return v
-                // keep special "no expiry" value as-is
-                if (v === "0000-00-00T23:59:59+08:00") return v
-                const date = new Date(v)
-                return isNaN(date.getTime()) ? v : date.toISOString()
-            }
-            const pnNormalized: PublicNote = {
-                billingDataMod: {
-                    ...publicNoteObj.billingDataMod,
-                    startDate: normalizeISO(publicNoteObj.billingDataMod.startDate),
-                    endDate: normalizeISO(publicNoteObj.billingDataMod.endDate),
-                    // keep others as-is
-                },
-                planDataMod: { ...publicNoteObj.planDataMod },
+                    const normalizeISO = (v: string) => {
+                        if (!v) return v
+                        if (v === "0000-00-00T23:59:59+08:00") return v
+                        const date = new Date(v)
+                        return isNaN(date.getTime()) ? v : date.toISOString()
+                    }
+                    const pnNormalized: PublicNote = {
+                        billingDataMod: {
+                            ...publicNoteObj.billingDataMod,
+                            // Cycle may be empty; submission no longer forces fallback
+                            startDate: normalizeISO(publicNoteObj.billingDataMod.startDate),
+                            endDate: normalizeISO(publicNoteObj.billingDataMod.endDate),
+                        },
+                        planDataMod: { ...publicNoteObj.planDataMod },
+                    }
+                    // Prune empty-string fields recursively; remove empty objects
+                    const pruneEmpty = (obj: any): any => {
+                        if (obj === null || obj === undefined) return obj
+                        if (typeof obj !== "object") return obj
+                        const result: any = Array.isArray(obj) ? [] : {}
+                        for (const key of Object.keys(obj)) {
+                            const val = (obj as any)[key]
+                            // Keep non-empty primitive values; remove empty strings
+                            if (typeof val === "string") {
+                                const trimmed = val.trim()
+                                if (trimmed === "") continue
+                                result[key] = val
+                            } else if (typeof val === "object" && val !== null) {
+                                const prunedChild = pruneEmpty(val)
+                                // Only keep child if it has keys (for objects) or length (for arrays)
+                                if (Array.isArray(prunedChild)) {
+                                    if (prunedChild.length > 0) result[key] = prunedChild
+                                } else {
+                                    if (Object.keys(prunedChild).length > 0)
+                                        result[key] = prunedChild
+                                }
+                            } else {
+                                // Keep booleans, numbers, and other non-object values as-is
+                                result[key] = val
+                            }
+                        }
+                        return result
+                    }
+                    const pruned = pruneEmpty(pnNormalized)
+                    const jsonStr = JSON.stringify(pruned)
+                    values.public_note = jsonStr.length > 2 ? jsonStr : undefined
+                }
             }
 
-            // serialize structured public note back to JSON string
-            values.public_note = JSON.stringify(pnNormalized)
             await updateServer(data!.id!, values)
         } catch (e) {
             console.error(e)
@@ -404,526 +476,772 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                {/* Structured Public Note fields */}
+                                {/* Public Note controls (optional + dual mode) */}
                                 <div className="space-y-3">
                                     <div className="space-y-1">
-                                        <FormLabel>{t("Public") + t("Note")}</FormLabel>
-                                        <p className="text-xs text-muted-foreground">
-                                            {t("PublicNote.DropdownHint")}
-                                        </p>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <FormLabel>{t("Public") + t("Note")}</FormLabel>
+                                                <a
+                                                    href="https://nezha.wiki/guide/servers.html#%E5%85%AC%E5%BC%80%E5%A4%87%E6%B3%A8%E8%AE%BE%E7%BD%AE"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center text-muted-foreground hover:text-foreground"
+                                                >
+                                                    <HelpCircle className="h-4 w-4" />
+                                                </a>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs">
+                                                    {publicNoteEnabled
+                                                        ? (t("PublicNote.Enabled") ?? "Enabled")
+                                                        : (t("PublicNote.Disabled") ?? "Disabled")}
+                                                </span>
+                                                <Switch
+                                                    checked={publicNoteEnabled}
+                                                    onCheckedChange={setPublicNoteEnabled}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div className="rounded-md border p-3 space-y-3">
-                                        <div className="text-sm font-medium opacity-80">
-                                            {t("PublicNote.Billing")}
+                                    {/* Toggle: when disabled, hide edit controls and submit an empty value */}
+                                    <div className="flex items-center gap-4">
+                                        {/* Mode switch: Raw text / Custom fields */}
+                                        {publicNoteEnabled && (
+                                            <div className="flex items-center gap-2">
+                                                {/* Show 'structured' first, then 'raw' */}
+                                                <Button
+                                                    type="button"
+                                                    variant={
+                                                        publicNoteMode === "structured"
+                                                            ? "default"
+                                                            : "outline"
+                                                    }
+                                                    className="text-xs h-7"
+                                                    onClick={() => {
+                                                        setPublicNoteMode("structured")
+                                                        setPublicNoteObj(
+                                                            parsePublicNote(publicNoteRaw),
+                                                        )
+                                                    }}
+                                                >
+                                                    {t("PublicNote.CustomFields") ?? "Custom"}
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant={
+                                                        publicNoteMode === "raw"
+                                                            ? "default"
+                                                            : "outline"
+                                                    }
+                                                    className="text-xs h-7"
+                                                    onClick={() => setPublicNoteMode("raw")}
+                                                >
+                                                    {t("PublicNote.RawText") ?? "Raw"}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Raw text mode: shown by default; submission uses this string */}
+                                    {publicNoteEnabled && publicNoteMode === "raw" && (
+                                        <div className="space-y-2">
+                                            <Textarea
+                                                className="resize-y"
+                                                value={publicNoteRaw}
+                                                onChange={(e) => setPublicNoteRaw(e.target.value)}
+                                                placeholder="{... JSON or empty ...}"
+                                                rows={5}
+                                            />
+                                            {publicNoteRawError && (
+                                                <p className="text-xs text-destructive mt-1">
+                                                    {publicNoteRawError}
+                                                </p>
+                                            )}
+                                            <p className="text-xs text-muted-foreground">
+                                                {t("PublicNote.EditRawHint")}
+                                            </p>
                                         </div>
-                                        <div className="grid gap-3 sm:grid-cols-2">
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.StartDate")}
-                                                </Label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
+                                    )}
+
+                                    {/* Custom fields mode: keep structured editing; serialize to string on submit */}
+                                    {publicNoteEnabled && publicNoteMode === "structured" && (
+                                        <>
+                                            <div className="rounded-md border p-3 space-y-3">
+                                                <div className="text-sm font-medium opacity-80">
+                                                    {t("PublicNote.Billing")}
+                                                </div>
+                                                <div className="grid gap-3 sm:grid-cols-2">
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.StartDate")}
+                                                        </Label>
+                                                        {/* Add 'Clear' button to allow removing the date */}
                                                         <Button
+                                                            type="button"
                                                             variant="outline"
-                                                            className="w-full justify-start text-left font-normal"
+                                                            className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700 ml-2"
+                                                            onClick={() =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    billingDataMod: {
+                                                                        ...prev.billingDataMod,
+                                                                        startDate: "",
+                                                                    },
+                                                                }))
+                                                            }
                                                         >
-                                                            {publicNoteObj.billingDataMod.startDate
-                                                                ? new Date(
-                                                                      publicNoteObj.billingDataMod.startDate,
-                                                                  ).toLocaleDateString()
-                                                                : "YYYY-MM-DD"}
+                                                            {t("PublicNote.ClearDate") ?? "Clear"}
                                                         </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="p-0 w-[300px] max-h-[60dvh] overflow-hidden"
-                                                        align="start"
-                                                    >
-                                                        <div className="max-h-[500px] overflow-y-auto">
-                                                            <Calendar
-                                                                className="w-full min-h-[320px]"
-                                                                mode="single"
-                                                                captionLayout="dropdown"
-                                                                startMonth={new Date(2000, 0)}
-                                                                endMonth={new Date(2050, 11)}
-                                                                selected={
-                                                                    publicNoteObj.billingDataMod
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    className="w-full justify-start text-left font-normal"
+                                                                >
+                                                                    {publicNoteObj.billingDataMod
                                                                         .startDate
                                                                         ? new Date(
                                                                               publicNoteObj.billingDataMod.startDate,
-                                                                          )
-                                                                        : undefined
-                                                                }
-                                                                onSelect={(d) => {
-                                                                    if (!d) return
-                                                                    setPublicNoteObj((prev) => {
-                                                                        const prevDateStr =
-                                                                            prev.billingDataMod
+                                                                          ).toLocaleDateString()
+                                                                        : "YYYY-MM-DD"}
+                                                                </Button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="p-0 w-[300px] max-h-[60dvh] overflow-hidden"
+                                                                align="start"
+                                                            >
+                                                                <div className="max-h-[500px] overflow-y-auto">
+                                                                    <Calendar
+                                                                        className="w-full min-h-[320px]"
+                                                                        mode="single"
+                                                                        captionLayout="dropdown"
+                                                                        startMonth={
+                                                                            new Date(2000, 0)
+                                                                        }
+                                                                        endMonth={
+                                                                            new Date(2050, 11)
+                                                                        }
+                                                                        selected={
+                                                                            publicNoteObj
+                                                                                .billingDataMod
                                                                                 .startDate
-                                                                        if (prevDateStr) {
-                                                                            const pd = new Date(
-                                                                                prevDateStr,
+                                                                                ? new Date(
+                                                                                      publicNoteObj.billingDataMod.startDate,
+                                                                                  )
+                                                                                : undefined
+                                                                        }
+                                                                        onSelect={(d) => {
+                                                                            if (!d) return
+                                                                            setPublicNoteObj(
+                                                                                (prev) => {
+                                                                                    const prevDateStr =
+                                                                                        prev
+                                                                                            .billingDataMod
+                                                                                            .startDate
+                                                                                    if (
+                                                                                        prevDateStr
+                                                                                    ) {
+                                                                                        const pd =
+                                                                                            new Date(
+                                                                                                prevDateStr,
+                                                                                            )
+                                                                                        if (
+                                                                                            !isNaN(
+                                                                                                pd.getTime(),
+                                                                                            )
+                                                                                        ) {
+                                                                                            d.setHours(
+                                                                                                pd.getHours(),
+                                                                                                pd.getMinutes(),
+                                                                                                pd.getSeconds(),
+                                                                                                0,
+                                                                                            )
+                                                                                        }
+                                                                                    }
+                                                                                    return {
+                                                                                        ...prev,
+                                                                                        billingDataMod:
+                                                                                            {
+                                                                                                ...prev.billingDataMod,
+                                                                                                startDate:
+                                                                                                    d.toISOString(),
+                                                                                            },
+                                                                                    }
+                                                                                },
                                                                             )
-                                                                            // 仅在有效日期时复制时分秒
-                                                                            if (
-                                                                                !isNaN(pd.getTime())
-                                                                            ) {
-                                                                                d.setHours(
-                                                                                    pd.getHours(),
-                                                                                    pd.getMinutes(),
-                                                                                    pd.getSeconds(),
-                                                                                    0,
-                                                                                )
-                                                                            }
-                                                                        }
-                                                                        return {
-                                                                            ...prev,
-                                                                            billingDataMod: {
-                                                                                ...prev.billingDataMod,
-                                                                                startDate:
-                                                                                    d.toISOString(),
-                                                                            },
-                                                                        }
-                                                                    })
-                                                                }}
-                                                                autoFocus
-                                                            />
-                                                        </div>
-                                                    </PopoverContent>
-                                                </Popover>
-                                                {publicNoteErrors["billing.startDate"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["billing.startDate"]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Label className="text-xs">
-                                                        {t("PublicNote.EndDate")}
-                                                    </Label>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
-                                                        onClick={() =>
-                                                            setPublicNoteObj((prev) => ({
-                                                                ...prev,
-                                                                billingDataMod: {
-                                                                    ...prev.billingDataMod,
-                                                                    endDate:
-                                                                        prev.billingDataMod
-                                                                            .endDate ===
-                                                                        "0000-00-00T23:59:59+08:00"
-                                                                            ? ""
-                                                                            : "0000-00-00T23:59:59+08:00",
-                                                                },
-                                                            }))
-                                                        }
-                                                    >
-                                                        {publicNoteObj.billingDataMod.endDate ===
-                                                        "0000-00-00T23:59:59+08:00"
-                                                            ? t("PublicNote.CancelNoExpiry")
-                                                            : t("PublicNote.SetNoExpiry")}
-                                                    </Button>
-                                                </div>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className="w-full justify-start text-left font-normal"
-                                                        >
-                                                            {publicNoteObj.billingDataMod.endDate
-                                                                ? publicNoteObj.billingDataMod
-                                                                      .endDate ===
-                                                                  "0000-00-00T23:59:59+08:00"
-                                                                    ? t("PublicNote.NoExpiry")
-                                                                    : new Date(
-                                                                          publicNoteObj.billingDataMod.endDate,
-                                                                      ).toLocaleDateString()
-                                                                : "YYYY-MM-DD"}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="p-0 w-[300px] max-h-[60dvh] overflow-hidden"
-                                                        align="start"
-                                                    >
-                                                        <div className="max-h-[500px] overflow-y-auto">
-                                                            <Calendar
-                                                                className="w-full min-h-[320px]"
-                                                                mode="single"
-                                                                captionLayout="dropdown"
-                                                                startMonth={new Date(2000, 0)}
-                                                                endMonth={new Date(2050, 11)}
-                                                                selected={
-                                                                    publicNoteObj.billingDataMod
-                                                                        .endDate &&
-                                                                    publicNoteObj.billingDataMod
-                                                                        .endDate !==
-                                                                        "0000-00-00T23:59:59+08:00"
-                                                                        ? new Date(
-                                                                              publicNoteObj.billingDataMod.endDate,
-                                                                          )
-                                                                        : undefined
+                                                                        }}
+                                                                        autoFocus
+                                                                    />
+                                                                </div>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        {publicNoteErrors["billing.startDate"] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {
+                                                                    publicNoteErrors[
+                                                                        "billing.startDate"
+                                                                    ]
                                                                 }
-                                                                onSelect={(d) => {
-                                                                    if (!d) return
-                                                                    setPublicNoteObj((prev) => {
-                                                                        const prevDateStr =
-                                                                            prev.billingDataMod
-                                                                                .endDate
-                                                                        if (prevDateStr) {
-                                                                            const pd = new Date(
-                                                                                prevDateStr,
-                                                                            )
-                                                                            // 仅在有效日期时复制时分秒（特殊“不过期”值不会影响）
-                                                                            if (
-                                                                                !isNaN(pd.getTime())
-                                                                            ) {
-                                                                                d.setHours(
-                                                                                    pd.getHours(),
-                                                                                    pd.getMinutes(),
-                                                                                    pd.getSeconds(),
-                                                                                    0,
-                                                                                )
-                                                                            }
-                                                                        }
-                                                                        return {
-                                                                            ...prev,
-                                                                            billingDataMod: {
-                                                                                ...prev.billingDataMod,
-                                                                                endDate:
-                                                                                    d.toISOString(),
-                                                                            },
-                                                                        }
-                                                                    })
-                                                                }}
-                                                                autoFocus
-                                                            />
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <Label className="text-xs">
+                                                                {t("PublicNote.EndDate")}
+                                                            </Label>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            endDate:
+                                                                                prev.billingDataMod
+                                                                                    .endDate ===
+                                                                                "0000-00-00T23:59:59+08:00"
+                                                                                    ? ""
+                                                                                    : "0000-00-00T23:59:59+08:00",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {publicNoteObj.billingDataMod
+                                                                    .endDate ===
+                                                                "0000-00-00T23:59:59+08:00"
+                                                                    ? t("PublicNote.CancelNoExpiry")
+                                                                    : t("PublicNote.SetNoExpiry")}
+                                                            </Button>
+                                                            {/* Add 'Clear' button to allow removing the date */}
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            endDate: "",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {t("PublicNote.ClearDate") ??
+                                                                    "Clear"}
+                                                            </Button>
                                                         </div>
-                                                    </PopoverContent>
-                                                </Popover>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    className="w-full justify-start text-left font-normal"
+                                                                >
+                                                                    {publicNoteObj.billingDataMod
+                                                                        .endDate
+                                                                        ? publicNoteObj
+                                                                              .billingDataMod
+                                                                              .endDate ===
+                                                                          "0000-00-00T23:59:59+08:00"
+                                                                            ? t(
+                                                                                  "PublicNote.NoExpiry",
+                                                                              )
+                                                                            : new Date(
+                                                                                  publicNoteObj.billingDataMod.endDate,
+                                                                              ).toLocaleDateString()
+                                                                        : "YYYY-MM-DD"}
+                                                                </Button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="p-0 w-[300px] max-h-[60dvh] overflow-hidden"
+                                                                align="start"
+                                                            >
+                                                                <div className="max-h-[500px] overflow-y-auto">
+                                                                    <Calendar
+                                                                        className="w-full min-h-[320px]"
+                                                                        mode="single"
+                                                                        captionLayout="dropdown"
+                                                                        startMonth={
+                                                                            new Date(2000, 0)
+                                                                        }
+                                                                        endMonth={
+                                                                            new Date(2050, 11)
+                                                                        }
+                                                                        selected={
+                                                                            publicNoteObj
+                                                                                .billingDataMod
+                                                                                .endDate &&
+                                                                            publicNoteObj
+                                                                                .billingDataMod
+                                                                                .endDate !==
+                                                                                "0000-00-00T23:59:59+08:00"
+                                                                                ? new Date(
+                                                                                      publicNoteObj.billingDataMod.endDate,
+                                                                                  )
+                                                                                : undefined
+                                                                        }
+                                                                        onSelect={(d) => {
+                                                                            if (!d) return
+                                                                            setPublicNoteObj(
+                                                                                (prev) => {
+                                                                                    const prevDateStr =
+                                                                                        prev
+                                                                                            .billingDataMod
+                                                                                            .endDate
+                                                                                    if (
+                                                                                        prevDateStr
+                                                                                    ) {
+                                                                                        const pd =
+                                                                                            new Date(
+                                                                                                prevDateStr,
+                                                                                            )
+                                                                                        if (
+                                                                                            !isNaN(
+                                                                                                pd.getTime(),
+                                                                                            )
+                                                                                        ) {
+                                                                                            d.setHours(
+                                                                                                pd.getHours(),
+                                                                                                pd.getMinutes(),
+                                                                                                pd.getSeconds(),
+                                                                                                0,
+                                                                                            )
+                                                                                        }
+                                                                                    }
+                                                                                    return {
+                                                                                        ...prev,
+                                                                                        billingDataMod:
+                                                                                            {
+                                                                                                ...prev.billingDataMod,
+                                                                                                endDate:
+                                                                                                    d.toISOString(),
+                                                                                            },
+                                                                                    }
+                                                                                },
+                                                                            )
+                                                                        }}
+                                                                        autoFocus
+                                                                    />
+                                                                </div>
+                                                            </PopoverContent>
+                                                        </Popover>
 
-                                                {publicNoteErrors["billing.endDate"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["billing.endDate"]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.AutoRenewal")}
-                                                </Label>
-                                                <Select
-                                                    onValueChange={(val) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            billingDataMod: {
-                                                                ...prev.billingDataMod,
-                                                                autoRenewal: val,
-                                                            },
-                                                        }))
-                                                    }
-                                                    defaultValue={
-                                                        publicNoteObj.billingDataMod.autoRenewal ||
-                                                        "0"
-                                                    }
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="1">
-                                                            {t("PublicNote.Enabled")}
-                                                        </SelectItem>
-                                                        <SelectItem value="0">
-                                                            {t("PublicNote.Disabled")}
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                {publicNoteErrors["billing.autoRenewal"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["billing.autoRenewal"]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.Cycle")}
-                                                </Label>
-                                                <Select
-                                                    onValueChange={(val) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            billingDataMod: {
-                                                                ...prev.billingDataMod,
-                                                                cycle: val,
-                                                            },
-                                                        }))
-                                                    }
-                                                    defaultValue={
-                                                        publicNoteObj.billingDataMod.cycle ||
-                                                        "Month"
-                                                    }
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select cycle" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="Day">
-                                                            {t("PublicNote.Day")}
-                                                        </SelectItem>
-                                                        <SelectItem value="Week">
-                                                            {t("PublicNote.Week")}
-                                                        </SelectItem>
-                                                        <SelectItem value="Month">
-                                                            {t("PublicNote.Month")}
-                                                        </SelectItem>
-                                                        <SelectItem value="Year">
-                                                            {t("PublicNote.Year")}
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                {publicNoteErrors["billing.cycle"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["billing.cycle"]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1 sm:col-span-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Label className="text-xs">
-                                                        {t("PublicNote.Amount")}
-                                                    </Label>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
-                                                        onClick={() =>
-                                                            setPublicNoteObj((prev) => ({
-                                                                ...prev,
-                                                                billingDataMod: {
-                                                                    ...prev.billingDataMod,
-                                                                    amount: "0",
-                                                                },
-                                                            }))
-                                                        }
-                                                    >
-                                                        {t("PublicNote.Free")}
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
-                                                        onClick={() =>
-                                                            setPublicNoteObj((prev) => ({
-                                                                ...prev,
-                                                                billingDataMod: {
-                                                                    ...prev.billingDataMod,
-                                                                    amount: "-1",
-                                                                },
-                                                            }))
-                                                        }
-                                                    >
-                                                        {t("PublicNote.PayAsYouGo")}
-                                                    </Button>
+                                                        {publicNoteErrors["billing.endDate"] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {
+                                                                    publicNoteErrors[
+                                                                        "billing.endDate"
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <Label className="text-xs">
+                                                                {t("PublicNote.AutoRenewal")}
+                                                            </Label>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            autoRenewal: "",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {t("PublicNote.Clear") ?? "Clear"}
+                                                            </Button>
+                                                        </div>
+                                                        <Select
+                                                            onValueChange={(val) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    billingDataMod: {
+                                                                        ...prev.billingDataMod,
+                                                                        autoRenewal: val,
+                                                                    },
+                                                                }))
+                                                            }
+                                                            value={
+                                                                publicNoteObj.billingDataMod
+                                                                    .autoRenewal ?? ""
+                                                            }
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="1">
+                                                                    {t("PublicNote.Enabled")}
+                                                                </SelectItem>
+                                                                <SelectItem value="0">
+                                                                    {t("PublicNote.Disabled")}
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        {publicNoteErrors[
+                                                            "billing.autoRenewal"
+                                                        ] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {
+                                                                    publicNoteErrors[
+                                                                        "billing.autoRenewal"
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <Label className="text-xs">
+                                                                {t("PublicNote.Cycle")}
+                                                            </Label>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            cycle: "",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {t("PublicNote.Clear") ?? "Clear"}
+                                                            </Button>
+                                                        </div>
+                                                        <Select
+                                                            onValueChange={(val) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    billingDataMod: {
+                                                                        ...prev.billingDataMod,
+                                                                        cycle: val,
+                                                                    },
+                                                                }))
+                                                            }
+                                                            value={
+                                                                publicNoteObj.billingDataMod
+                                                                    .cycle ?? ""
+                                                            }
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select cycle" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="Day">
+                                                                    {t("PublicNote.Day")}
+                                                                </SelectItem>
+                                                                <SelectItem value="Week">
+                                                                    {t("PublicNote.Week")}
+                                                                </SelectItem>
+                                                                <SelectItem value="Month">
+                                                                    {t("PublicNote.Month")}
+                                                                </SelectItem>
+                                                                <SelectItem value="Year">
+                                                                    {t("PublicNote.Year")}
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        {publicNoteErrors["billing.cycle"] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {publicNoteErrors["billing.cycle"]}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1 sm:col-span-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Label className="text-xs">
+                                                                {t("PublicNote.Amount")}
+                                                            </Label>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            amount: "0",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {t("PublicNote.Free")}
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        billingDataMod: {
+                                                                            ...prev.billingDataMod,
+                                                                            amount: "-1",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {t("PublicNote.PayAsYouGo")}
+                                                            </Button>
+                                                        </div>
+                                                        <Input
+                                                            placeholder="200EUR"
+                                                            value={
+                                                                publicNoteObj.billingDataMod.amount
+                                                            }
+                                                            onChange={(e) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    billingDataMod: {
+                                                                        ...prev.billingDataMod,
+                                                                        amount: e.target.value,
+                                                                    },
+                                                                }))
+                                                            }
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <Input
-                                                    placeholder="200EUR"
-                                                    value={publicNoteObj.billingDataMod.amount}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            billingDataMod: {
-                                                                ...prev.billingDataMod,
-                                                                amount: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div className="rounded-md border p-3 space-y-3">
-                                        <div className="text-sm font-medium opacity-80">
-                                            {t("PublicNote.Plan")}
-                                        </div>
-                                        <div className="grid gap-3 sm:grid-cols-2">
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.Bandwidth")}
-                                                </Label>
-                                                <Input
-                                                    placeholder="30Mbps"
-                                                    value={publicNoteObj.planDataMod.bandwidth}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                bandwidth: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.TrafficVolume")}
-                                                </Label>
-                                                <Input
-                                                    placeholder="1TB/Month"
-                                                    value={publicNoteObj.planDataMod.trafficVol}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                trafficVol: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.TrafficType")}
-                                                </Label>
-                                                <Select
-                                                    onValueChange={(val) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                trafficType: val,
-                                                            },
-                                                        }))
-                                                    }
-                                                    defaultValue={
-                                                        publicNoteObj.planDataMod.trafficType || "2"
-                                                    }
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select type" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="1">
-                                                            {t("PublicNote.Inbound")}
-                                                        </SelectItem>
-                                                        <SelectItem value="2">
-                                                            {t("PublicNote.Both")}
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                {publicNoteErrors["plan.trafficType"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["plan.trafficType"]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.IPv4")}
-                                                </Label>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <span className="text-xs">
-                                                        {t("PublicNote.None")}
-                                                    </span>
-                                                    <Switch
-                                                        checked={
-                                                            publicNoteObj.planDataMod.IPv4 === "1"
-                                                        }
-                                                        onCheckedChange={(checked) =>
-                                                            setPublicNoteObj((prev) => ({
-                                                                ...prev,
-                                                                planDataMod: {
-                                                                    ...prev.planDataMod,
-                                                                    IPv4: checked ? "1" : "0",
-                                                                },
-                                                            }))
-                                                        }
-                                                    />
-                                                    <span className="text-xs">
-                                                        {t("PublicNote.Has")}
-                                                    </span>
+                                            <div className="rounded-md border p-3 space-y-3">
+                                                <div className="text-sm font-medium opacity-80">
+                                                    {t("PublicNote.Plan")}
                                                 </div>
-                                                {publicNoteErrors["plan.IPv4"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["plan.IPv4"]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.IPv6")}
-                                                </Label>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <span className="text-xs">
-                                                        {t("PublicNote.None")}
-                                                    </span>
-                                                    <Switch
-                                                        checked={
-                                                            publicNoteObj.planDataMod.IPv6 === "1"
-                                                        }
-                                                        onCheckedChange={(checked) =>
-                                                            setPublicNoteObj((prev) => ({
-                                                                ...prev,
-                                                                planDataMod: {
-                                                                    ...prev.planDataMod,
-                                                                    IPv6: checked ? "1" : "0",
-                                                                },
-                                                            }))
-                                                        }
-                                                    />
-                                                    <span className="text-xs">
-                                                        {t("PublicNote.Has")}
-                                                    </span>
+                                                <div className="grid gap-3 sm:grid-cols-2">
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.Bandwidth")}
+                                                        </Label>
+                                                        <Input
+                                                            placeholder="30Mbps"
+                                                            value={
+                                                                publicNoteObj.planDataMod.bandwidth
+                                                            }
+                                                            onChange={(e) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    planDataMod: {
+                                                                        ...prev.planDataMod,
+                                                                        bandwidth: e.target.value,
+                                                                    },
+                                                                }))
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.TrafficVolume")}
+                                                        </Label>
+                                                        <Input
+                                                            placeholder="1TB/Month"
+                                                            value={
+                                                                publicNoteObj.planDataMod.trafficVol
+                                                            }
+                                                            onChange={(e) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    planDataMod: {
+                                                                        ...prev.planDataMod,
+                                                                        trafficVol: e.target.value,
+                                                                    },
+                                                                }))
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <Label className="text-xs">
+                                                                {t("PublicNote.TrafficType")}
+                                                            </Label>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                onClick={() =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        planDataMod: {
+                                                                            ...prev.planDataMod,
+                                                                            trafficType: "",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            >
+                                                                {t("PublicNote.Clear") ?? "Clear"}
+                                                            </Button>
+                                                        </div>
+                                                        <Select
+                                                            onValueChange={(val) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    planDataMod: {
+                                                                        ...prev.planDataMod,
+                                                                        trafficType: val,
+                                                                    },
+                                                                }))
+                                                            }
+                                                            value={
+                                                                publicNoteObj.planDataMod
+                                                                    .trafficType ?? ""
+                                                            }
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="1">
+                                                                    {t("PublicNote.Inbound")}
+                                                                </SelectItem>
+                                                                <SelectItem value="2">
+                                                                    {t("PublicNote.Both")}
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        {publicNoteErrors["plan.trafficType"] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {
+                                                                    publicNoteErrors[
+                                                                        "plan.trafficType"
+                                                                    ]
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.IPv4")}
+                                                        </Label>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <span className="text-xs">
+                                                                {t("PublicNote.None")}
+                                                            </span>
+                                                            <Switch
+                                                                checked={
+                                                                    publicNoteObj.planDataMod
+                                                                        .IPv4 === "1"
+                                                                }
+                                                                onCheckedChange={(checked) =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        planDataMod: {
+                                                                            ...prev.planDataMod,
+                                                                            IPv4: checked
+                                                                                ? "1"
+                                                                                : "0",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            />
+                                                            <span className="text-xs">
+                                                                {t("PublicNote.Has")}
+                                                            </span>
+                                                        </div>
+                                                        {publicNoteErrors["plan.IPv4"] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {publicNoteErrors["plan.IPv4"]}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.IPv6")}
+                                                        </Label>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <span className="text-xs">
+                                                                {t("PublicNote.None")}
+                                                            </span>
+                                                            <Switch
+                                                                checked={
+                                                                    publicNoteObj.planDataMod
+                                                                        .IPv6 === "1"
+                                                                }
+                                                                onCheckedChange={(checked) =>
+                                                                    setPublicNoteObj((prev) => ({
+                                                                        ...prev,
+                                                                        planDataMod: {
+                                                                            ...prev.planDataMod,
+                                                                            IPv6: checked
+                                                                                ? "1"
+                                                                                : "0",
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            />
+                                                            <span className="text-xs">
+                                                                {t("PublicNote.Has")}
+                                                            </span>
+                                                        </div>
+                                                        {publicNoteErrors["plan.IPv6"] && (
+                                                            <p className="text-xs text-destructive mt-1">
+                                                                {publicNoteErrors["plan.IPv6"]}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.NetworkRoute")}
+                                                        </Label>
+                                                        <Input
+                                                            placeholder={t(
+                                                                "PublicNote.CommaSeparated",
+                                                            )}
+                                                            value={
+                                                                publicNoteObj.planDataMod
+                                                                    .networkRoute
+                                                            }
+                                                            onChange={(e) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    planDataMod: {
+                                                                        ...prev.planDataMod,
+                                                                        networkRoute:
+                                                                            e.target.value,
+                                                                    },
+                                                                }))
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1 sm:col-span-2">
+                                                        <Label className="text-xs">
+                                                            {t("PublicNote.Extra")}
+                                                        </Label>
+                                                        <Input
+                                                            placeholder={t(
+                                                                "PublicNote.CommaSeparated",
+                                                            )}
+                                                            value={publicNoteObj.planDataMod.extra}
+                                                            onChange={(e) =>
+                                                                setPublicNoteObj((prev) => ({
+                                                                    ...prev,
+                                                                    planDataMod: {
+                                                                        ...prev.planDataMod,
+                                                                        extra: e.target.value,
+                                                                    },
+                                                                }))
+                                                            }
+                                                        />
+                                                    </div>
                                                 </div>
-                                                {publicNoteErrors["plan.IPv6"] && (
-                                                    <p className="text-xs text-destructive mt-1">
-                                                        {publicNoteErrors["plan.IPv6"]}
-                                                    </p>
-                                                )}
                                             </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.NetworkRoute")}
-                                                </Label>
-                                                <Input
-                                                    placeholder={t("PublicNote.CommaSeparated")}
-                                                    value={publicNoteObj.planDataMod.networkRoute}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                networkRoute: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="space-y-1 sm:col-span-2">
-                                                <Label className="text-xs">
-                                                    {t("PublicNote.Extra")}
-                                                </Label>
-                                                <Input
-                                                    placeholder={t("PublicNote.CommaSeparated")}
-                                                    value={publicNoteObj.planDataMod.extra}
-                                                    onChange={(e) =>
-                                                        setPublicNoteObj((prev) => ({
-                                                            ...prev,
-                                                            planDataMod: {
-                                                                ...prev.planDataMod,
-                                                                extra: e.target.value,
-                                                            },
-                                                        }))
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </>
+                                    )}
                                 </div>
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
