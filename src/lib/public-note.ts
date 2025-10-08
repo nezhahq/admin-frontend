@@ -106,7 +106,7 @@ export const detectPublicNoteMode = (s?: string): "structured" | "raw" => {
     if (!s) return "raw"
     try {
         const obj = JSON.parse(s)
-        const parsed = PublicNoteSchema.safeParse(obj)
+        const parsed = PublicNoteSchema.strict().safeParse(obj)
         return parsed.success ? "structured" : "raw"
     } catch {
         return "raw"
