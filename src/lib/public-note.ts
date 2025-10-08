@@ -12,12 +12,12 @@ import i18n from "./i18n"
  */
 export const PublicNoteSchema = z.object({
     billingDataMod: z.object({
-        startDate: z.string().optional().default(""),
-        endDate: z.string().optional().default(""),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
         autoRenewal: z.string().optional().default(""),
         cycle: z.string().optional().default(""),
         amount: z.string().optional().default(""),
-    }),
+    }).optional(),
     planDataMod: z.object({
         bandwidth: z.string().optional().default(""),
         trafficVol: z.string().optional().default(""),
@@ -26,7 +26,7 @@ export const PublicNoteSchema = z.object({
         IPv6: z.string().optional().default("0"),
         networkRoute: z.string().optional().default(""),
         extra: z.string().optional().default(""),
-    }),
+    }).optional(),
 })
 
 export type PublicNote = z.infer<typeof PublicNoteSchema>
@@ -57,35 +57,11 @@ export const isValidISOLike = (v: string) => {
     return !isNaN(d.getTime())
 }
 
-export const normalizeISO = (v: string) => {
-    if (!v) return v
+export const normalizeISO = (v?: string) => {
+    if (!v) return undefined
     if (v === "0000-00-00T23:59:59+08:00") return v
     const date = new Date(v)
     return isNaN(date.getTime()) ? v : date.toISOString()
-}
-
-export const pruneEmpty = (obj: any): any => {
-    if (obj === null || obj === undefined) return obj
-    if (typeof obj !== "object") return obj
-    const result: any = Array.isArray(obj) ? [] : {}
-    for (const key of Object.keys(obj)) {
-        const val = (obj as any)[key]
-        if (typeof val === "string") {
-            const trimmed = val.trim()
-            if (trimmed === "") continue
-            result[key] = val
-        } else if (typeof val === "object" && val !== null) {
-            const prunedChild = pruneEmpty(val)
-            if (Array.isArray(prunedChild)) {
-                if (prunedChild.length > 0) result[key] = prunedChild
-            } else {
-                if (Object.keys(prunedChild).length > 0) result[key] = prunedChild
-            }
-        } else {
-            result[key] = val
-        }
-    }
-    return result
 }
 
 /**
@@ -100,20 +76,20 @@ export const parsePublicNote = (s?: string): PublicNote => {
             const v = parsed.data
             return {
                 billingDataMod: {
-                    startDate: v.billingDataMod.startDate ?? "",
-                    endDate: v.billingDataMod.endDate ?? "",
-                    autoRenewal: v.billingDataMod.autoRenewal ?? "",
-                    cycle: v.billingDataMod.cycle ?? "",
-                    amount: v.billingDataMod.amount ?? "",
+                    startDate: v.billingDataMod?.startDate ?? "",
+                    endDate: v.billingDataMod?.endDate ?? "",
+                    autoRenewal: v.billingDataMod?.autoRenewal ?? "",
+                    cycle: v.billingDataMod?.cycle ?? "",
+                    amount: v.billingDataMod?.amount ?? "",
                 },
                 planDataMod: {
-                    bandwidth: v.planDataMod.bandwidth ?? "",
-                    trafficVol: v.planDataMod.trafficVol ?? "",
-                    trafficType: v.planDataMod.trafficType ?? "",
-                    IPv4: v.planDataMod.IPv4 === "1" ? "1" : "0",
-                    IPv6: v.planDataMod.IPv6 === "1" ? "1" : "0",
-                    networkRoute: v.planDataMod.networkRoute ?? "",
-                    extra: v.planDataMod.extra ?? "",
+                    bandwidth: v.planDataMod?.bandwidth ?? "",
+                    trafficVol: v.planDataMod?.trafficVol ?? "",
+                    trafficType: v.planDataMod?.trafficType ?? "",
+                    IPv4: v.planDataMod?.IPv4 === "1" ? "1" : "0",
+                    IPv6: v.planDataMod?.IPv6 === "1" ? "1" : "0",
+                    networkRoute: v.planDataMod?.networkRoute ?? "",
+                    extra: v.planDataMod?.extra ?? "",
                 },
             }
         }
@@ -131,27 +107,27 @@ export const validatePublicNote = (pn: PublicNote) => {
     const errors: Partial<Record<string, string>> = {}
 
     // Structural and enum validations
-    if (pn.billingDataMod.autoRenewal && !/^(0|1)$/.test(pn.billingDataMod.autoRenewal)) {
+    if (pn.billingDataMod?.autoRenewal && !/^(0|1)$/.test(pn.billingDataMod.autoRenewal)) {
         errors["billing.autoRenewal"] = i18n.t("Validation.MustBe0Or1")
     }
-    if (pn.billingDataMod.cycle && !/^(Day|Week|Month|Year)$/i.test(pn.billingDataMod.cycle)) {
+    if (pn.billingDataMod?.cycle && !/^(Day|Week|Month|Year)$/i.test(pn.billingDataMod.cycle)) {
         errors["billing.cycle"] = i18n.t("Validation.MustBeDayWeekMonthYear")
     }
-    if (pn.planDataMod.trafficType && !/^(1|2)$/.test(pn.planDataMod.trafficType)) {
+    if (pn.planDataMod?.trafficType && !/^(1|2)$/.test(pn.planDataMod.trafficType)) {
         errors["plan.trafficType"] = i18n.t("Validation.MustBe1Or2")
     }
-    if (!/^(0|1)$/.test(pn.planDataMod.IPv4)) {
+    if (pn.planDataMod?.IPv4 !== undefined && !/^(0|1)$/.test(pn.planDataMod.IPv4)) {
         errors["plan.IPv4"] = i18n.t("Validation.MustBe0Or1")
     }
-    if (!/^(0|1)$/.test(pn.planDataMod.IPv6)) {
+    if (pn.planDataMod?.IPv6 !== undefined && !/^(0|1)$/.test(pn.planDataMod.IPv6)) {
         errors["plan.IPv6"] = i18n.t("Validation.MustBe0Or1")
     }
 
     // Date validity checks
-    if (pn.billingDataMod.startDate && !isValidISOLike(pn.billingDataMod.startDate)) {
+    if (pn.billingDataMod?.startDate && !isValidISOLike(pn.billingDataMod.startDate)) {
         errors["billing.startDate"] = i18n.t("Validation.InvalidDate")
     }
-    if (pn.billingDataMod.endDate && !isValidISOLike(pn.billingDataMod.endDate)) {
+    if (pn.billingDataMod?.endDate && !isValidISOLike(pn.billingDataMod.endDate)) {
         errors["billing.endDate"] = i18n.t("Validation.InvalidDate")
     }
 
@@ -176,7 +152,7 @@ export const detectPublicNoteMode = (s?: string): "structured" | "raw" => {
  * Immutable patch by path, for use in component wrappers around setPublicNoteObj.
  * Example path: "billingDataMod.startDate"
  */
-export const applyPublicNotePatch = (obj: PublicNote, path: string, value: string): PublicNote => {
+export const applyPublicNotePatch = (obj: PublicNote, path: string, value: string | undefined): PublicNote => {
     const keys = path.split(".")
     const draft: any = structuredClone ? structuredClone(obj) : JSON.parse(JSON.stringify(obj))
     let cur: any = draft
@@ -231,24 +207,7 @@ export const applyPublicNoteDate = (obj: PublicNote, path: string, date: Date): 
  */
 export const toggleEndNoExpiry = (obj: PublicNote): PublicNote => {
     const NO_EXPIRY = "0000-00-00T23:59:59+08:00"
-    const current = obj.billingDataMod.endDate
+    const current = obj.billingDataMod?.endDate
     const next = current === NO_EXPIRY ? "" : NO_EXPIRY
     return applyPublicNotePatch(obj, "billingDataMod.endDate", next)
-}
-
-/**
- * Clipboard helpers (browser-only). Throw on failure.
- */
-export const writeClipboard = async (text: string): Promise<void> => {
-    if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
-        throw new Error("Clipboard API not available")
-    }
-    await navigator.clipboard.writeText(text ?? "")
-}
-
-export const readClipboard = async (): Promise<string> => {
-    if (typeof navigator === "undefined" || !navigator.clipboard?.readText) {
-        throw new Error("Clipboard API not available")
-    }
-    return await navigator.clipboard.readText()
 }
