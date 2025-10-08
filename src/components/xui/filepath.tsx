@@ -15,7 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { formatPath } from "@/lib/utils"
-import { Dispatch, SetStateAction, FC, useState, Fragment } from "react"
+import { Dispatch, FC, Fragment, SetStateAction, useState } from "react"
 
 const ITEMS_TO_DISPLAY = 3
 

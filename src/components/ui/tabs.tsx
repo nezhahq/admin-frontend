@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-import { forwardRef, ComponentRef, ComponentPropsWithoutRef } from "react"
+import { ComponentPropsWithoutRef, ComponentRef, forwardRef } from "react"
 
 const Tabs = TabsPrimitive.Root
 
