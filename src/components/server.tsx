@@ -74,7 +74,8 @@ const serverFormSchema = z.object({
                     const obj = JSON.parse(s)
                     return PublicNoteSchema.safeParse(obj).success
                 } catch {
-                    return false
+                    // skip check if not JSON
+                    return true
                 }
             },
             { message: "Invalid Public Note JSON" },
@@ -209,26 +210,12 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 const bd = publicNoteObj.billingDataMod
                 const pd = publicNoteObj.planDataMod
                 const pnNormalized: PublicNote = {
-                    billingDataMod: bd
-                        ? {
-                              autoRenewal: bd.autoRenewal ?? "",
-                              cycle: bd.cycle ?? "",
-                              amount: bd.amount ?? "",
-                              startDate: normalizeISO(bd.startDate),
-                              endDate: normalizeISO(bd.endDate),
-                          }
-                        : undefined,
-                    planDataMod: pd
-                        ? {
-                              bandwidth: pd.bandwidth ?? "",
-                              trafficVol: pd.trafficVol ?? "",
-                              trafficType: pd.trafficType ?? "",
-                              IPv4: pd.IPv4 ?? "0",
-                              IPv6: pd.IPv6 ?? "0",
-                              networkRoute: pd.networkRoute ?? "",
-                              extra: pd.extra ?? "",
-                          }
-                        : undefined,
+                    billingDataMod: bd && {
+                        ...bd,
+                        startDate: normalizeISO(bd.startDate),
+                        endDate: normalizeISO(bd.endDate),
+                    },
+                    planDataMod: pd,
                 }
                 const jsonStr = JSON.stringify(pnNormalized)
                 values.public_note = jsonStr.length > 2 ? jsonStr : undefined
@@ -672,7 +659,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 onCheckedChange={(checked) =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.autoRenewal",
-                                                                        checked ? "1" : "0",
+                                                                        checked ? "1" : undefined,
                                                                     )
                                                                 }
                                                             />
@@ -705,7 +692,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.cycle",
-                                                                        "",
+                                                                        undefined,
                                                                     )
                                                                 }
                                                             >
@@ -720,8 +707,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 )
                                                             }
                                                             value={
-                                                                publicNoteObj.billingDataMod
-                                                                    ?.cycle ?? ""
+                                                                publicNoteObj.billingDataMod?.cycle
                                                             }
                                                         >
                                                             <SelectTrigger>
@@ -760,7 +746,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.amount",
-                                                                        "0",
+                                                                        undefined,
                                                                     )
                                                                 }
                                                             >
@@ -783,8 +769,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Input
                                                             placeholder="200EUR"
                                                             value={
-                                                                publicNoteObj.billingDataMod
-                                                                    ?.amount ?? ""
+                                                                publicNoteObj.billingDataMod?.amount
                                                             }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
@@ -809,8 +794,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Input
                                                             placeholder="30Mbps"
                                                             value={
-                                                                publicNoteObj.planDataMod
-                                                                    ?.bandwidth ?? ""
+                                                                publicNoteObj.planDataMod?.bandwidth
                                                             }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
@@ -828,7 +812,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             placeholder="1TB/Month"
                                                             value={
                                                                 publicNoteObj.planDataMod
-                                                                    ?.trafficVol ?? ""
+                                                                    ?.trafficVol
                                                             }
                                                             onChange={(e) =>
                                                                 patchPublicNote(
@@ -850,7 +834,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "planDataMod.trafficType",
-                                                                        "",
+                                                                        undefined,
                                                                     )
                                                                 }
                                                             >

@@ -15,44 +15,27 @@ export const PublicNoteSchema = z.object({
         .object({
             startDate: z.string().optional(),
             endDate: z.string().optional(),
-            autoRenewal: z.string().optional().default(""),
-            cycle: z.string().optional().default(""),
-            amount: z.string().optional().default(""),
+            autoRenewal: z.string().optional(),
+            cycle: z.string().optional(),
+            amount: z.string().optional(),
         })
         .optional(),
     planDataMod: z
         .object({
-            bandwidth: z.string().optional().default(""),
-            trafficVol: z.string().optional().default(""),
-            trafficType: z.string().optional().default(""),
-            IPv4: z.string().optional().default("0"),
-            IPv6: z.string().optional().default("0"),
-            networkRoute: z.string().optional().default(""),
-            extra: z.string().optional().default(""),
+            bandwidth: z.string().optional(),
+            trafficVol: z.string().optional(),
+            trafficType: z.string().optional(),
+            IPv4: z.string().optional(),
+            IPv6: z.string().optional(),
+            networkRoute: z.string().optional(),
+            extra: z.string().optional(),
         })
         .optional(),
 })
 
 export type PublicNote = z.infer<typeof PublicNoteSchema>
 
-export const defaultPublicNote: PublicNote = {
-    billingDataMod: {
-        startDate: "",
-        endDate: "",
-        autoRenewal: "",
-        cycle: "",
-        amount: "",
-    },
-    planDataMod: {
-        bandwidth: "",
-        trafficVol: "",
-        trafficType: "",
-        IPv4: "0",
-        IPv6: "0",
-        networkRoute: "",
-        extra: "",
-    },
-}
+export const defaultPublicNote: PublicNote = {}
 
 export const isValidISOLike = (v: string) => {
     if (!v) return true
@@ -77,25 +60,7 @@ export const parsePublicNote = (s?: string): PublicNote => {
         const obj = JSON.parse(s)
         const parsed = PublicNoteSchema.safeParse(obj)
         if (parsed.success) {
-            const v = parsed.data
-            return {
-                billingDataMod: {
-                    startDate: v.billingDataMod?.startDate ?? "",
-                    endDate: v.billingDataMod?.endDate ?? "",
-                    autoRenewal: v.billingDataMod?.autoRenewal ?? "",
-                    cycle: v.billingDataMod?.cycle ?? "",
-                    amount: v.billingDataMod?.amount ?? "",
-                },
-                planDataMod: {
-                    bandwidth: v.planDataMod?.bandwidth ?? "",
-                    trafficVol: v.planDataMod?.trafficVol ?? "",
-                    trafficType: v.planDataMod?.trafficType ?? "",
-                    IPv4: v.planDataMod?.IPv4 === "1" ? "1" : "0",
-                    IPv6: v.planDataMod?.IPv6 === "1" ? "1" : "0",
-                    networkRoute: v.planDataMod?.networkRoute ?? "",
-                    extra: v.planDataMod?.extra ?? "",
-                },
-            }
+            return parsed.data
         }
         return defaultPublicNote
     } catch {
@@ -103,10 +68,6 @@ export const parsePublicNote = (s?: string): PublicNote => {
     }
 }
 
-/**
- * Validate with zod and convert to a UI-friendly error map.
- * Error keys follow the component's path naming; messages provided via i18n.t.
- */
 export const validatePublicNote = (pn: PublicNote) => {
     const errors: Partial<Record<string, string>> = {}
 
