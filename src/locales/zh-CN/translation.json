@@ -195,6 +195,7 @@
     "Preview": "预览",
     "Option": "选项",
     "PublicNote": {
+        "Label": "公开备注",
         "Billing": "账单信息",
         "Plan": "套餐配置",
         "StartDate": "开始时间",
@@ -225,7 +226,6 @@
         "CommaSeparated": "以英文逗号分隔多个",
         "Has": "有",
         "None": "无",
-        "RawText": "原始文本",
         "CustomFields": "自定义字段",
         "ClearDate": "清除日期",
         "Clear": "清除",
@@ -246,5 +246,13 @@
         "IgnoreHint": "{{server}}ID: true/false",
         "IgnoreExample": "例如：{\"1\": true, \"2\": false}"
     },
-    "Search": "搜索..."
+    "Search": "搜索...",
+    "Format": "格式化",
+    "Formatted": "已格式化",
+    "Copy": "复制",
+    "Paste": "粘贴",
+    "CopiedToClipboard": "已复制到剪贴板",
+    "ClipboardWriteFailed": "无法写入剪贴板",
+    "PastedFromClipboard": "已从剪贴板粘贴",
+    "ClipboardReadFailed": "无法读取剪贴板"
 }

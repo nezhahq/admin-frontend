@@ -34,6 +34,20 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
+import i18n from "@/lib/i18n"
+import {
+    type PublicNote,
+    applyPublicNoteDate,
+    applyPublicNotePatch,
+    detectPublicNoteMode,
+    normalizeISO,
+    parsePublicNote,
+    pruneEmpty,
+    toggleEndNoExpiry,
+    validatePublicNote,
+    writeClipboard,
+    readClipboard,
+} from "@/lib/public-note"
 import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
 import { ModelServer } from "@/types"
@@ -41,7 +55,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { HelpCircle } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
@@ -79,7 +92,7 @@ const serverFormSchema = z.object({
 })
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
-    const { t } = useTranslation()
+    const t = i18n.t
     const form = useForm({
         resolver: zodResolver(serverFormSchema) as any,
         defaultValues: {
@@ -95,71 +108,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     })
 
     const [open, setOpen] = useState(false)
-
-    type PublicNote = {
-        billingDataMod: {
-            startDate: string
-            endDate: string
-            autoRenewal: string
-            cycle: string
-            amount: string
-        }
-        planDataMod: {
-            bandwidth: string
-            trafficVol: string
-            trafficType: string
-            IPv4: string
-            IPv6: string
-            networkRoute: string
-            extra: string
-        }
-    }
-
-    const defaultPublicNote: PublicNote = {
-        billingDataMod: {
-            startDate: "",
-            endDate: "",
-            autoRenewal: "",
-            cycle: "",
-            amount: "",
-        },
-        planDataMod: {
-            bandwidth: "",
-            trafficVol: "",
-            trafficType: "",
-            IPv4: "0",
-            IPv6: "0",
-            networkRoute: "",
-            extra: "",
-        },
-    }
-
-    const parsePublicNote = (s?: string): PublicNote => {
-        if (!s) return defaultPublicNote
-        try {
-            const obj = JSON.parse(s)
-            return {
-                billingDataMod: {
-                    startDate: obj?.billingDataMod?.startDate ?? "",
-                    endDate: obj?.billingDataMod?.endDate ?? "",
-                    autoRenewal: obj?.billingDataMod?.autoRenewal ?? "",
-                    cycle: obj?.billingDataMod?.cycle ?? "",
-                    amount: obj?.billingDataMod?.amount ?? "",
-                },
-                planDataMod: {
-                    bandwidth: obj?.planDataMod?.bandwidth ?? "",
-                    trafficVol: obj?.planDataMod?.trafficVol ?? "",
-                    trafficType: obj?.planDataMod?.trafficType ?? "",
-                    IPv4: obj?.planDataMod?.IPv4 === "1" ? "1" : "0",
-                    IPv6: obj?.planDataMod?.IPv6 === "1" ? "1" : "0",
-                    networkRoute: obj?.planDataMod?.networkRoute ?? "",
-                    extra: obj?.planDataMod?.extra ?? "",
-                },
-            }
-        } catch {
-            return defaultPublicNote
-        }
-    }
 
     const [publicNoteObj, setPublicNoteObj] = useState<PublicNote>(
         parsePublicNote(data?.public_note),
@@ -183,51 +131,69 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         >
     >({})
 
-    // Public note toggle: default disabled for new entries; auto-enabled when editing if existing content is present
-    const [publicNoteEnabled, setPublicNoteEnabled] = useState<boolean>(
-        !!(data?.public_note && data.public_note.trim().length > 0),
+    const [publicNoteMode, setPublicNoteMode] = useState<"structured" | "raw">(
+        detectPublicNoteMode(data?.public_note),
     )
-    // Edit mode: default to raw text
-    const [publicNoteMode, setPublicNoteMode] = useState<"structured" | "raw">("structured")
-    // Raw text content: when enabled, submission always uses this string
     const [publicNoteRaw, setPublicNoteRaw] = useState<string>(data?.public_note ?? "")
-    const [publicNoteRawError, setPublicNoteRawError] = useState<string | undefined>(undefined)
 
-    const isValidISOLike = (v: string) => {
-        if (!v) return true
-        // special marker for "no expiry"
-        if (v === "0000-00-00T23:59:59+08:00") return true
-        const d = new Date(v)
-        return !isNaN(d.getTime())
+    const handleCopyClick = async () => {
+        try {
+            await writeClipboard(publicNoteRaw ?? "")
+            toast(t("Success"), {
+                description: t("CopiedToClipboard") ?? "Copied to clipboard",
+            })
+        } catch (e) {
+            toast(t("Error"), {
+                description: t("ClipboardWriteFailed") ?? "Clipboard write failed",
+            })
+        }
     }
 
-    const validatePublicNote = (pn: PublicNote) => {
-        const errs: Partial<Record<string, string>> = {}
+    const handlePasteClick = async () => {
+        try {
+            const txt = await readClipboard()
+            setPublicNoteRaw(txt)
+            toast(t("Success"), {
+                description: t("PastedFromClipboard") ?? "Pasted from clipboard",
+            })
+        } catch (e) {
+            toast(t("Error"), {
+                description: t("ClipboardReadFailed") ?? "Clipboard read failed",
+            })
+        }
+    }
 
-        if (pn.billingDataMod.startDate && !isValidISOLike(pn.billingDataMod.startDate)) {
-            errs["billing.startDate"] = t("Validation.InvalidDate")
+    const handleFormatClick = () => {
+        try {
+            const raw = publicNoteRaw ?? ""
+            if (!raw.trim()) {
+                setPublicNoteRaw("")
+                return
+            }
+            const parsed = JSON.parse(raw)
+            const formatted = JSON.stringify(parsed, null, 2)
+            setPublicNoteRaw(formatted)
+            toast(t("Success"), {
+                description: t("Formatted") ?? "Formatted",
+            })
+        } catch (e) {
+            toast(t("Error"), {
+                description: t("Validation.InvalidJSON") ?? "Invalid JSON",
+            })
         }
-        if (pn.billingDataMod.endDate && !isValidISOLike(pn.billingDataMod.endDate)) {
-            errs["billing.endDate"] = t("Validation.InvalidDate")
-        }
-        if (pn.billingDataMod.autoRenewal && !/^(0|1)$/.test(pn.billingDataMod.autoRenewal)) {
-            errs["billing.autoRenewal"] = t("Validation.MustBe0Or1")
-        }
-        if (pn.billingDataMod.cycle && !/^(Day|Week|Month|Year)$/i.test(pn.billingDataMod.cycle)) {
-            errs["billing.cycle"] = t("Validation.MustBeDayWeekMonthYear")
-        }
-        // amount: allow any non-empty string or empty
-        if (pn.planDataMod.trafficType && !/^(1|2)$/.test(pn.planDataMod.trafficType)) {
-            errs["plan.trafficType"] = t("Validation.MustBe1Or2")
-        }
-        if (!/^(0|1)$/.test(pn.planDataMod.IPv4)) {
-            errs["plan.IPv4"] = t("Validation.MustBe0Or1")
-        }
-        if (!/^(0|1)$/.test(pn.planDataMod.IPv6)) {
-            errs["plan.IPv6"] = t("Validation.MustBe0Or1")
-        }
+    }
 
-        return { errors: errs, valid: Object.keys(errs).length === 0 }
+    const patchPublicNote = (path: string, value: string) => {
+        setPublicNoteObj((prev) => applyPublicNotePatch(prev, path, value))
+    }
+    const patchPublicNoteDate = (
+        path: "billingDataMod.startDate" | "billingDataMod.endDate",
+        d: Date,
+    ) => {
+        setPublicNoteObj((prev) => applyPublicNoteDate(prev, path, d))
+    }
+    const toggleEndNoExpiryLocal = () => {
+        setPublicNoteObj((prev) => toggleEndNoExpiry(prev))
     }
 
     const onSubmit = async (values: any) => {
@@ -239,94 +205,33 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 ? JSON.parse(values.override_ddns_domains_raw)
                 : undefined
 
-            // Public note submission strategy:
-            // - Disabled: submit undefined to avoid default values causing frontend rendering issues
-            // - Enabled: always rely on raw string; if in structured mode, serialize to string before submitting
-            if (!publicNoteEnabled) {
-                values.public_note = undefined
-            } else {
-                if (publicNoteMode === "raw") {
-                    const raw = (publicNoteRaw ?? "").trim()
-                    if (raw.length === 0) {
-                        values.public_note = undefined
-                        setPublicNoteRawError(undefined)
-                    } else {
-                        try {
-                            const parsed = JSON.parse(raw)
-                            // Require an object; reject numbers, strings, booleans, null, arrays (if you also want to reject arrays, keep the check below)
-                            if (
-                                typeof parsed !== "object" ||
-                                parsed === null ||
-                                Array.isArray(parsed)
-                            ) {
-                                throw new Error("Public note must be a JSON object")
-                            }
-                            // Normalize JSON before submit
-                            values.public_note = JSON.stringify(parsed)
-                            setPublicNoteRawError(undefined)
-                        } catch {
-                            setPublicNoteRawError(t("Validation.InvalidJSON"))
-                            toast(t("Error"), { description: t("Validation.InvalidJSON") })
-                            return
-                        }
-                    }
+            if (publicNoteMode === "raw") {
+                const raw = (publicNoteRaw ?? "").trim()
+                if (raw.length === 0) {
+                    values.public_note = undefined
                 } else {
-                    // Validation and normalization in structured mode, used only to produce the final raw string
-                    const { errors, valid } = validatePublicNote(publicNoteObj)
-                    if (!valid) {
-                        setPublicNoteErrors(errors)
-                        toast(t("Error"), { description: t("Validation.InvalidForm") })
-                        return
-                    }
-                    setPublicNoteErrors({})
-
-                    const normalizeISO = (v: string) => {
-                        if (!v) return v
-                        if (v === "0000-00-00T23:59:59+08:00") return v
-                        const date = new Date(v)
-                        return isNaN(date.getTime()) ? v : date.toISOString()
-                    }
-                    const pnNormalized: PublicNote = {
-                        billingDataMod: {
-                            ...publicNoteObj.billingDataMod,
-                            // Cycle may be empty; submission no longer forces fallback
-                            startDate: normalizeISO(publicNoteObj.billingDataMod.startDate),
-                            endDate: normalizeISO(publicNoteObj.billingDataMod.endDate),
-                        },
-                        planDataMod: { ...publicNoteObj.planDataMod },
-                    }
-                    // Prune empty-string fields recursively; remove empty objects
-                    const pruneEmpty = (obj: any): any => {
-                        if (obj === null || obj === undefined) return obj
-                        if (typeof obj !== "object") return obj
-                        const result: any = Array.isArray(obj) ? [] : {}
-                        for (const key of Object.keys(obj)) {
-                            const val = (obj as any)[key]
-                            // Keep non-empty primitive values; remove empty strings
-                            if (typeof val === "string") {
-                                const trimmed = val.trim()
-                                if (trimmed === "") continue
-                                result[key] = val
-                            } else if (typeof val === "object" && val !== null) {
-                                const prunedChild = pruneEmpty(val)
-                                // Only keep child if it has keys (for objects) or length (for arrays)
-                                if (Array.isArray(prunedChild)) {
-                                    if (prunedChild.length > 0) result[key] = prunedChild
-                                } else {
-                                    if (Object.keys(prunedChild).length > 0)
-                                        result[key] = prunedChild
-                                }
-                            } else {
-                                // Keep booleans, numbers, and other non-object values as-is
-                                result[key] = val
-                            }
-                        }
-                        return result
-                    }
-                    const pruned = pruneEmpty(pnNormalized)
-                    const jsonStr = JSON.stringify(pruned)
-                    values.public_note = jsonStr.length > 2 ? jsonStr : undefined
+                    values.public_note = raw
                 }
+            } else {
+                const { errors, valid } = validatePublicNote(publicNoteObj)
+                if (!valid) {
+                    setPublicNoteErrors(errors)
+                    toast(t("Error"), { description: t("Validation.InvalidForm") })
+                    return
+                }
+                setPublicNoteErrors({})
+
+                const pnNormalized: PublicNote = {
+                    billingDataMod: {
+                        ...publicNoteObj.billingDataMod,
+                        startDate: normalizeISO(publicNoteObj.billingDataMod.startDate),
+                        endDate: normalizeISO(publicNoteObj.billingDataMod.endDate),
+                    },
+                    planDataMod: { ...publicNoteObj.planDataMod },
+                }
+                const pruned = pruneEmpty(pnNormalized)
+                const jsonStr = JSON.stringify(pruned)
+                values.public_note = jsonStr.length > 2 ? jsonStr : undefined
             }
 
             await updateServer(data!.id!, values)
@@ -481,7 +386,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     <div className="space-y-1">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <FormLabel>{t("Public") + t("Note")}</FormLabel>
+                                                <FormLabel>{t("PublicNote.Label")}</FormLabel>
                                                 <a
                                                     href="https://nezha.wiki/guide/servers.html#%E5%85%AC%E5%BC%80%E5%A4%87%E6%B3%A8%E8%AE%BE%E7%BD%AE"
                                                     target="_blank"
@@ -491,74 +396,79 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                     <HelpCircle className="h-4 w-4" />
                                                 </a>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs">
-                                                    {publicNoteEnabled
-                                                        ? (t("PublicNote.Enabled") ?? "Enabled")
-                                                        : (t("PublicNote.Disabled") ?? "Disabled")}
-                                                </span>
-                                                <Switch
-                                                    checked={publicNoteEnabled}
-                                                    onCheckedChange={setPublicNoteEnabled}
-                                                />
-                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Toggle: when disabled, hide edit controls and submit an empty value */}
                                     <div className="flex items-center gap-4">
                                         {/* Mode switch: Raw text / Custom fields */}
-                                        {publicNoteEnabled && (
-                                            <div className="flex items-center gap-2">
-                                                {/* Show 'structured' first, then 'raw' */}
-                                                <Button
-                                                    type="button"
-                                                    variant={
-                                                        publicNoteMode === "structured"
-                                                            ? "default"
-                                                            : "outline"
-                                                    }
-                                                    className="text-xs h-7"
-                                                    onClick={() => {
-                                                        setPublicNoteMode("structured")
-                                                        setPublicNoteObj(
-                                                            parsePublicNote(publicNoteRaw),
-                                                        )
-                                                    }}
-                                                >
-                                                    {t("PublicNote.CustomFields") ?? "Custom"}
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant={
-                                                        publicNoteMode === "raw"
-                                                            ? "default"
-                                                            : "outline"
-                                                    }
-                                                    className="text-xs h-7"
-                                                    onClick={() => setPublicNoteMode("raw")}
-                                                >
-                                                    {t("PublicNote.RawText") ?? "Raw"}
-                                                </Button>
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            {/* Show 'structured' first, then 'raw' */}
+                                            <Button
+                                                type="button"
+                                                variant={
+                                                    publicNoteMode === "structured"
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                className="text-xs h-7"
+                                                onClick={() => {
+                                                    setPublicNoteMode("structured")
+                                                    setPublicNoteObj(parsePublicNote(publicNoteRaw))
+                                                }}
+                                            >
+                                                {t("PublicNote.CustomFields")}
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={
+                                                    publicNoteMode === "raw" ? "default" : "outline"
+                                                }
+                                                className="text-xs h-7"
+                                                onClick={() => setPublicNoteMode("raw")}
+                                            >
+                                                {t("AdvancedJSON")}
+                                            </Button>
+                                        </div>
                                     </div>
 
                                     {/* Raw text mode: shown by default; submission uses this string */}
-                                    {publicNoteEnabled && publicNoteMode === "raw" && (
+                                    {publicNoteMode === "raw" && (
                                         <div className="space-y-2">
                                             <Textarea
                                                 className="resize-y"
                                                 value={publicNoteRaw}
                                                 onChange={(e) => setPublicNoteRaw(e.target.value)}
                                                 placeholder="{... JSON or empty ...}"
-                                                rows={5}
+                                                rows={10}
                                             />
-                                            {publicNoteRawError && (
-                                                <p className="text-xs text-destructive mt-1">
-                                                    {publicNoteRawError}
-                                                </p>
-                                            )}
+
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className="h-7 text-xs"
+                                                    onClick={handleCopyClick}
+                                                >
+                                                    {t("Copy") ?? "Copy"}
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className="h-7 text-xs"
+                                                    onClick={handlePasteClick}
+                                                >
+                                                    {t("Paste") ?? "Paste"}
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className="h-7 text-xs"
+                                                    onClick={handleFormatClick}
+                                                >
+                                                    {t("Format") ?? "Format"}
+                                                </Button>
+                                            </div>
                                             <p className="text-xs text-muted-foreground">
                                                 {t("PublicNote.EditRawHint")}
                                             </p>
@@ -566,7 +476,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
 
                                     {/* Custom fields mode: keep structured editing; serialize to string on submit */}
-                                    {publicNoteEnabled && publicNoteMode === "structured" && (
+                                    {publicNoteMode === "structured" && (
                                         <>
                                             <div className="rounded-md border p-3 space-y-3">
                                                 <div className="text-sm font-medium opacity-80">
@@ -583,13 +493,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             variant="outline"
                                                             className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700 ml-2"
                                                             onClick={() =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    billingDataMod: {
-                                                                        ...prev.billingDataMod,
-                                                                        startDate: "",
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "billingDataMod.startDate",
+                                                                    "",
+                                                                )
                                                             }
                                                         >
                                                             {t("PublicNote.ClearDate") ?? "Clear"}
@@ -634,42 +541,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         }
                                                                         onSelect={(d) => {
                                                                             if (!d) return
-                                                                            setPublicNoteObj(
-                                                                                (prev) => {
-                                                                                    const prevDateStr =
-                                                                                        prev
-                                                                                            .billingDataMod
-                                                                                            .startDate
-                                                                                    if (
-                                                                                        prevDateStr
-                                                                                    ) {
-                                                                                        const pd =
-                                                                                            new Date(
-                                                                                                prevDateStr,
-                                                                                            )
-                                                                                        if (
-                                                                                            !isNaN(
-                                                                                                pd.getTime(),
-                                                                                            )
-                                                                                        ) {
-                                                                                            d.setHours(
-                                                                                                pd.getHours(),
-                                                                                                pd.getMinutes(),
-                                                                                                pd.getSeconds(),
-                                                                                                0,
-                                                                                            )
-                                                                                        }
-                                                                                    }
-                                                                                    return {
-                                                                                        ...prev,
-                                                                                        billingDataMod:
-                                                                                            {
-                                                                                                ...prev.billingDataMod,
-                                                                                                startDate:
-                                                                                                    d.toISOString(),
-                                                                                            },
-                                                                                    }
-                                                                                },
+                                                                            patchPublicNoteDate(
+                                                                                "billingDataMod.startDate",
+                                                                                d,
                                                                             )
                                                                         }}
                                                                         autoFocus
@@ -696,20 +570,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 type="button"
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
-                                                                onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            endDate:
-                                                                                prev.billingDataMod
-                                                                                    .endDate ===
-                                                                                "0000-00-00T23:59:59+08:00"
-                                                                                    ? ""
-                                                                                    : "0000-00-00T23:59:59+08:00",
-                                                                        },
-                                                                    }))
-                                                                }
+                                                                onClick={toggleEndNoExpiryLocal}
                                                             >
                                                                 {publicNoteObj.billingDataMod
                                                                     .endDate ===
@@ -723,13 +584,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            endDate: "",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "billingDataMod.endDate",
+                                                                        "",
+                                                                    )
                                                                 }
                                                             >
                                                                 {t("PublicNote.ClearDate") ??
@@ -787,42 +645,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         }
                                                                         onSelect={(d) => {
                                                                             if (!d) return
-                                                                            setPublicNoteObj(
-                                                                                (prev) => {
-                                                                                    const prevDateStr =
-                                                                                        prev
-                                                                                            .billingDataMod
-                                                                                            .endDate
-                                                                                    if (
-                                                                                        prevDateStr
-                                                                                    ) {
-                                                                                        const pd =
-                                                                                            new Date(
-                                                                                                prevDateStr,
-                                                                                            )
-                                                                                        if (
-                                                                                            !isNaN(
-                                                                                                pd.getTime(),
-                                                                                            )
-                                                                                        ) {
-                                                                                            d.setHours(
-                                                                                                pd.getHours(),
-                                                                                                pd.getMinutes(),
-                                                                                                pd.getSeconds(),
-                                                                                                0,
-                                                                                            )
-                                                                                        }
-                                                                                    }
-                                                                                    return {
-                                                                                        ...prev,
-                                                                                        billingDataMod:
-                                                                                            {
-                                                                                                ...prev.billingDataMod,
-                                                                                                endDate:
-                                                                                                    d.toISOString(),
-                                                                                            },
-                                                                                    }
-                                                                                },
+                                                                            patchPublicNoteDate(
+                                                                                "billingDataMod.endDate",
+                                                                                d,
                                                                             )
                                                                         }}
                                                                         autoFocus
@@ -851,13 +676,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            autoRenewal: "",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "billingDataMod.autoRenewal",
+                                                                        "",
+                                                                    )
                                                                 }
                                                             >
                                                                 {t("PublicNote.Clear") ?? "Clear"}
@@ -865,13 +687,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         </div>
                                                         <Select
                                                             onValueChange={(val) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    billingDataMod: {
-                                                                        ...prev.billingDataMod,
-                                                                        autoRenewal: val,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "billingDataMod.autoRenewal",
+                                                                    val,
+                                                                )
                                                             }
                                                             value={
                                                                 publicNoteObj.billingDataMod
@@ -912,13 +731,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            cycle: "",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "billingDataMod.cycle",
+                                                                        "",
+                                                                    )
                                                                 }
                                                             >
                                                                 {t("PublicNote.Clear") ?? "Clear"}
@@ -926,13 +742,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         </div>
                                                         <Select
                                                             onValueChange={(val) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    billingDataMod: {
-                                                                        ...prev.billingDataMod,
-                                                                        cycle: val,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "billingDataMod.cycle",
+                                                                    val,
+                                                                )
                                                             }
                                                             value={
                                                                 publicNoteObj.billingDataMod
@@ -973,13 +786,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            amount: "0",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "billingDataMod.amount",
+                                                                        "0",
+                                                                    )
                                                                 }
                                                             >
                                                                 {t("PublicNote.Free")}
@@ -989,13 +799,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        billingDataMod: {
-                                                                            ...prev.billingDataMod,
-                                                                            amount: "-1",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "billingDataMod.amount",
+                                                                        "-1",
+                                                                    )
                                                                 }
                                                             >
                                                                 {t("PublicNote.PayAsYouGo")}
@@ -1007,13 +814,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 publicNoteObj.billingDataMod.amount
                                                             }
                                                             onChange={(e) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    billingDataMod: {
-                                                                        ...prev.billingDataMod,
-                                                                        amount: e.target.value,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "billingDataMod.amount",
+                                                                    e.target.value,
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -1035,13 +839,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 publicNoteObj.planDataMod.bandwidth
                                                             }
                                                             onChange={(e) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    planDataMod: {
-                                                                        ...prev.planDataMod,
-                                                                        bandwidth: e.target.value,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "planDataMod.bandwidth",
+                                                                    e.target.value,
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -1055,13 +856,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 publicNoteObj.planDataMod.trafficVol
                                                             }
                                                             onChange={(e) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    planDataMod: {
-                                                                        ...prev.planDataMod,
-                                                                        trafficVol: e.target.value,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "planDataMod.trafficVol",
+                                                                    e.target.value,
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -1075,13 +873,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 variant="outline"
                                                                 className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
                                                                 onClick={() =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        planDataMod: {
-                                                                            ...prev.planDataMod,
-                                                                            trafficType: "",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "planDataMod.trafficType",
+                                                                        "",
+                                                                    )
                                                                 }
                                                             >
                                                                 {t("PublicNote.Clear") ?? "Clear"}
@@ -1089,13 +884,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         </div>
                                                         <Select
                                                             onValueChange={(val) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    planDataMod: {
-                                                                        ...prev.planDataMod,
-                                                                        trafficType: val,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "planDataMod.trafficType",
+                                                                    val,
+                                                                )
                                                             }
                                                             value={
                                                                 publicNoteObj.planDataMod
@@ -1138,15 +930,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         .IPv4 === "1"
                                                                 }
                                                                 onCheckedChange={(checked) =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        planDataMod: {
-                                                                            ...prev.planDataMod,
-                                                                            IPv4: checked
-                                                                                ? "1"
-                                                                                : "0",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "planDataMod.IPv4",
+                                                                        checked ? "1" : "0",
+                                                                    )
                                                                 }
                                                             />
                                                             <span className="text-xs">
@@ -1173,15 +960,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                         .IPv6 === "1"
                                                                 }
                                                                 onCheckedChange={(checked) =>
-                                                                    setPublicNoteObj((prev) => ({
-                                                                        ...prev,
-                                                                        planDataMod: {
-                                                                            ...prev.planDataMod,
-                                                                            IPv6: checked
-                                                                                ? "1"
-                                                                                : "0",
-                                                                        },
-                                                                    }))
+                                                                    patchPublicNote(
+                                                                        "planDataMod.IPv6",
+                                                                        checked ? "1" : "0",
+                                                                    )
                                                                 }
                                                             />
                                                             <span className="text-xs">
@@ -1207,14 +989,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     .networkRoute
                                                             }
                                                             onChange={(e) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    planDataMod: {
-                                                                        ...prev.planDataMod,
-                                                                        networkRoute:
-                                                                            e.target.value,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "planDataMod.networkRoute",
+                                                                    e.target.value,
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -1228,13 +1006,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             )}
                                                             value={publicNoteObj.planDataMod.extra}
                                                             onChange={(e) =>
-                                                                setPublicNoteObj((prev) => ({
-                                                                    ...prev,
-                                                                    planDataMod: {
-                                                                        ...prev.planDataMod,
-                                                                        extra: e.target.value,
-                                                                    },
-                                                                }))
+                                                                patchPublicNote(
+                                                                    "planDataMod.extra",
+                                                                    e.target.value,
+                                                                )
                                                             }
                                                         />
                                                     </div>

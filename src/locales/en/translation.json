@@ -195,6 +195,7 @@
     "Value": "Value",
     "Preview": "Preview",
     "PublicNote": {
+        "Label": "Public Note",
         "Billing": "Billing",
         "Plan": "Plan",
         "StartDate": "Start Date",
@@ -225,7 +226,6 @@
         "CommaSeparated": "Separate multiple items with commas",
         "Has": "Has",
         "None": "None",
-        "RawText": "Raw Text",
         "CustomFields": "Custom Fields",
         "ClearDate": "Clear Date",
         "Clear": "Clear",
@@ -246,5 +246,13 @@
         "IgnoreHint": "{{server}} ID: true/false",
         "IgnoreExample": "e.g., {\"1\": true, \"2\": false}"
     },
-    "Search": "Search..."
+    "Search": "Search...",
+    "Format": "Format",
+    "Formatted": "Formatted",
+    "Copy": "Copy",
+    "Paste": "Paste",
+    "CopiedToClipboard": "Copied to clipboard",
+    "ClipboardWriteFailed": "Clipboard write failed",
+    "PastedFromClipboard": "Pasted from clipboard",
+    "ClipboardReadFailed": "Clipboard read failed"
 }
