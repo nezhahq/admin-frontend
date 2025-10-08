@@ -149,26 +149,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     )
     const [publicNoteRaw, setPublicNoteRaw] = useState<string>(data?.public_note ?? "")
 
-    const handleFormatClick = () => {
-        try {
-            const raw = publicNoteRaw ?? ""
-            if (!raw.trim()) {
-                setPublicNoteRaw("")
-                return
-            }
-            const parsed = JSON.parse(raw)
-            const formatted = JSON.stringify(parsed, null, 2)
-            setPublicNoteRaw(formatted)
-            toast(t("Success"), {
-                description: t("Formatted") ?? "Formatted",
-            })
-        } catch (e) {
-            toast(t("Error"), {
-                description: t("Validation.InvalidJSON") ?? "Invalid JSON",
-            })
-        }
-    }
-
     const patchPublicNote = (path: string, value: string | undefined) => {
         setPublicNoteObj((prev) => applyPublicNotePatch(prev, path, value))
     }
@@ -414,35 +394,20 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 className="text-xs h-7"
                                                 onClick={() => setPublicNoteMode("raw")}
                                             >
-                                                {t("AdvancedJSON")}
+                                                {t("PublicNote.RawText")}
                                             </Button>
                                         </div>
                                     </div>
 
                                     {/* Raw text mode: shown by default; submission uses this string */}
                                     {publicNoteMode === "raw" && (
-                                        <div className="space-y-2">
+                                        <div>
                                             <Textarea
                                                 className="resize-y"
                                                 value={publicNoteRaw}
                                                 onChange={(e) => setPublicNoteRaw(e.target.value)}
-                                                placeholder="{... JSON or empty ...}"
                                                 rows={10}
                                             />
-
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    className="h-7 text-xs"
-                                                    onClick={handleFormatClick}
-                                                >
-                                                    {t("Format") ?? "Format"}
-                                                </Button>
-                                            </div>
-                                            <p className="text-xs text-muted-foreground">
-                                                {t("PublicNote.EditRawHint")}
-                                            </p>
                                         </div>
                                     )}
 

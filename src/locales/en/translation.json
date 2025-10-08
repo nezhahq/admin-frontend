@@ -229,7 +229,7 @@
         "CustomFields": "Custom Fields",
         "ClearDate": "Clear Date",
         "Clear": "Clear",
-        "EditRawHint": "You can paste JSON. Submission uses this raw string."
+        "RawText": "Raw Text"
     },
     "Validation": {
         "InvalidDate": "Invalid date",

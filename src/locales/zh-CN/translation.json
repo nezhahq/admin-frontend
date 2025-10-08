@@ -229,7 +229,7 @@
         "CustomFields": "自定义字段",
         "ClearDate": "清除日期",
         "Clear": "清除",
-        "EditRawHint": "你可以粘贴 JSON，提交将使用该原始字符串。"
+        "RawText": "原始文本"
     },
     "Validation": {
         "InvalidDate": "无效的日期格式",
