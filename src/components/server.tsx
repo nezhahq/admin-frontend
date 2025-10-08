@@ -34,7 +34,6 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
-import i18n from "@/lib/i18n"
 import {
     type PublicNote,
     applyPublicNoteDate,
@@ -55,6 +54,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { HelpCircle } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
@@ -92,7 +92,7 @@ const serverFormSchema = z.object({
 })
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
-    const t = i18n.t
+    const { t } = useTranslation()
     const form = useForm({
         resolver: zodResolver(serverFormSchema) as any,
         defaultValues: {
