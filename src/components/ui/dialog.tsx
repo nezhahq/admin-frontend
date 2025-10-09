@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
-import { forwardRef, ComponentRef, ComponentPropsWithoutRef, HTMLAttributes } from "react"
+import { ComponentPropsWithoutRef, ComponentRef, HTMLAttributes, forwardRef } from "react"
 
 const Dialog = DialogPrimitive.Root
 

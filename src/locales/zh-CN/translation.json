@@ -195,6 +195,7 @@
     "Preview": "预览",
     "Option": "选项",
     "PublicNote": {
+        "Label": "公开备注",
         "Billing": "账单信息",
         "Plan": "套餐配置",
         "StartDate": "开始时间",
@@ -222,10 +223,13 @@
         "CancelNoExpiry": "取消不过期",
         "Free": "免费",
         "PayAsYouGo": "按量付费",
-        "DropdownHint": "下拉项需要重新选择才能生效",
         "CommaSeparated": "以英文逗号分隔多个",
         "Has": "有",
-        "None": "无"
+        "None": "无",
+        "CustomFields": "自定义字段",
+        "ClearDate": "清除日期",
+        "Clear": "清除",
+        "RawText": "原始文本"
     },
     "Validation": {
         "InvalidDate": "无效的日期格式",
@@ -233,7 +237,8 @@
         "MustBeDayWeekMonthYear": "必须为 Day/Week/Month/Year",
         "MustBe1Or2": "只能为 1 或 2",
         "DigitsOnly": "仅允许数字",
-        "InvalidForm": "表单校验失败"
+        "InvalidForm": "表单校验失败",
+        "InvalidJSON": "无效的 JSON"
     },
     "AlertRules": {
         "CoverAllServers": "监控所有服务器",
@@ -241,5 +246,13 @@
         "IgnoreHint": "{{server}}ID: true/false",
         "IgnoreExample": "例如：{\"1\": true, \"2\": false}"
     },
-    "Search": "搜索..."
+    "Search": "搜索...",
+    "Format": "格式化",
+    "Formatted": "已格式化",
+    "Copy": "复制",
+    "Paste": "粘贴",
+    "CopiedToClipboard": "已复制到剪贴板",
+    "ClipboardWriteFailed": "无法写入剪贴板",
+    "PastedFromClipboard": "已从剪贴板粘贴",
+    "ClipboardReadFailed": "无法读取剪贴板"
 }
