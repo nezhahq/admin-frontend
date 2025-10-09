@@ -711,7 +711,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.amount",
-                                                                        undefined,
+                                                                        "0",
                                                                     )
                                                                 }
                                                             >
