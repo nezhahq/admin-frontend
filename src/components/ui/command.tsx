@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
-import { forwardRef, ComponentRef, ComponentPropsWithoutRef, HTMLAttributes } from "react"
+import { ComponentPropsWithoutRef, ComponentRef, HTMLAttributes, forwardRef } from "react"
 
 const Command = forwardRef<
     ComponentRef<typeof CommandPrimitive>,

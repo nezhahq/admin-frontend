@@ -195,6 +195,7 @@
     "Value": "Value",
     "Preview": "Preview",
     "PublicNote": {
+        "Label": "Public Note",
         "Billing": "Billing",
         "Plan": "Plan",
         "StartDate": "Start Date",
@@ -222,10 +223,13 @@
         "CancelNoExpiry": "Cancel No Expiry",
         "Free": "Free",
         "PayAsYouGo": "Pay as you go",
-        "DropdownHint": "You may need to reselect for dropdown changes to take effect",
         "CommaSeparated": "Separate multiple items with commas",
         "Has": "Has",
-        "None": "None"
+        "None": "None",
+        "CustomFields": "Custom Fields",
+        "ClearDate": "Clear Date",
+        "Clear": "Clear",
+        "RawText": "Raw Text"
     },
     "Validation": {
         "InvalidDate": "Invalid date",
@@ -233,7 +237,8 @@
         "MustBeDayWeekMonthYear": "Must be Day/Week/Month/Year",
         "MustBe1Or2": "Must be 1 or 2",
         "DigitsOnly": "Digits only",
-        "InvalidForm": "Invalid form"
+        "InvalidForm": "Invalid form",
+        "InvalidJSON": "Invalid JSON"
     },
     "AlertRules": {
         "CoverAllServers": "Monitor all servers",
@@ -241,5 +246,13 @@
         "IgnoreHint": "{{server}} ID: true/false",
         "IgnoreExample": "e.g., {\"1\": true, \"2\": false}"
     },
-    "Search": "Search..."
+    "Search": "Search...",
+    "Format": "Format",
+    "Formatted": "Formatted",
+    "Copy": "Copy",
+    "Paste": "Paste",
+    "CopiedToClipboard": "Copied to clipboard",
+    "ClipboardWriteFailed": "Clipboard write failed",
+    "PastedFromClipboard": "Pasted from clipboard",
+    "ClipboardReadFailed": "Clipboard read failed"
 }

@@ -38,7 +38,7 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { type VariantProps, cva } from "class-variance-authority"
 import { CheckIcon, ChevronDown, WandSparkles, XIcon } from "lucide-react"
-import { useState, forwardRef, KeyboardEvent } from "react"
+import { KeyboardEvent, forwardRef, useState } from "react"
 
 /**
  * Variants for the multi-select component to handle different styles.
