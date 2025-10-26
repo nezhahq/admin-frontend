@@ -144,7 +144,6 @@ export const TerminalPage = () => {
         <div className="px-8">
             <div className="flex mt-6 mb-4">
                 <h1 className="flex-1 text-3xl font-bold tracking-tight">
-                    {" "}
                     {terminal?.server_name || "Terminal"} ({id})
                 </h1>
                 <div className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0">
