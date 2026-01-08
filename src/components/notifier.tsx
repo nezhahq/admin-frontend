@@ -57,7 +57,7 @@ const notificationFormSchema = z.object({
     request_body: z.string(),
     verify_tls: asOptionalField(z.boolean()),
     skip_check: asOptionalField(z.boolean()),
-    format_body: asOptionalField(z.boolean()),
+    format_metric_units: asOptionalField(z.boolean()),
 })
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
@@ -76,7 +76,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_body: data.request_body ?? "",
                   verify_tls: (data as any).verify_tls ?? false,
                   skip_check: (data as any).skip_check ?? false,
-                  format_body: (data as any).format_body ?? false,
+                  format_metric_units: (data as any).format_body ?? false,
               }
             : {
                   name: "",
@@ -288,7 +288,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="format_body"
+                                    name="format_metric_units"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
                                             <FormControl>
@@ -298,7 +298,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">
-                                                        {t("FormatBody")}
+                                                        {t("FormatMetricUnits")}
                                                     </Label>
                                                 </div>
                                             </FormControl>

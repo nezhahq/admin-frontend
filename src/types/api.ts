@@ -389,7 +389,7 @@ export interface ModelNotification {
     updated_at: string
     url: string
     verify_tls: boolean
-    format_body: boolean
+    format_metric_units: boolean
 }
 
 export interface ModelNotificationForm {
