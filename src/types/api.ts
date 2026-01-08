@@ -389,6 +389,7 @@ export interface ModelNotification {
     updated_at: string
     url: string
     verify_tls: boolean
+    format_body: boolean
 }
 
 export interface ModelNotificationForm {

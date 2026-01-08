@@ -185,5 +185,6 @@
     "EditServerConfig": "編輯伺服器配置",
     "Option": "選項",
     "Value": "值",
-    "Preview": "預覽"
+    "Preview": "預覽",
+    "FormatBody": "格式化資料單位"
 }

@@ -254,5 +254,6 @@
     "CopiedToClipboard": "已复制到剪贴板",
     "ClipboardWriteFailed": "无法写入剪贴板",
     "PastedFromClipboard": "已从剪贴板粘贴",
-    "ClipboardReadFailed": "无法读取剪贴板"
+    "ClipboardReadFailed": "无法读取剪贴板",
+    "FormatBody": "格式化数据单位"
 }
