@@ -1,3 +1,4 @@
+// NOTE: Do not modify the import order unless absolutely necessary.
 import { createRoot } from "react-dom/client"
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 
