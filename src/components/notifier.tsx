@@ -76,7 +76,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_body: data.request_body ?? "",
                   verify_tls: (data as any).verify_tls ?? false,
                   skip_check: (data as any).skip_check ?? false,
-                  format_metric_units: (data as any).format_body ?? false,
+                  format_metric_units: (data as any).format_metric_units ?? false,
               }
             : {
                   name: "",
@@ -87,7 +87,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_body: "",
                   verify_tls: false,
                   skip_check: false,
-                  format_body: false,
+                  format_metric_units: false,
               },
         resetOptions: {
             keepDefaultValues: false,
