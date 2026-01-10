@@ -254,5 +254,6 @@
     "CopiedToClipboard": "Copied to clipboard",
     "ClipboardWriteFailed": "Clipboard write failed",
     "PastedFromClipboard": "Pasted from clipboard",
-    "ClipboardReadFailed": "Clipboard read failed"
+    "ClipboardReadFailed": "Clipboard read failed",
+    "FormatMetricUnits": "Format Metric Units"
 }

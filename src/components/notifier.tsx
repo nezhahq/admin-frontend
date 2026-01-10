@@ -57,6 +57,7 @@ const notificationFormSchema = z.object({
     request_body: z.string(),
     verify_tls: asOptionalField(z.boolean()),
     skip_check: asOptionalField(z.boolean()),
+    format_metric_units: asOptionalField(z.boolean()),
 })
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
@@ -75,6 +76,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_body: data.request_body ?? "",
                   verify_tls: (data as any).verify_tls ?? false,
                   skip_check: (data as any).skip_check ?? false,
+                  format_metric_units: (data as any).format_body ?? false,
               }
             : {
                   name: "",
@@ -85,6 +87,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_body: "",
                   verify_tls: false,
                   skip_check: false,
+                  format_body: false,
               },
         resetOptions: {
             keepDefaultValues: false,
@@ -276,6 +279,26 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                     />
                                                     <Label className="text-sm">
                                                         {t("DoNotSendTestMessage")}
+                                                    </Label>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="format_metric_units"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                    <Label className="text-sm">
+                                                        {t("FormatMetricUnits")}
                                                     </Label>
                                                 </div>
                                             </FormControl>
