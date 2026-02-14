@@ -465,7 +465,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     {publicNoteObj.billingDataMod
                                                                         ?.startDate
                                                                         ? new Date(
-                                                                              publicNoteObj.billingDataMod!.startDate!,
+                                                                              publicNoteObj
+                                                                                  .billingDataMod!
+                                                                                  .startDate!,
                                                                           ).toLocaleDateString()
                                                                         : "YYYY-MM-DD"}
                                                                 </Button>
@@ -490,7 +492,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                                 .billingDataMod
                                                                                 ?.startDate
                                                                                 ? new Date(
-                                                                                      publicNoteObj.billingDataMod!.startDate!,
+                                                                                      publicNoteObj
+                                                                                          .billingDataMod!
+                                                                                          .startDate!,
                                                                                   )
                                                                                 : undefined
                                                                         }
