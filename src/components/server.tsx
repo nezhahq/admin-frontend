@@ -214,8 +214,27 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         form.reset()
     }
 
+    const handleOpenChange = (v: boolean) => {
+        if (v) {
+            form.reset({
+                ...data,
+                ddns_profiles_raw: data.ddns_profiles
+                    ? conv.arrToStr(data.ddns_profiles)
+                    : undefined,
+                override_ddns_domains_raw: data.override_ddns_domains
+                    ? JSON.stringify(data.override_ddns_domains)
+                    : undefined,
+            })
+            setPublicNoteObj(parsePublicNote(data?.public_note))
+            setPublicNoteRaw(data?.public_note ?? "")
+            setPublicNoteMode(detectPublicNoteMode(data?.public_note))
+            setPublicNoteErrors({})
+        }
+        setOpen(v)
+    }
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 <IconButton variant="outline" icon="edit" />
             </DialogTrigger>
