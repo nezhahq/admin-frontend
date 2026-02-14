@@ -577,6 +577,8 @@ export interface ModelServerTaskResponse {
 export interface ModelService {
     cover: number
     created_at: string
+    /** 展示排序，越大越靠前 */
+    display_index: number
     duration: number
     enable_show_in_service: boolean
     enable_trigger_task: boolean
@@ -600,6 +602,8 @@ export interface ModelService {
 
 export interface ModelServiceForm {
     cover: number
+    /** 展示排序，越大越靠前 */
+    display_index: number
     duration: number
     enable_show_in_service?: boolean
     enable_trigger_task?: boolean

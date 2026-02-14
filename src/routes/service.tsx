@@ -60,7 +60,7 @@ export default function ServicePage() {
         {
             header: "ID",
             accessorKey: "id",
-            accessorFn: (row) => row.id,
+            accessorFn: (row) => `${row.id}(${row.display_index ?? 0})`,
         },
         {
             header: t("Name"),
