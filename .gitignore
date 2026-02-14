@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 bun.lock
 pnpm-lock.yaml
+package-lock.json
