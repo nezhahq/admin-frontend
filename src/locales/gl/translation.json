@@ -1,0 +1,25 @@
+{
+    "nezha": "Monitoreo Nezha",
+    "theme": {
+        "light": "Claro",
+        "dark": "Escuro",
+        "system": "Seguir o sistema"
+    },
+    "Username": "Nome de usuario",
+    "Password": "Contrasinal",
+    "InvalidUsernameOrPassword": "Nome de usuario ou contrasinal non válidos",
+    "NetworkError": "Error de rede",
+    "LoginFirst": "Por favor, inicie sesión primeiro",
+    "CurrentTime": "Hora actual",
+    "Results": {
+        "UsernameMin": "O nome de usuario debe ter polo menos {{number}} caracteres.",
+        "PasswordRequired": "O contrasinal non pode estar baleiro.",
+        "ErrorFetchingResource": "Erro ao obter o recurso: {{error}}",
+        "SelectAtLeastOneServer": "Por favor, selecciona polo menos un servidor.",
+        "UnExpectedError": "Erro inesperado. Consulta a consola para obter máis detalles.",
+        "ForceUpdate": "Actualización forzada:",
+        "NoRowsAreSelected": "Non hai filas seleccionadas",
+        "ThisOperationIsUnrecoverable": "A operación non se pode desfacer!",
+        "TaskTriggeredSuccessfully": "A tarefa desencadeouse correctamente"
+    }
+}
