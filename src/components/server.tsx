@@ -72,6 +72,7 @@ const serverFormSchema = z.object({
                 if (s.length === 0) return true
                 try {
                     const obj = JSON.parse(s)
+                    if (typeof obj !== "object" || obj === null) return true
                     return PublicNoteSchema.safeParse(obj).success
                 } catch {
                     // skip check if not JSON
