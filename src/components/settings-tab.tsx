@@ -20,14 +20,14 @@ export const SettingsTab = ({ className }: { className?: string }) => {
                         <TabsTrigger value="/dashboard/settings/user" asChild>
                             <Link to="/dashboard/settings/user">{t("User")}</Link>
                         </TabsTrigger>
+                        <TabsTrigger value="/dashboard/settings/online-user" asChild>
+                            <Link to="/dashboard/settings/online-user">{t("OnlineUser")}</Link>
+                        </TabsTrigger>
+                        <TabsTrigger value="/dashboard/settings/waf" asChild>
+                            <Link to="/dashboard/settings/waf">{t("WAF")}</Link>
+                        </TabsTrigger>
                     </>
                 )}
-                <TabsTrigger value="/dashboard/settings/online-user" asChild>
-                    <Link to="/dashboard/settings/online-user">{t("OnlineUser")}</Link>
-                </TabsTrigger>
-                <TabsTrigger value="/dashboard/settings/waf" asChild>
-                    <Link to="/dashboard/settings/waf">{t("WAF")}</Link>
-                </TabsTrigger>
             </TabsList>
         </Tabs>
     )
