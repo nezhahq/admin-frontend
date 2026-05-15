@@ -3,6 +3,7 @@ import { SettingsTab } from "@/components/settings-tab"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Combobox } from "@/components/ui/combobox"
 import {
     Form,
     FormControl,
@@ -21,9 +22,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Combobox } from "@/components/ui/combobox"
-import { useNotification } from "@/hooks/useNotfication"
 import { useAuth } from "@/hooks/useAuth"
+import { useNotification } from "@/hooks/useNotfication"
 import useSetting from "@/hooks/useSetting"
 import { asOptionalField } from "@/lib/utils"
 import { nezhaLang, settingCoverageTypes } from "@/types"
