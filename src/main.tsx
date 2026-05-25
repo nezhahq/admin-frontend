@@ -27,6 +27,7 @@ import NotificationPage from "./routes/notification"
 import OnlineUserPage from "./routes/online-user"
 import ProfilePage from "./routes/profile"
 import SettingsPage from "./routes/settings"
+import TransferPage from "./routes/transfer"
 import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
 
@@ -145,6 +146,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/settings/online-user",
                 element: <OnlineUserPage />,
+            },
+            {
+                path: "/dashboard/transfer",
+                element: <TransferPage />,
             },
         ],
     },

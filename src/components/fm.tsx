@@ -37,7 +37,7 @@ import {
 import { ColumnDef } from "@tanstack/react-table"
 import { Row, flexRender } from "@tanstack/react-table"
 import { File, Folder } from "lucide-react"
-import { HTMLAttributes, JSX, useEffect, useRef, useState } from "react"
+import { HTMLAttributes, JSX, useCallback, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
@@ -59,6 +59,10 @@ interface FMProps {
     wsUrl: string
 }
 
+type VirtualizedTableRowProps = HTMLAttributes<HTMLTableRowElement> & {
+    "data-index"?: number | string
+}
+
 const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
     if (a.length !== b.length) return false
     for (let i = 0; i < a.length; i++) {
@@ -67,16 +71,12 @@ const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
     return true
 }
 
-const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, ...props }) => {
+export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, ...props }) => {
     const { t } = useTranslation()
     const fmRef = useRef<HTMLDivElement>(null)
     const wsRef = useRef<WebSocket | null>(null)
-
-    useEffect(() => {
-        return () => {
-            wsRef.current?.close()
-        }
-    }, [])
+    const tRef = useRef(t)
+    tRef.current = t
 
     const [dOpen, setdOpen] = useState(false)
     const [uOpen, setuOpen] = useState(false)
@@ -120,9 +120,8 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
     ]
 
     const tableRowComponent = (rows: Row<FMEntry>[]) =>
-        function getTableRow(props: HTMLAttributes<HTMLTableRowElement>) {
-            // @ts-expect-error data-index is a valid attribute
-            const index = props["data-index"]
+        function getTableRow(props: VirtualizedTableRowProps) {
+            const index = Number(props["data-index"])
             const row = rows[index]
 
             if (!row) return null
@@ -161,6 +160,65 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
     }
 
     useEffect(() => {
+        worker.onmessage = async (event: MessageEvent<FMWorkerData>) => {
+            switch (event.data.type) {
+            case FMWorkerOpcode.Error: {
+                console.error("Error from worker", event.data.error)
+                break
+            }
+            case FMWorkerOpcode.Progress: {
+                handleReady.current = true
+                break
+            }
+            case FMWorkerOpcode.Result: {
+                handleReady.current = false
+
+                if (event.data.blob && event.data.fileName) {
+                    const url = URL.createObjectURL(event.data.blob)
+                    const anchor = document.createElement("a")
+                    anchor.href = url
+                    anchor.download = event.data.fileName
+                    anchor.click()
+                    URL.revokeObjectURL(url)
+                }
+
+                firstChunk.current = true
+                if (dOpen) setdOpen(false)
+                break
+            }
+            }
+        }
+
+        const handleBeforeUnload = () => {
+            worker.postMessage({
+                operation: 3,
+            })
+        }
+
+        window.addEventListener("beforeunload", handleBeforeUnload)
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload)
+        }
+    }, [dOpen])
+
+    const [currentPath, setPath] = useState("")
+    const currentPathRef = useRef(currentPath)
+    currentPathRef.current = currentPath
+
+    const listFile = useCallback(() => {
+        const prefix = new Int8Array([FMOpcode.List])
+        const pathMsg = new TextEncoder().encode(currentPathRef.current)
+
+        const msg = new Int8Array(prefix.length + pathMsg.length)
+        msg.set(prefix)
+        msg.set(pathMsg, prefix.length)
+
+        wsRef.current?.send(msg)
+    }, [])
+
+    // The WebSocket initialization must not depend on listFile or currentPath,
+    // otherwise navigating directories triggers a disconnect and reconnect.
+    useEffect(() => {
         const url = new URL(wsUrl, window.location.origin)
         url.protocol = url.protocol.replace("http", "ws")
         const ws = new WebSocket(url)
@@ -174,8 +232,8 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
         }
         ws.onerror = (e) => {
             console.error(e)
-            toast("Websocket" + " " + t("Error"), {
-                description: t("Results.UnExpectedError"),
+            toast("Websocket" + " " + tRef.current("Error"), {
+                description: tRef.current("Results.UnExpectedError"),
             })
         }
         ws.onmessage = async (e: MessageEvent<ArrayBufferLike>) => {
@@ -186,7 +244,6 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                     const errMsg = new TextDecoder("utf-8").decode(errBytes)
                     throw new Error(errMsg)
                 }
-
                 if (firstChunk.current) {
                     if (arraysEqual(identifier, FMIdentifier.file)) {
                         worker.postMessage({
@@ -204,7 +261,7 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                         setuOpen(false)
                         listFile()
                     } else {
-                        throw new Error(t("Results.UnknownIdentifier"))
+                        throw new Error(tRef.current("Results.UnknownIdentifier"))
                     }
                 } else {
                     await waitForHandleReady()
@@ -216,74 +273,27 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                 }
             } catch (error) {
                 console.error("Error processing received data:", error)
-                toast("FM" + " " + t("Error"), {
-                    description: t("Results.UnExpectedError"),
+                toast("FM" + " " + tRef.current("Error"), {
+                    description: tRef.current("Results.UnExpectedError"),
                 })
                 setdOpen(false)
                 setuOpen(false)
             }
         }
-    }, [wsUrl])
 
-    useEffect(() => {
-        worker.onmessage = async (event: MessageEvent<FMWorkerData>) => {
-            switch (event.data.type) {
-                case FMWorkerOpcode.Error: {
-                    console.error("Error from worker", event.data.error)
-                    break
-                }
-                case FMWorkerOpcode.Progress: {
-                    handleReady.current = true
-                    break
-                }
-                case FMWorkerOpcode.Result: {
-                    handleReady.current = false
-
-                    if (event.data.blob && event.data.fileName) {
-                        const url = URL.createObjectURL(event.data.blob)
-                        const anchor = document.createElement("a")
-                        anchor.href = url
-                        anchor.download = event.data.fileName
-                        anchor.click()
-                        URL.revokeObjectURL(url)
-                    }
-
-                    firstChunk.current = true
-                    if (dOpen) setdOpen(false)
-                    break
-                }
+        return () => {
+            ws.close()
+            if (wsRef.current === ws) {
+                wsRef.current = null
             }
         }
+    }, [listFile, wsUrl])
 
-        const handleBeforeUnload = () => {
-            worker.postMessage({
-                operation: 3,
-            })
-        }
-
-        window.addEventListener("beforeunload", handleBeforeUnload)
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload)
-        }
-    }, [worker, dOpen])
-
-    const [currentPath, setPath] = useState("")
     useEffect(() => {
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             listFile()
         }
-    }, [wsRef.current, currentPath])
-
-    const listFile = () => {
-        const prefix = new Int8Array([FMOpcode.List])
-        const pathMsg = new TextEncoder().encode(currentPath)
-
-        const msg = new Int8Array(prefix.length + pathMsg.length)
-        msg.set(prefix)
-        msg.set(pathMsg, prefix.length)
-
-        wsRef.current?.send(msg)
-    }
+    }, [currentPath, listFile])
 
     const downloadFile = (basename: string) => {
         currentBasename.current = basename
@@ -331,9 +341,10 @@ const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, 
                                 onClick={async () => {
                                     try {
                                         await copyToClipboard(formatPath(currentPath))
-                                    } catch (error: any) {
+                                    } catch (error) {
+                                        const description = error instanceof Error ? error.message : t("Results.UnExpectedError")
                                         toast("FM" + " " + t("Error"), {
-                                            description: error.message,
+                                            description,
                                         })
                                         console.error("copy error: ", error)
                                     }

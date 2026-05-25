@@ -49,7 +49,7 @@ const agentConfigSchema = z.object({
                 try {
                     JSON.parse(val)
                     return true
-                } catch (e) {
+                } catch {
                     return false
                 }
             },
@@ -66,7 +66,7 @@ const agentConfigSchema = z.object({
                 try {
                     JSON.parse(val)
                     return true
-                } catch (e) {
+                } catch {
                     return false
                 }
             },
@@ -129,7 +129,7 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
             }
         }
         if (open) fetchData()
-    }, [open])
+    }, [open, sid, t])
 
     const form = useForm({
         resolver: zodResolver(agentConfigSchema) as any,

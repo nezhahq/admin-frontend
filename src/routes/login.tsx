@@ -39,7 +39,7 @@ function Login() {
         if (oauth2) {
             loginOauth2()
         }
-    }, [window.location.search])
+    }, [loginOauth2])
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -56,7 +56,7 @@ function Login() {
     async function loginWith(provider: string) {
         try {
             const redirectUrl = await getOauth2RedirectURL(provider, Oauth2RequestType.LOGIN)
-            window.location.href = redirectUrl.redirect!
+            window.location.assign(redirectUrl.redirect!)
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -108,14 +108,14 @@ function Login() {
                 </form>
                 {settingData?.config?.oauth2_providers &&
                     settingData?.config?.oauth2_providers.length > 0 && (
-                        <section className="flex items-center my-3 w-full">
-                            <Separator className="flex-1" />
-                            <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
+                    <section className="flex items-center my-3 w-full">
+                        <Separator className="flex-1" />
+                        <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
                                 OAuth2
-                            </div>
-                            <Separator className="flex-1" />
-                        </section>
-                    )}
+                        </div>
+                        <Separator className="flex-1" />
+                    </section>
+                )}
             </Form>
             <div className="mt-3 flex flex-col gap-3">
                 {settingData?.config?.oauth2_providers?.map((p: string) => (

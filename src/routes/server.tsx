@@ -100,6 +100,38 @@ export default function ServerPage() {
             },
         },
         {
+            id: "owner",
+            header: t("Owner"),
+            // Backend Server.MarshalJSON always emits owner.id; username is
+            // omitted for uid=0 (legacy global agent secret) and for users
+            // that no longer exist. Render uid=0 as "Global Agent" and a
+            // missing username as "Unknown user (#id)" so deleted-user rows
+            // stay debuggable instead of silently appearing ownerless.
+            accessorFn: (row) => {
+                if (!row.owner) return ""
+                if (row.owner.id === 0) return t("GlobalAgent")
+                return row.owner.username || t("UnknownUser", { id: row.owner.id })
+            },
+            cell: ({ row }) => {
+                const owner = row.original.owner
+                if (!owner) {
+                    return <span className="text-muted-foreground">-</span>
+                }
+                if (owner.id === 0) {
+                    return <span>{t("GlobalAgent")}</span>
+                }
+                const label = owner.username || t("UnknownUser", { id: owner.id })
+                return (
+                    <div
+                        className="max-w-32 whitespace-normal break-words"
+                        title={`uid=${owner.id}`}
+                    >
+                        {label}
+                    </div>
+                )
+            },
+        },
+        {
             id: "ip",
             header: "IP",
             cell: ({ row }) => {
@@ -260,9 +292,9 @@ export default function ServerPage() {
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext(),
-                                                  )}
+                                                    header.column.columnDef.header,
+                                                    header.getContext(),
+                                                )}
                                         </TableHead>
                                     )
                                 })}

@@ -76,19 +76,19 @@ export default function SettingsPage() {
         resolver: zodResolver(settingFormSchema) as any,
         defaultValues: config
             ? {
-                  ...config.config,
-                  user_template:
+                ...config.config,
+                user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
                       "user-dist",
-              }
+            }
             : {
-                  ip_change_notification_group_id: 0,
-                  cover: 1,
-                  site_name: "",
-                  language: "",
-                  user_template: "user-dist",
-              },
+                ip_change_notification_group_id: 0,
+                cover: 1,
+                site_name: "",
+                language: "",
+                user_template: "user-dist",
+            },
         resetOptions: {
             keepDefaultValues: false,
         },

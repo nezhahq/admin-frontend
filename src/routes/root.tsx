@@ -22,16 +22,18 @@ export default function Root() {
         }
     }, [settingData?.config?.custom_code_dashboard])
 
+    useEffect(() => {
+        if (settingData?.config?.language && !localStorage.getItem("language")) {
+            i18n.changeLanguage(settingData?.config?.language)
+        }
+    }, [settingData?.config?.language])
+
     if (error) {
         throw error
     }
 
     if (!settingData) {
         return null
-    }
-
-    if (settingData?.config?.language && !localStorage.getItem("language")) {
-        i18n.changeLanguage(settingData?.config?.language)
     }
 
     return (

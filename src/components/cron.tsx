@@ -63,33 +63,34 @@ const cronFormSchema = z.object({
     notification_group_id: z.coerce.number().int(),
 })
 
-type CronFormData = z.infer<typeof cronFormSchema>
+type CronFormInput = z.input<typeof cronFormSchema>
+type CronFormData = z.output<typeof cronFormSchema>
 
 export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<CronFormData>({
-        resolver: zodResolver(cronFormSchema as any),
+    const form = useForm<CronFormInput, unknown, CronFormData>({
+        resolver: zodResolver(cronFormSchema),
         defaultValues: data
             ? {
-                  task_type: data.task_type ?? 0,
-                  name: data.name ?? "",
-                  scheduler: data.scheduler ?? "",
-                  command: (data as any).command ?? "",
-                  servers: data.servers ?? [],
-                  cover: data.cover ?? 0,
-                  push_successful: (data as any).push_successful ?? false,
-                  notification_group_id: data.notification_group_id ?? 0,
-              }
+                task_type: data.task_type ?? 0,
+                name: data.name ?? "",
+                scheduler: data.scheduler ?? "",
+                command: data.command ?? "",
+                servers: data.servers ?? [],
+                cover: data.cover ?? 0,
+                push_successful: data.push_successful ?? false,
+                notification_group_id: data.notification_group_id ?? 0,
+            }
             : {
-                  task_type: 0,
-                  name: "",
-                  scheduler: "",
-                  command: "",
-                  servers: [],
-                  cover: 0,
-                  push_successful: false,
-                  notification_group_id: 0,
-              },
+                task_type: 0,
+                name: "",
+                scheduler: "",
+                command: "",
+                servers: [],
+                cover: 0,
+                push_successful: false,
+                notification_group_id: 0,
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -99,7 +100,11 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
 
     const onSubmit = async (values: CronFormData) => {
         try {
-            data?.id ? await updateCron(data.id, values) : await createCron(values)
+            if (data?.id) {
+                await updateCron(data.id, values)
+            } else {
+                await createCron(values)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -267,7 +272,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                                     placeholder="Search..."
                                                     options={ngroupList}
                                                     onValueChange={field.onChange}
-                                                    defaultValue={field.value.toString()}
+                                                    defaultValue={String(field.value ?? "")}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -282,7 +287,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">

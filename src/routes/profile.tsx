@@ -26,12 +26,12 @@ export default function ProfilePage() {
             })
             window.history.replaceState({}, document.title, window.location.pathname)
         }
-    }, [window.location.search])
+    }, [setProfile])
 
     const bindO2 = async (provider: string) => {
         try {
             const redirectUrl = await getOauth2RedirectURL(provider, Oauth2RequestType.BIND)
-            window.location.href = redirectUrl.redirect!
+            window.location.assign(redirectUrl.redirect!)
         } catch (error: any) {
             toast.error(error.message)
         }

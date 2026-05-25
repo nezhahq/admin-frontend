@@ -158,9 +158,9 @@ export function DataTable<TData, TValue>({
                                                 {...{
                                                     style: header.column.getCanSort()
                                                         ? {
-                                                              cursor: "pointer",
-                                                              userSelect: "none",
-                                                          }
+                                                            cursor: "pointer",
+                                                            userSelect: "none",
+                                                        }
                                                         : {},
                                                     onClick:
                                                         header.column.getToggleSortingHandler(),

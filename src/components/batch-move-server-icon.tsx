@@ -33,8 +33,9 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({
     const [toUserId, setToUserId] = useState<number | undefined>(undefined)
 
     const onSubmit = async () => {
+        let results
         try {
-            await batchMoveServer({
+            results = await batchMoveServer({
                 ids: serverIds,
                 to_user: toUserId!,
             })
@@ -45,7 +46,30 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({
             })
             return
         }
-        toast(t("Done"))
+
+        // The backend now responds per-server; render a structured summary
+        // instead of "Done" so the operator can see which ids hit a snag
+        // (DisableCommandExecute / already_transferring / etc). Pending ids
+        // remain async — watching /ws/transfer or the Transfers page will
+        // surface their terminal state.
+        const pending = results.filter((r) => r.status === "pending").length
+        const denied = results.filter((r) => r.status === "permission_denied").length
+        const dup = results.filter((r) => r.status === "already_transferring").length
+        const missing = results.filter((r) => r.status === "server_not_found").length
+        const same = results.filter((r) => r.status === "same_owner").length
+        const tooOld = results.filter((r) => r.status === "agent_too_old").length
+
+        const parts: string[] = []
+        if (pending) parts.push(t("Transfer.PendingCount", { count: pending }))
+        if (denied) parts.push(t("Transfer.PermissionDeniedCount", { count: denied }))
+        if (dup) parts.push(t("Transfer.AlreadyTransferringCount", { count: dup }))
+        if (missing) parts.push(t("Transfer.ServerNotFoundCount", { count: missing }))
+        if (same) parts.push(t("Transfer.SameOwnerCount", { count: same }))
+        if (tooOld) parts.push(t("Transfer.AgentTooOldCount", { count: tooOld }))
+
+        toast(t("Transfer.BatchSubmitted"), {
+            description: parts.join(" · ") || t("Done"),
+        })
         setOpen(false)
     }
 

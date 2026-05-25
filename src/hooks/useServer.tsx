@@ -54,7 +54,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({
                     setServer(undefined)
                 }
             })()
-    }, [location.pathname])
+    }, [location.pathname, setServer, setServerGroup, withServer, withServerGroup])
 
     const value: ServerContextProps = useMemo(
         () => ({
