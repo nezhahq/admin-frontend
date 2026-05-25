@@ -1,5 +1,6 @@
 import {
     ModelBatchMoveServerForm,
+    ModelBatchMoveServerResult,
     ModelServer,
     ModelServerConfigForm,
     ModelServerForm,
@@ -16,8 +17,16 @@ export const deleteServer = async (id: number[]): Promise<void> => {
     return fetcher<void>(FetcherMethod.POST, "/api/v1/batch-delete/server", id)
 }
 
-export const batchMoveServer = async (data: ModelBatchMoveServerForm): Promise<void> => {
-    return fetcher<void>(FetcherMethod.POST, "/api/v1/batch-move/server", data)
+// batchMoveServer kicks off one ServerTransfer per id and returns a per-id
+// result. The dashboard previously returned void from this endpoint; the new
+// response shape carries the transfer ID for callers that want to subscribe
+// to /ws/transfer for state changes, plus structured non-pending statuses
+// (permission_denied, already_transferring, server_not_found, same_owner)
+// that the UI can render without parsing prose error messages.
+export const batchMoveServer = async (
+    data: ModelBatchMoveServerForm,
+): Promise<ModelBatchMoveServerResult[]> => {
+    return fetcher<ModelBatchMoveServerResult[]>(FetcherMethod.POST, "/api/v1/batch-move/server", data)
 }
 
 export const forceUpdateServer = async (id: number[]): Promise<ModelServerTaskResponse> => {

@@ -67,45 +67,46 @@ const ddnsFormSchema = z.object({
     webhook_headers: asOptionalField(z.string()),
 })
 
-type DDNSFormData = z.infer<typeof ddnsFormSchema>
+type DDNSFormInput = z.input<typeof ddnsFormSchema>
+type DDNSFormData = z.output<typeof ddnsFormSchema>
 
 export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<DDNSFormData>({
-        resolver: zodResolver(ddnsFormSchema as any),
+    const form = useForm<DDNSFormInput, unknown, DDNSFormData>({
+        resolver: zodResolver(ddnsFormSchema),
         defaultValues: data
             ? {
-                  max_retries: data.max_retries ?? 3,
-                  enable_ipv4: (data as any).enable_ipv4 ?? false,
-                  enable_ipv6: (data as any).enable_ipv6 ?? false,
-                  name: data.name ?? "",
-                  provider: data.provider ?? "dummy",
-                  domains: data.domains ?? [],
-                  domains_raw: conv.arrToStr(data.domains ?? []),
-                  access_id: (data as any).access_id ?? "",
-                  access_secret: (data as any).access_secret ?? "",
-                  webhook_url: (data as any).webhook_url ?? "",
-                  webhook_method: (data as any).webhook_method,
-                  webhook_request_type: (data as any).webhook_request_type,
-                  webhook_request_body: (data as any).webhook_request_body ?? "",
-                  webhook_headers: (data as any).webhook_headers ?? "",
-              }
+                max_retries: data.max_retries ?? 3,
+                enable_ipv4: data.enable_ipv4 ?? false,
+                enable_ipv6: data.enable_ipv6 ?? false,
+                name: data.name ?? "",
+                provider: data.provider ?? "dummy",
+                domains: data.domains ?? [],
+                domains_raw: conv.arrToStr(data.domains ?? []),
+                access_id: data.access_id ?? "",
+                access_secret: data.access_secret ?? "",
+                webhook_url: data.webhook_url ?? "",
+                webhook_method: data.webhook_method,
+                webhook_request_type: data.webhook_request_type,
+                webhook_request_body: data.webhook_request_body ?? "",
+                webhook_headers: data.webhook_headers ?? "",
+            }
             : {
-                  max_retries: 3,
-                  enable_ipv4: false,
-                  enable_ipv6: false,
-                  name: "",
-                  provider: "dummy",
-                  domains: [],
-                  domains_raw: "",
-                  access_id: "",
-                  access_secret: "",
-                  webhook_url: "",
-                  webhook_method: undefined,
-                  webhook_request_type: undefined,
-                  webhook_request_body: "",
-                  webhook_headers: "",
-              },
+                max_retries: 3,
+                enable_ipv4: false,
+                enable_ipv6: false,
+                name: "",
+                provider: "dummy",
+                domains: [],
+                domains_raw: "",
+                access_id: "",
+                access_secret: "",
+                webhook_url: "",
+                webhook_method: undefined,
+                webhook_request_type: undefined,
+                webhook_request_body: "",
+                webhook_headers: "",
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -116,7 +117,11 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
     const onSubmit = async (values: DDNSFormData) => {
         try {
             values.domains = conv.strToArr(values.domains_raw)
-            data?.id ? await updateDDNSProfile(data.id, values) : await createDDNSProfile(values)
+            if (data?.id) {
+                await updateDDNSProfile(data.id, values)
+            } else {
+                await createDDNSProfile(values)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -227,15 +232,23 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                 <FormField
                                     control={form.control}
                                     name="max_retries"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("MaximumRetryAttempts")}</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" placeholder="3" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    render={({ field }) => {
+                                        const { value, ...fieldProps } = field
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>{t("MaximumRetryAttempts")}</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="3"
+                                                        value={String(value ?? "")}
+                                                        {...fieldProps}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
                                 />
                                 <FormField
                                     control={form.control}
@@ -351,7 +364,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">
@@ -371,7 +384,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">

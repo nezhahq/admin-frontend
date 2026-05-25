@@ -49,6 +49,7 @@ const pages = [
     { href: "/dashboard/ddns", label: i18next.t("DDNS") },
     { href: "/dashboard/nat", label: i18next.t("NATT") },
     { href: "/dashboard/server-group", label: i18next.t("Group") },
+    { href: "/dashboard/transfer", label: i18next.t("Transfer.Title") },
 ]
 
 export default function Header() {
@@ -248,6 +249,15 @@ export default function Header() {
                                     <Link to="/dashboard/server-group">{t("Group")}</Link>
                                 </NzNavigationMenuLink>
                             </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/transfer"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/transfer">{t("Transfer.Title")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
                         </>
                     )}
                 </div>
@@ -385,8 +395,7 @@ const useInterval = (callback: () => void, delay?: number | null) => {
 function Overview() {
     const { t } = useTranslation()
     const profile = useMainStore((store) => store.profile)
-    const timeOption = DateTime.TIME_SIMPLE
-    timeOption.hour12 = true
+    const timeOption = { ...DateTime.TIME_SIMPLE, hour12: true }
     const [timeString, setTimeString] = useState(
         DateTime.now().setLocale("en-US").toLocaleString(timeOption),
     )

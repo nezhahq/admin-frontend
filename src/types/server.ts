@@ -16,7 +16,7 @@ export const AgentConfigSchema = z.object({
                 try {
                     JSON.parse(val)
                     return true
-                } catch (e) {
+                } catch {
                     return false
                 }
             },
@@ -33,7 +33,7 @@ export const AgentConfigSchema = z.object({
                 try {
                     JSON.parse(val)
                     return true
-                } catch (e) {
+                } catch {
                     return false
                 }
             },

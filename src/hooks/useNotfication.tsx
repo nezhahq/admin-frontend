@@ -54,7 +54,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
                     setNotifier(undefined)
                 }
             })()
-    }, [location.pathname])
+    }, [location.pathname, setNotifier, setNotifierGroup, withNotifier, withNotifierGroup])
 
     const value: NotificationContextProps = useMemo(
         () => ({

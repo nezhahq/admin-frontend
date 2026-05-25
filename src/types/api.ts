@@ -1,4 +1,3 @@
-/* eslint-disable */
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
@@ -191,6 +190,46 @@ export interface ModelAlertRuleForm {
 export interface ModelBatchMoveServerForm {
     ids: number[]
     to_user: number
+}
+
+// ModelServerTransferStatus mirrors model.ServerTransferStatus in nezha. The
+// values are stable iota numbers; do NOT renumber without coordinating with
+// the backend or every existing transfer row will be misread.
+export const ModelServerTransferStatusPending = 0
+export const ModelServerTransferStatusVerified = 1
+export const ModelServerTransferStatusFailed = 2
+export const ModelServerTransferStatusTimeout = 3
+export const ModelServerTransferStatusCancelled = 4
+export type ModelServerTransferStatus = 0 | 1 | 2 | 3 | 4
+
+// ModelBatchMoveServerResultStatus enumerates the per-server outcomes of
+// /batch-move/server. Mirrors model.BatchMoveServerResultStatus.
+export type ModelBatchMoveServerResultStatus =
+    | "pending"
+    | "permission_denied"
+    | "already_transferring"
+    | "server_not_found"
+    | "same_owner"
+    | "agent_too_old"
+
+export interface ModelBatchMoveServerResult {
+    server_id: number
+    status: ModelBatchMoveServerResultStatus
+    transfer_id?: number
+    error?: string
+}
+
+export interface ModelServerTransfer {
+    id: number
+    created_at: string
+    updated_at: string
+    server_id: number
+    from_user_id: number
+    to_user_id: number
+    initiator_id: number
+    status: ModelServerTransferStatus
+    last_error?: string
+    acked_at?: string
 }
 
 export interface ModelCreateFMResponse {
@@ -500,6 +539,14 @@ export interface ModelSensorTemperature {
     temperature?: number
 }
 
+// ModelServerOwner mirrors model.ServerOwnerInfo from the backend. Server.id
+// is always present; username is omitted for the legacy uid=0 pseudo-owner
+// and for users that no longer exist in the User table.
+export interface ModelServerOwner {
+    id: number
+    username?: string
+}
+
 export interface ModelServer {
     created_at: string
     /** DDNS配置 */
@@ -518,6 +565,10 @@ export interface ModelServer {
     /** 管理员可见备注 */
     note: string
     override_ddns_domains?: Record<string, string[]>
+    /** Owner identity from model.Server.MarshalJSON. Always present for
+     *  current backends; optional here for compatibility with older
+     *  dashboards that pre-date the owner field. */
+    owner?: ModelServerOwner
     /** 公开备注 */
     public_note: string
     state: ModelHostState

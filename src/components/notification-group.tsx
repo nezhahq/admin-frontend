@@ -48,13 +48,13 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
         resolver: zodResolver(notificationGroupFormSchema),
         defaultValues: data
             ? {
-                  name: data.group.name,
-                  notifications: data.notifications,
-              }
+                name: data.group.name,
+                notifications: data.notifications,
+            }
             : {
-                  name: "",
-                  notifications: [],
-              },
+                name: "",
+                notifications: [],
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -64,9 +64,11 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
 
     const onSubmit = async (values: z.infer<typeof notificationGroupFormSchema>) => {
         try {
-            data?.group.id
-                ? await updateNotificationGroup(data.group.id, values)
-                : await createNotificationGroup(values)
+            if (data?.group.id) {
+                await updateNotificationGroup(data.group.id, values)
+            } else {
+                await createNotificationGroup(values)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {

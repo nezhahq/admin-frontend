@@ -62,33 +62,36 @@ const notificationFormSchema = z.object({
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    type notificationFormData = z.infer<typeof notificationFormSchema>
+    type NotificationFormInput = z.input<typeof notificationFormSchema>
+    type NotificationFormData = z.output<typeof notificationFormSchema>
+    type NotificationDefaults = ModelNotification & Partial<Pick<NotificationFormData, "skip_check">>
+    const notificationDefaults: NotificationDefaults | undefined = data
 
-    const form = useForm({
-        resolver: zodResolver(notificationFormSchema) as any,
+    const form = useForm<NotificationFormInput, unknown, NotificationFormData>({
+        resolver: zodResolver(notificationFormSchema),
         defaultValues: data
             ? {
-                  name: data.name ?? "",
-                  url: data.url ?? "",
-                  request_method: data.request_method ?? 1,
-                  request_type: data.request_type ?? 1,
-                  request_header: data.request_header ?? "",
-                  request_body: data.request_body ?? "",
-                  verify_tls: (data as any).verify_tls ?? false,
-                  skip_check: (data as any).skip_check ?? false,
-                  format_metric_units: (data as any).format_metric_units ?? false,
-              }
+                name: data.name ?? "",
+                url: data.url ?? "",
+                request_method: data.request_method ?? 1,
+                request_type: data.request_type ?? 1,
+                request_header: data.request_header ?? "",
+                request_body: data.request_body ?? "",
+                verify_tls: data.verify_tls ?? false,
+                skip_check: notificationDefaults?.skip_check ?? false,
+                format_metric_units: data.format_metric_units ?? false,
+            }
             : {
-                  name: "",
-                  url: "",
-                  request_method: 1,
-                  request_type: 1,
-                  request_header: "",
-                  request_body: "",
-                  verify_tls: false,
-                  skip_check: false,
-                  format_metric_units: false,
-              },
+                name: "",
+                url: "",
+                request_method: 1,
+                request_type: 1,
+                request_header: "",
+                request_body: "",
+                verify_tls: false,
+                skip_check: false,
+                format_metric_units: false,
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -96,9 +99,13 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: notificationFormData) => {
+    const onSubmit = async (values: NotificationFormData) => {
         try {
-            data?.id ? await updateNotification(data.id, values) : await createNotification(values)
+            if (data?.id) {
+                await updateNotification(data.id, values)
+            } else {
+                await createNotification(values)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -127,7 +134,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                         </DialogHeader>
                         <Form {...form}>
                             <form
-                                onSubmit={form.handleSubmit(onSubmit as any)}
+                                onSubmit={form.handleSubmit(onSubmit)}
                                 className="space-y-2 my-2"
                             >
                                 <FormField
@@ -254,7 +261,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">
@@ -274,7 +281,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">
@@ -294,7 +301,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">

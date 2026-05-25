@@ -80,28 +80,28 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
         resolver: zodResolver(serviceFormSchema) as any,
         defaultValues: data
             ? {
-                  ...data,
-                  fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
-                  recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
-                  skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
-              }
+                ...data,
+                fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
+                recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
+                skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
+            }
             : {
-                  type: 1,
-                  cover: 0,
-                  display_index: 0,
-                  name: "",
-                  target: "",
-                  max_latency: 0.0,
-                  min_latency: 0.0,
-                  duration: 30,
-                  notification_group_id: 0,
-                  fail_trigger_tasks: [],
-                  fail_trigger_tasks_raw: "",
-                  recover_trigger_tasks: [],
-                  recover_trigger_tasks_raw: "",
-                  skip_servers: {},
-                  skip_servers_raw: [],
-              },
+                type: 1,
+                cover: 0,
+                display_index: 0,
+                name: "",
+                target: "",
+                max_latency: 0.0,
+                min_latency: 0.0,
+                duration: 30,
+                notification_group_id: 0,
+                fail_trigger_tasks: [],
+                fail_trigger_tasks_raw: "",
+                recover_trigger_tasks: [],
+                recover_trigger_tasks_raw: "",
+                skip_servers: {},
+                skip_servers_raw: [],
+            },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -113,11 +113,14 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
         values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
         values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
         values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)
-        const { skip_servers_raw, ...requiredFields } = values
+        const requiredFields = { ...values }
+        delete (requiredFields as Record<string, unknown>).skip_servers_raw
         try {
-            data?.id
-                ? await updateService(data.id, requiredFields)
-                : await createService(requiredFields)
+            if (data?.id) {
+                await updateService(data.id, requiredFields)
+            } else {
+                await createService(requiredFields)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
