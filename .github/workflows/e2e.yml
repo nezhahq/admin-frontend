@@ -75,6 +75,7 @@ jobs:
           printf '<!doctype html><title>user e2e</title>\n' > cmd/dashboard/user-dist/index.html
           go install github.com/swaggo/swag/cmd/swag@latest
           "$(go env GOPATH)/bin/swag" init --pd -d cmd/dashboard -g main.go -o cmd/dashboard/docs
+          go build -o /tmp/nezha-dashboard ./cmd/dashboard
 
       - name: Start backend
         working-directory: nezha
@@ -82,7 +83,7 @@ jobs:
           GIN_MODE: release
         run: |
           mkdir -p data
-          nohup go run ./cmd/dashboard -c data/config.yaml -db data/sqlite.db \
+          nohup /tmp/nezha-dashboard -c data/config.yaml -db data/sqlite.db \
             > /tmp/dashboard.log 2>&1 &
           echo $! > /tmp/dashboard.pid
 
