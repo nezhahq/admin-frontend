@@ -15,5 +15,5 @@ export const deleteCron = async (id: number[]): Promise<void> => {
 }
 
 export const runCron = async (id: number): Promise<void> => {
-    return fetcher<void>(FetcherMethod.GET, `/api/v1/cron/${id}/manual`, null)
+    return fetcher<void>(FetcherMethod.POST, `/api/v1/cron/${id}/manual`, null)
 }
