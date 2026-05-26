@@ -30,12 +30,13 @@ printf '<!doctype html><title>admin e2e</title>\n' > cmd/dashboard/admin-dist/in
 printf '<!doctype html><title>user e2e</title>\n' > cmd/dashboard/user-dist/index.html
 go install github.com/swaggo/swag/cmd/swag@latest
 "$(go env GOPATH)/bin/swag" init --pd -d cmd/dashboard -g main.go -o cmd/dashboard/docs
+go build -o /tmp/nezha-dashboard ./cmd/dashboard
 
 NZ_LISTENHOST=127.0.0.1 NZ_LISTENPORT=8008 \
   NZ_JWTSECRETKEY=e2e-jwt-secret-key-min-32-chars-long-ok \
   NZ_AGENTSECRETKEY=e2e-agent-secret-32-bytes-long-ok \
   NZ_SITENAME=nezha-e2e GIN_MODE=release \
-  go run ./cmd/dashboard -c data/config.yaml -db data/sqlite.db
+  /tmp/nezha-dashboard -c data/config.yaml -db data/sqlite.db
 ```
 
 Then back in this repo:
