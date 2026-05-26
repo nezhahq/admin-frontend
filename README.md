@@ -26,7 +26,8 @@ Then start the backend separately. The shape the CI workflow uses is:
 ```bash
 # in a checkout of nezhahq/nezha
 mkdir -p cmd/dashboard/admin-dist cmd/dashboard/user-dist
-touch cmd/dashboard/admin-dist/.gitkeep cmd/dashboard/user-dist/.gitkeep
+printf '<!doctype html><title>admin e2e</title>\n' > cmd/dashboard/admin-dist/index.html
+printf '<!doctype html><title>user e2e</title>\n' > cmd/dashboard/user-dist/index.html
 go install github.com/swaggo/swag/cmd/swag@latest
 "$(go env GOPATH)/bin/swag" init --pd -d cmd/dashboard -g main.go -o cmd/dashboard/docs
 
