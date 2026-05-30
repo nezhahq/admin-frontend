@@ -6,6 +6,10 @@ export default defineConfig({
     base: "/dashboard",
     plugins: [react()],
     server: {
+        // Bind the dev server to loopback so an in-browser CSRF or LAN
+        // scan cannot reach a developer's dashboard token. Override with
+        // `bun run dev -- --host 0.0.0.0` for Docker / remote dev only.
+        host: "127.0.0.1",
         proxy: {
             "^/api/v1/ws/.*": {
                 target: "ws://127.0.0.1:8008",
@@ -13,6 +17,10 @@ export default defineConfig({
                 ws: true,
             },
             "/api": {
+                target: "http://127.0.0.1:8008",
+                changeOrigin: true,
+            },
+            "/mcp": {
                 target: "http://127.0.0.1:8008",
                 changeOrigin: true,
             },

@@ -8,10 +8,11 @@ export const SettingsTab = ({ className }: { className?: string }) => {
     const { profile } = useAuth()
 
     const isAdmin = profile?.role === 0
+    const colsClass = isAdmin ? "grid-cols-5" : "grid-cols-1"
 
     return (
         <Tabs defaultValue={window.location.pathname} className={className}>
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className={`grid w-full ${colsClass}`}>
                 {isAdmin && (
                     <>
                         <TabsTrigger value="/dashboard/settings" asChild>
@@ -28,6 +29,9 @@ export const SettingsTab = ({ className }: { className?: string }) => {
                         </TabsTrigger>
                     </>
                 )}
+                <TabsTrigger value="/dashboard/settings/api-tokens" asChild>
+                    <Link to="/dashboard/settings/api-tokens">{t("ApiTokens")}</Link>
+                </TabsTrigger>
             </TabsList>
         </Tabs>
     )
