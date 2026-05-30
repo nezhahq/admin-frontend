@@ -30,6 +30,7 @@ import SettingsPage from "./routes/settings"
 import TransferPage from "./routes/transfer"
 import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
+import ApiTokensPage from "./routes/api-tokens"
 
 const router = createBrowserRouter([
     {
@@ -146,6 +147,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/settings/online-user",
                 element: <OnlineUserPage />,
+            },
+            {
+                path: "/dashboard/settings/api-tokens",
+                element: <ApiTokensPage />,
             },
             {
                 path: "/dashboard/transfer",

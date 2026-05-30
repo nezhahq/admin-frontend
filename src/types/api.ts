@@ -712,6 +712,8 @@ export interface ModelSetting {
     enable_ip_change_notification: boolean
     /** 通知信息IP不打码 */
     enable_plain_ip_in_notification: boolean
+    /** 是否启用 MCP 入口（默认关闭） */
+    enable_mcp: boolean
     /** 特定服务器IP（多个服务器用逗号分隔） */
     ignored_ip_notification: string
     ignored_ip_notification_server_ids: Record<string, boolean>
@@ -737,6 +739,7 @@ export interface ModelSettingForm {
     dns_servers?: string
     enable_ip_change_notification?: boolean
     enable_plain_ip_in_notification?: boolean
+    enable_mcp?: boolean
     ignored_ip_notification?: string
     install_host?: string
     /** IP变更提醒的通知组 */

@@ -31,7 +31,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -52,13 +52,13 @@ const settingFormSchema = z.object({
     tls: asOptionalField(z.boolean()),
     enable_ip_change_notification: asOptionalField(z.boolean()),
     enable_plain_ip_in_notification: asOptionalField(z.boolean()),
+    enable_mcp: asOptionalField(z.boolean()),
 })
 
 export default function SettingsPage() {
     const { t, i18n } = useTranslation()
     const { data: config, mutate } = useSetting()
-    const { profile } = useAuth()
-    const navigate = useNavigate()
+    const { profile, loading: authLoading } = useAuth()
 
     const { notifierGroup } = useNotification()
     const ngroupList = notifierGroup?.map((ng) => ({
@@ -68,10 +68,7 @@ export default function SettingsPage() {
 
     const isAdmin = profile?.role === 0
 
-    if (!isAdmin) {
-        navigate("/dashboard/settings/online-user")
-    }
-
+    // 所有 hooks 必须在条件 return 之前调用，否则违反 rules-of-hooks。
     const form = useForm({
         resolver: zodResolver(settingFormSchema) as any,
         defaultValues: config
@@ -100,6 +97,13 @@ export default function SettingsPage() {
         }
     }, [config?.config, form])
 
+    if (authLoading) {
+        return null
+    }
+    if (!isAdmin) {
+        return <Navigate to="/dashboard/settings/api-tokens" replace />
+    }
+
     const onSubmit = async (values: any) => {
         try {
             await updateSettings(values)
@@ -112,12 +116,11 @@ export default function SettingsPage() {
                 }),
             })
             return
-        } finally {
-            if (values.language != i18n.language) {
-                i18n.changeLanguage(values.language)
-            }
-            toast(t("Success"))
         }
+        if (values.language != i18n.language) {
+            i18n.changeLanguage(values.language)
+        }
+        toast(t("Success"))
     }
 
     return (
@@ -340,16 +343,10 @@ export default function SettingsPage() {
                                                 checked={field.value == "NZ::Use-Peer-IP"}
                                                 className="ml-2"
                                                 onCheckedChange={(checked) => {
-                                                    if (checked) {
-                                                        field.disabled = true
-                                                        form.setValue(
-                                                            "web_real_ip_header",
-                                                            "NZ::Use-Peer-IP",
-                                                        )
-                                                    } else {
-                                                        field.disabled = false
-                                                        form.setValue("web_real_ip_header", "")
-                                                    }
+                                                    form.setValue(
+                                                        "web_real_ip_header",
+                                                        checked ? "NZ::Use-Peer-IP" : "",
+                                                    )
                                                 }}
                                             />
                                             <FormLabel className="font-normal ml-2">
@@ -379,16 +376,10 @@ export default function SettingsPage() {
                                                 checked={field.value == "NZ::Use-Peer-IP"}
                                                 className="ml-2"
                                                 onCheckedChange={(checked) => {
-                                                    if (checked) {
-                                                        field.disabled = true
-                                                        form.setValue(
-                                                            "agent_real_ip_header",
-                                                            "NZ::Use-Peer-IP",
-                                                        )
-                                                    } else {
-                                                        field.disabled = false
-                                                        form.setValue("agent_real_ip_header", "")
-                                                    }
+                                                    form.setValue(
+                                                        "agent_real_ip_header",
+                                                        checked ? "NZ::Use-Peer-IP" : "",
+                                                    )
                                                 }}
                                             />
                                             <FormLabel className="font-normal ml-2">
@@ -506,6 +497,26 @@ export default function SettingsPage() {
                                             />
                                             <Label className="text-sm">
                                                 {t("FullIPNotification")}
+                                            </Label>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="enable_mcp"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center space-x-2">
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                            <Label className="text-sm">
+                                                {t("EnableMCP")}
                                             </Label>
                                         </div>
                                     </FormControl>
