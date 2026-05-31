@@ -142,6 +142,8 @@
     "CustomCodes": "Codice personalizzato (stili e script)",
     "CustomCodesDashboard": "Codice personalizzato per dashboard",
     "DashboardOriginalHost": "Indirizzo di ancoraggio dell'agente [nome dominio/IP:porta]",
+    "ReservedHosts": "Host riservati (separati da virgola; domini pubblici/reverse-proxy che i membri non possono usare come dominio NAT)",
+    "ReservedHostsHint": "Dietro un reverse proxy il pannello non vede il proprio dominio pubblico, quindi non è protetto automaticamente. Elenca qui ogni hostname di ingresso pubblico, altrimenti un membro potrebbe registrarlo come dominio NAT e dirottare il routing del pannello.",
     "ConfigTLS": "Usa TLS per connettere Agent",
     "CustomPublicDNSNameserversforDDNS": "Server dei nomi DNS pubblici personalizzati per DDNS",
     "WebRealIPHeader": "Intestazione della richiesta IP reale del frontend",

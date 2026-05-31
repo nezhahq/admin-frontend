@@ -722,6 +722,8 @@ export interface ModelSetting {
     /** 系统语言，默认 zh_CN */
     language: string
     oauth2_providers: string[]
+    /** 反代部署下声明对外域名（逗号分隔），防止成员注册冲突 NAT 域名抢占路由 */
+    reserved_hosts: string
     site_name: string
     /** 用于前端判断生成的安装命令是否启用 TLS */
     tls: boolean
@@ -742,6 +744,7 @@ export interface ModelSettingForm {
     enable_mcp?: boolean
     ignored_ip_notification?: string
     install_host?: string
+    reserved_hosts?: string
     /** IP变更提醒的通知组 */
     ip_change_notification_group_id: number
     /** @minLength 2 */

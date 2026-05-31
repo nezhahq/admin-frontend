@@ -148,6 +148,8 @@
     "Loading": "Laden",
     "Services": "Services",
     "DashboardOriginalHost": "Agent Verbindungsadresse [Domainname/IP:port]",
+    "ReservedHosts": "Reservierte Hosts (kommagetrennt; öffentliche/Reverse-Proxy-Domains, die Mitglieder nicht als NAT-Domain nutzen dürfen)",
+    "ReservedHostsHint": "Hinter einem Reverse-Proxy sieht das Dashboard seine eigene öffentliche Domain nicht und ist daher nicht automatisch geschützt. Tragen Sie hier jeden öffentlichen Eingangs-Hostnamen ein, sonst könnte ein Mitglied ihn als NAT-Domain registrieren und das Dashboard-Routing übernehmen.",
     "NavigateTo": "Navigieren",
     "Offline": "Offline",
     "Interval": "Intervall",

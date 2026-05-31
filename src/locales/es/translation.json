@@ -158,6 +158,8 @@
     "RequestType": "Tipo de solicitud",
     "RequestBody": "Cuerpo de la solicitud",
     "DashboardOriginalHost": "Dirección de conexión del Agent [nombre de dominio/IP:puerto]",
+    "ReservedHosts": "Hosts reservados (separados por comas; dominios públicos/proxy inverso que los miembros no pueden usar como dominio NAT)",
+    "ReservedHostsHint": "Detrás de un proxy inverso, el panel no ve su propio dominio público, por lo que no se protege automáticamente. Indique aquí todos los nombres de host de entrada públicos; de lo contrario, un miembro podría registrarlo como dominio NAT y secuestrar el enrutamiento del panel.",
     "ConfigTLS": "Usar TLS para conectar el Agent",
     "CustomCodes": "Códigos personalizados (Style y Script)",
     "CustomCodesDashboard": "Códigos personalizados para el Dashboard",
