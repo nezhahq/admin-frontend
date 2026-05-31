@@ -39,10 +39,22 @@ function isUnsafeMethod(method: FetcherMethod): boolean {
     return method !== FetcherMethod.GET
 }
 
+// Only attach the CSRF token to same-origin requests. Keying on HTTP method
+// alone would leak the nz-csrf value to any absolute cross-origin URL a caller
+// passes in; the double-submit token is meaningful only to our own backend.
+function isSameOrigin(path: string): boolean {
+    try {
+        return new URL(path, window.location.origin).origin === window.location.origin
+    } catch {
+        return false
+    }
+}
+
 // Double-submit CSRF: backend requires X-CSRF-Token == nz-csrf cookie on
 // cookie-authenticated unsafe methods.
-function csrfHeaders(method: FetcherMethod): Record<string, string> {
+function csrfHeaders(method: FetcherMethod, path: string): Record<string, string> {
     if (!isUnsafeMethod(method)) return {}
+    if (!isSameOrigin(path)) return {}
     const token = readCookie(csrfCookieName)
     return token ? { [csrfHeaderName]: token } : {}
 }
@@ -52,14 +64,14 @@ export async function fetcher<T>(method: FetcherMethod, path: string, data?: any
     if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {
         response = await fetch(buildUrl(path, data), {
             method: method,
-            headers: csrfHeaders(method),
+            headers: csrfHeaders(method, path),
         })
     } else {
         response = await fetch(path, {
             method: method,
             headers: {
                 "Content-Type": "application/json",
-                ...csrfHeaders(method),
+                ...csrfHeaders(method, path),
             },
             body: data ? JSON.stringify(data) : null,
         })
@@ -98,7 +110,7 @@ function triggerAutoRefresh() {
         lastestRefreshTokenAt = Date.now()
         fetch("/api/v1/refresh-token", {
             method: "POST",
-            headers: csrfHeaders(FetcherMethod.POST),
+            headers: csrfHeaders(FetcherMethod.POST, "/api/v1/refresh-token"),
         })
     }
 }

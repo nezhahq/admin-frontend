@@ -133,6 +133,19 @@ export function formatPath(path: string) {
     return path.replace(/\/{2,}/g, "/")
 }
 
+// Returns the URL only if it uses an http(s) scheme, else undefined. Guards
+// against rendering attacker-controlled template metadata as a clickable
+// javascript:/data: href.
+export function safeExternalHref(url?: string): string | undefined {
+    if (!url) return undefined
+    try {
+        const parsed = new URL(url, window.location.origin)
+        return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : undefined
+    } catch {
+        return undefined
+    }
+}
+
 export function joinIP(p?: ModelIP) {
     if (p) {
         if (p.ipv4_addr && p.ipv6_addr) {
