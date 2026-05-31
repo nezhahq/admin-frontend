@@ -142,6 +142,8 @@
     "WAF": "Web Application Firewall",
     "SiteName": "Site Name",
     "DashboardOriginalHost": "Agent connecting address [domain name/IP:port]",
+    "ReservedHosts": "Reserved hosts (comma-separated; public/reverse-proxy domains members cannot use as NAT domains)",
+    "ReservedHostsHint": "Behind a reverse proxy the dashboard cannot see its own public domain, so it is not auto-protected. List every public entry hostname here, or a member could register it as a NAT domain and hijack dashboard routing.",
     "ConfigTLS": "Use TLS to connect Agent",
     "LoginFailed": "Login Failed",
     "BruteForceAttackingToken": "Brute Force Attacking Token",

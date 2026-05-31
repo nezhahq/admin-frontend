@@ -155,6 +155,8 @@
     "CustomCodes": "自定义代码（样式和脚本）",
     "CustomCodesDashboard": "仪表板的自定义代码",
     "DashboardOriginalHost": "Agent对接地址【域名/IP:端口】",
+    "ReservedHosts": "保留 Host（逗号分隔；反代/公网域名，成员不可注册为 NAT 域名）",
+    "ReservedHostsHint": "反代部署下面板看不到自身的对外域名，无法自动保护。请在此列出所有公网入口域名，否则成员可将其注册为 NAT 域名抢占面板路由。",
     "ConfigTLS": "Agent 使用 TLS 连接",
     "CustomPublicDNSNameserversforDDNS": "DDNS 的自定义公共 DNS 名称服务器",
     "WebRealIPHeader": "前端真实IP请求头",

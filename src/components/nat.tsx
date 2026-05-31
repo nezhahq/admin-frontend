@@ -82,10 +82,11 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
             } else {
                 await createNAT(values)
             }
-        } catch (e) {
+        } catch (e: unknown) {
             console.error(e)
             toast(t("Error"), {
-                description: t("Results.UnExpectedError"),
+                description:
+                    e instanceof Error && e.message ? e.message : t("Results.UnExpectedError"),
             })
             return
         }

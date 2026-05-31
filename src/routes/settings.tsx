@@ -7,6 +7,7 @@ import { Combobox } from "@/components/ui/combobox"
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -44,6 +45,7 @@ const settingFormSchema = z.object({
     language: z.string().min(2),
     user_template: z.string().min(1),
     install_host: asOptionalField(z.string()),
+    reserved_hosts: asOptionalField(z.string()),
     custom_code: asOptionalField(z.string()),
     custom_code_dashboard: asOptionalField(z.string()),
     web_real_ip_header: asOptionalField(z.string()),
@@ -286,6 +288,20 @@ export default function SettingsPage() {
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="reserved_hosts"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("ReservedHosts")}</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormDescription>{t("ReservedHostsHint")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
