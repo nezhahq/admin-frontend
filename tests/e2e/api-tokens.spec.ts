@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { defaultAdmin, loginAs, test } from "./fixtures"
+import { csrfHeaders, defaultAdmin, loginAs, test } from "./fixtures"
 
 test("admin can create and reveal an API token via UI", async ({ page }) => {
     await loginAs(page, defaultAdmin)
@@ -15,7 +15,7 @@ test("admin can create and reveal an API token via UI", async ({ page }) => {
     await dialog.getByLabel(/^Name|^名称/).fill(name)
     await dialog.getByText("nezha:server:read").click()
 
-    await page.getByRole("button", { name: /^Create$|^创建$/ }).click()
+    await dialog.getByRole("button", { name: /Create API token|创建 API 令牌/ }).click()
 
     const codeBlock = page.locator("code").filter({ hasText: /^nzp_/ })
     await expect(codeBlock).toBeVisible({ timeout: 10_000 })
@@ -31,7 +31,9 @@ test("admin can create and reveal an API token via UI", async ({ page }) => {
     const tokens = await page.request.get("/api/v1/api-tokens").then((r) => r.json())
     const target = tokens.data.find((t: { name: string }) => t.name === name)
     if (target) {
-        const del = await page.request.delete(`/api/v1/api-tokens/${target.id}`)
+        const del = await page.request.delete(`/api/v1/api-tokens/${target.id}`, {
+            headers: await csrfHeaders(page),
+        })
         expect(del.ok()).toBeTruthy()
     }
 })
@@ -41,6 +43,7 @@ test("admin can revoke an API token via UI revoke button", async ({ page }) => {
 
     const name = `e2e-revoke-${Date.now().toString(36)}`
     const created = await page.request.post("/api/v1/api-tokens", {
+        headers: await csrfHeaders(page),
         data: { name, scopes: ["nezha:server:read"] },
     })
     expect(created.ok()).toBeTruthy()
@@ -76,12 +79,14 @@ test("an API token can authenticate /mcp", async ({ page }) => {
         user_template: settingBefore?.user_template || "user-dist",
     }
     const enableResp = await page.request.patch("/api/v1/setting", {
+        headers: await csrfHeaders(page),
         data: { ...baseSettings, enable_mcp: true },
     })
     expect(enableResp.ok(), "PATCH /api/v1/setting must succeed to enable MCP for the test").toBeTruthy()
 
     try {
         const apiResp = await page.request.post("/api/v1/api-tokens", {
+            headers: await csrfHeaders(page),
             data: {
                 name: `e2e-mcp-${Date.now().toString(36)}`,
                 scopes: ["nezha:server:read"],
@@ -115,10 +120,13 @@ test("an API token can authenticate /mcp", async ({ page }) => {
         expect(whoamiBody.result?.isError).toBeFalsy()
         expect(whoamiBody.result?.structuredContent?.scopes).toContain("nezha:server:read")
 
-        const delResp = await page.request.delete(`/api/v1/api-tokens/${tokenID}`)
+        const delResp = await page.request.delete(`/api/v1/api-tokens/${tokenID}`, {
+            headers: await csrfHeaders(page),
+        })
         expect(delResp.ok()).toBeTruthy()
     } finally {
         await page.request.patch("/api/v1/setting", {
+            headers: await csrfHeaders(page),
             data: { ...baseSettings, enable_mcp: !!settingBefore?.enable_mcp },
         })
     }

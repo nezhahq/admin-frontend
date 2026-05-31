@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { test } from "./fixtures"
+import { csrfHeaders, test } from "./fixtures"
 
 test("file manager creation only accepts POST", async ({ adminPage: page }) => {
     const getResp = await page.request.get("/api/v1/file?id=1", {
@@ -13,6 +13,7 @@ test("file manager creation only accepts POST", async ({ adminPage: page }) => {
 
     const postResp = await page.request.post("/api/v1/file?id=1", {
         failOnStatusCode: false,
+        headers: await csrfHeaders(page),
     })
     expect(postResp.status()).toBe(200)
     const body = await postResp.json()
