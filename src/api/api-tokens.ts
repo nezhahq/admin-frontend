@@ -119,11 +119,17 @@ export function parseServerIDsInput(raw: string): ParseServerIDsResult {
     if (trimmed === "") return { ok: true, value: undefined }
     const parts = trimmed.split(",").map((s) => s.trim())
     const out: number[] = []
+    const seen = new Set<number>()
     for (const p of parts) {
         if (p === "") return { ok: false, error: "empty server id" }
         if (!/^\d+$/.test(p)) return { ok: false, error: `invalid server id: ${p}` }
         const n = Number(p)
-        if (!Number.isInteger(n) || n <= 0) return { ok: false, error: `invalid server id: ${p}` }
+        // Server IDs are uint64 on the backend; reject values that lose
+        // precision as a JS number, otherwise the PAT could bind to a
+        // different server than the operator typed.
+        if (!Number.isSafeInteger(n) || n <= 0) return { ok: false, error: `invalid server id: ${p}` }
+        if (seen.has(n)) continue
+        seen.add(n)
         out.push(n)
     }
     return { ok: true, value: out }

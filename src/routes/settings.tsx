@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/useAuth"
 import { useNotification } from "@/hooks/useNotfication"
 import useSetting from "@/hooks/useSetting"
-import { asOptionalField } from "@/lib/utils"
+import { asOptionalField, safeExternalHref } from "@/lib/utils"
 import { nezhaLang, settingCoverageTypes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
@@ -223,14 +223,20 @@ export default function SettingsPage() {
                                                             </div>
                                                         </SelectItem>
                                                         <div className="px-8 py-1">
-                                                            <a
-                                                                href={template.repository}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                                                            >
-                                                                {template.repository}
-                                                            </a>
+                                                            {safeExternalHref(template.repository) ? (
+                                                                <a
+                                                                    href={safeExternalHref(template.repository)}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                                                >
+                                                                    {template.repository}
+                                                                </a>
+                                                            ) : (
+                                                                <span className="text-sm text-muted-foreground">
+                                                                    {template.repository}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}

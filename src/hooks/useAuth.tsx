@@ -15,6 +15,14 @@ const AuthContext = createContext<AuthContextProps>({
     logout: () => {},
 })
 
+// Admin is role 0 on the backend. A missing/non-numeric role must never
+// collapse to 0, or a malformed profile response would be treated as admin
+// client-side; default unknown roles to a non-admin value instead.
+const NON_ADMIN_ROLE = 1
+function normalizeRole(role: unknown): number {
+    return typeof role === "number" && Number.isFinite(role) ? role : NON_ADMIN_ROLE
+}
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const profile = useMainStore((store) => store.profile)
     const setProfile = useMainStore((store) => store.setProfile)
@@ -32,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
                 const user = await getProfile()
                 if (authEpoch.current !== epoch) return
-                user.role = user.role || 0
+                user.role = normalizeRole(user.role)
                 setProfile(user)
             } catch {
                 if (authEpoch.current !== epoch) return
@@ -50,7 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await loginRequest(username, password)
             const user = await getProfile()
             authEpoch.current++
-            user.role = user.role || 0
+            user.role = normalizeRole(user.role)
             setProfile(user)
             navigate("/dashboard")
         } catch (error: any) {
@@ -71,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const user = await getProfile()
             authEpoch.current++
-            user.role = user.role || 0
+            user.role = normalizeRole(user.role)
             setProfile(user)
             navigate("/dashboard")
         } catch (error: any) {
