@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { csrfHeaders, defaultAdmin, expectAuthenticated, expectUnauthenticated, loginAs, test } from "./fixtures"
+import { csrfRequest, defaultAdmin, expectAuthenticated, expectUnauthenticated, loginAs, test } from "./fixtures"
 
 test("login persists session via cookie and getProfile succeeds", async ({ page }) => {
     await loginAs(page, defaultAdmin)
@@ -17,8 +17,7 @@ test("password change rotates TokenVersion and revokes existing session", async 
     const newPassword = `e2e-${Date.now().toString(36)}`
     let isOnNewPassword = false
     try {
-        const resp = await page.request.post("/api/v1/profile", {
-            headers: await csrfHeaders(page),
+        const resp = await csrfRequest(page, "post", "/api/v1/profile", {
             data: {
                 original_password: defaultAdmin.password,
                 new_password: newPassword,
@@ -44,8 +43,7 @@ test("password change rotates TokenVersion and revokes existing session", async 
         if (isOnNewPassword) {
             await page.context().clearCookies()
             await loginAs(page, { username: defaultAdmin.username, password: newPassword })
-            const restoreResp = await page.request.post("/api/v1/profile", {
-                headers: await csrfHeaders(page),
+            const restoreResp = await csrfRequest(page, "post", "/api/v1/profile", {
                 data: {
                     original_password: newPassword,
                     new_password: defaultAdmin.password,

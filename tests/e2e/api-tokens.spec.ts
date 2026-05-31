@@ -58,8 +58,11 @@ test("admin can revoke an API token via UI revoke button", async ({ page }) => {
 
     await expect(row).toHaveCount(0)
 
+    // The list endpoint omits `data` entirely when the admin has zero tokens,
+    // so default to [] before searching for the revoked id.
     const after = await page.request.get("/api/v1/api-tokens").then((r) => r.json())
-    expect(after.data.find((t: { id: number }) => t.id === tokenID)).toBeUndefined()
+    const tokens: Array<{ id: number }> = after.data ?? []
+    expect(tokens.find((t) => t.id === tokenID)).toBeUndefined()
 })
 
 test("an API token can authenticate /mcp", async ({ page }) => {
