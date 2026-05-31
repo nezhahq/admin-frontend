@@ -48,6 +48,29 @@ export async function csrfHeaders(page: Page): Promise<Record<string, string>> {
     return { "X-CSRF-Token": value }
 }
 
+// csrfRequest issues a mutating request with the X-CSRF-Token header, retrying
+// once if the backend re-mints the nz-csrf cookie between read and send. A
+// password change triggers a refresh-token that rotates the cookie, so a single
+// read can race the new value and 403; re-reading on 403 closes that window.
+export async function csrfRequest(
+    page: Page,
+    method: "post" | "patch" | "delete" | "put",
+    url: string,
+    options: { data?: unknown; failOnStatusCode?: boolean } = {},
+): Promise<import("@playwright/test").APIResponse> {
+    let resp = await page.request[method](url, {
+        ...options,
+        headers: await csrfHeaders(page),
+    })
+    if (resp.status() === 403) {
+        resp = await page.request[method](url, {
+            ...options,
+            headers: await csrfHeaders(page),
+        })
+    }
+    return resp
+}
+
 export async function expectAuthenticated(page: Page) {
     const resp = await page.request.get("/api/v1/profile")
     expect(resp.status(), "profile must respond 2xx while authenticated").toBeLessThan(400)
