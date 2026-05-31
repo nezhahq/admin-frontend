@@ -47,11 +47,14 @@ export const deleteApiToken = async (id: number): Promise<void> => {
 }
 
 export const SCOPE_OPTIONS = [
-    { value: "nezha:server:read", label: "Server: read", desc: "List & inspect servers and files" },
-    { value: "nezha:server:write", label: "Server: write", desc: "Edit servers, push files" },
-    { value: "nezha:server:delete", label: "Server: delete", desc: "Delete servers, files" },
+    { value: "nezha:inventory:read", label: "Inventory: read", desc: "List servers & groups (server.list)" },
+    { value: "nezha:inventory:delete", label: "Inventory: delete", desc: "Delete servers & server groups" },
+    { value: "nezha:inventory:*", label: "Inventory: all", desc: "List + delete servers & groups" },
+    { value: "nezha:server:read", label: "Server: read", desc: "Inspect a server, read files & metrics (needs server id)" },
+    { value: "nezha:server:write", label: "Server: write", desc: "Edit a server, push files" },
+    { value: "nezha:server:delete", label: "Server: delete", desc: "Delete files on a server" },
     { value: "nezha:server:exec", label: "Server: exec", desc: "Run shell commands on servers" },
-    { value: "nezha:server:*", label: "Server: all", desc: "Every server permission (read+write+delete+exec)" },
+    { value: "nezha:server:*", label: "Server: all", desc: "Every server operation (read+write+delete+exec)" },
     { value: "nezha:service:read", label: "Service monitor: read", desc: "List service monitors & history" },
     { value: "nezha:service:write", label: "Service monitor: write", desc: "Create / edit service monitors" },
     { value: "nezha:service:delete", label: "Service monitor: delete", desc: "Delete service monitors" },
