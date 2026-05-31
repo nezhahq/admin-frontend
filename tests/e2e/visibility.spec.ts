@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { test } from "./fixtures"
+import { csrfHeaders, test } from "./fixtures"
 
 test("server-group hides guest-empty groups from anonymous callers", async ({ adminPage: page, browser }) => {
     const tag = Date.now().toString(36)
@@ -18,12 +18,14 @@ test("server-group hides guest-empty groups from anonymous callers", async ({ ad
     const createdGroupIDs: number[] = []
     if (publicServer) {
         const visibleResp = await page.request.post("/api/v1/server-group", {
+            headers: await csrfHeaders(page),
             data: { name: visibleName, servers: [publicServer.id] },
         })
         expect(visibleResp.ok()).toBeTruthy()
         createdGroupIDs.push(((await visibleResp.json()) as { data: number }).data)
     }
     const hiddenResp = await page.request.post("/api/v1/server-group", {
+        headers: await csrfHeaders(page),
         data: { name: hiddenName, servers: [] },
     })
     expect(hiddenResp.ok()).toBeTruthy()
@@ -47,7 +49,10 @@ test("server-group hides guest-empty groups from anonymous callers", async ({ ad
         }
     } finally {
         if (createdGroupIDs.length > 0) {
-            await page.request.post("/api/v1/batch-delete/server-group", { data: createdGroupIDs })
+            await page.request.post("/api/v1/batch-delete/server-group", {
+                headers: await csrfHeaders(page),
+                data: createdGroupIDs,
+            })
         }
     }
 })

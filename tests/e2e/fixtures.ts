@@ -16,10 +16,36 @@ export async function loginAs(page: Page, creds: LoginContext) {
     await page.locator('input[autocomplete="current-password"]').fill(creds.password)
     await page.locator('button[type="submit"]').click()
     await page.waitForURL(/\/dashboard\/?(?:$|\?|#)/, { timeout: 10_000 })
+    // Block until the signed nz-csrf cookie is readable. csrfHeaders() reads it
+    // synchronously; without this wait a mutating request fired right after
+    // login can race the Set-Cookie and send no token, getting a 403.
+    await expect
+        .poll(async () => (await page.context().cookies()).some((c) => c.name === "nz-csrf"), {
+            timeout: 10_000,
+        })
+        .toBe(true)
 }
 
 export async function logout(page: Page) {
     await page.context().clearCookies()
+}
+
+// csrfHeaders mirrors the signed nz-csrf cookie into the X-CSRF-Token header.
+// The backend's double-submit CSRF gate rejects unsafe methods unless the two
+// match; the SPA does this in api.ts, but page.request bypasses that JS, so
+// E2E mutating calls must replicate it or every POST/PATCH/DELETE gets 403.
+export async function csrfHeaders(page: Page): Promise<Record<string, string>> {
+    let value = ""
+    await expect
+        .poll(
+            async () => {
+                value = (await page.context().cookies()).find((c) => c.name === "nz-csrf")?.value ?? ""
+                return value
+            },
+            { timeout: 10_000 },
+        )
+        .not.toBe("")
+    return { "X-CSRF-Token": value }
 }
 
 export async function expectAuthenticated(page: Page) {
