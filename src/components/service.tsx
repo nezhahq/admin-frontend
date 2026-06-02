@@ -56,8 +56,8 @@ const serviceFormSchema = z.object({
     cover: z.coerce.number().int().min(0),
     display_index: z.coerce.number().int(),
     duration: z.coerce.number().int().min(30),
-    enable_show_in_service: asOptionalField(z.boolean()),
     enable_trigger_task: asOptionalField(z.boolean()),
+    hide_for_guest: asOptionalField(z.boolean()),
     fail_trigger_tasks: z.array(z.number()),
     fail_trigger_tasks_raw: z.string(),
     latency_notify: asOptionalField(z.boolean()),
@@ -235,7 +235,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="enable_show_in_service"
+                                    name="hide_for_guest"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
                                             <FormControl>
@@ -245,7 +245,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">
-                                                        {t("ShowInService")}
+                                                        {t("HideForGuest")}
                                                     </Label>
                                                 </div>
                                             </FormControl>

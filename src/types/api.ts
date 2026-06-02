@@ -631,10 +631,11 @@ export interface ModelService {
     /** 展示排序，越大越靠前 */
     display_index: number
     duration: number
-    enable_show_in_service: boolean
     enable_trigger_task: boolean
     /** 失败时执行的触发任务id */
     fail_trigger_tasks: number[]
+    /** 对游客隐藏 */
+    hide_for_guest: boolean
     id: number
     latency_notify: boolean
     max_latency: number
@@ -656,9 +657,9 @@ export interface ModelServiceForm {
     /** 展示排序，越大越靠前 */
     display_index: number
     duration: number
-    enable_show_in_service?: boolean
     enable_trigger_task?: boolean
     fail_trigger_tasks: number[]
+    hide_for_guest?: boolean
     latency_notify?: boolean
     /** @default 0 */
     max_latency: number
