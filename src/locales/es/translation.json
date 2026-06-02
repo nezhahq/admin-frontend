@@ -51,7 +51,6 @@
     "Coverage": "Cobertura",
     "LocalService": "Servicio local",
     "InstallCommands": "Comando de instalación",
-    "ShowInService": "Mostrar en servicio",
     "Coverages": {
         "Alarmed": "Ejecutado en el servidor que activó la alarma",
         "Excludes": "Excluir servidores específicos",

@@ -83,7 +83,6 @@
     "Confirm": "确认",
     "ConfirmDeletion": "确认删除？",
     "Services": "服务",
-    "ShowInService": "服务中显示",
     "Coverages": {
         "Excludes": "排除特定服务器",
         "Only": "仅特定服务器",
