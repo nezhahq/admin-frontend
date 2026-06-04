@@ -312,8 +312,6 @@
     "ApiTokenExpiryInvalid": "天数必须在 0 到 3650 之间。",
     "NameRequired": "名称必填。",
     "Revoke": "吊销",
-    "Copy": "复制",
     "Copied": "已复制到剪贴板",
-    "Done": "完成",
     "Scopes": "权限"
 }
