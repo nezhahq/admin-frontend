@@ -16,6 +16,10 @@ export const nezhaLang: Record<string, string> = {
     "it-IT": "Italiano",
     "fr-FR": "Français",
     "id-ID": "Bahasa Indonesia",
+    "ja-JP": "日本語",
+    "ro-RO": "Română",
+    "uk-UA": "Українська",
+    "gl-ES": "Galego",
 }
 
 export const wafBlockReasons: Record<number, string> = {
