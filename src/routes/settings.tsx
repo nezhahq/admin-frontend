@@ -45,6 +45,7 @@ const settingFormSchema = z.object({
     language: z.string().min(2),
     user_template: z.string().min(1),
     install_host: asOptionalField(z.string()),
+    dashboard_host: asOptionalField(z.string()),
     reserved_hosts: asOptionalField(z.string()),
     custom_code: asOptionalField(z.string()),
     custom_code_dashboard: asOptionalField(z.string()),
@@ -294,6 +295,20 @@ export default function SettingsPage() {
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="dashboard_host"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("DashboardHost")}</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormDescription>{t("DashboardHostHint")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}

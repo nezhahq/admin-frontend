@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
-const realFetch = global.fetch
+const realFetch = globalThis.fetch
 
 function setCookie(value: string) {
     Object.defineProperty(document, "cookie", { value, configurable: true })
@@ -19,7 +19,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    global.fetch = realFetch
+    globalThis.fetch = realFetch
     vi.restoreAllMocks()
 })
 
@@ -31,7 +31,7 @@ test("auto refresh is deferred while nz-csrf cookie is missing", async () => {
     const { FetcherMethod, fetcher } = await import("../api/api")
     setCookie("nz-jwt=session") // jwt present, but no nz-csrf yet
     const urls: string[] = []
-    global.fetch = vi.fn(async (input: any) => {
+    globalThis.fetch = vi.fn(async (input: any) => {
         urls.push(String(input))
         return jsonOk()
     }) as unknown as typeof fetch
@@ -46,7 +46,7 @@ test("auto refresh is deferred while nz-csrf cookie is missing", async () => {
 test("auto refresh fires after nz-csrf cookie becomes available", async () => {
     const { FetcherMethod, fetcher } = await import("../api/api")
     const urls: string[] = []
-    global.fetch = vi.fn(async (input: any) => {
+    globalThis.fetch = vi.fn(async (input: any) => {
         urls.push(String(input))
         return jsonOk()
     }) as unknown as typeof fetch

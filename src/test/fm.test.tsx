@@ -130,7 +130,7 @@ class MockWebSocket extends EventTarget implements WebSocket {
     onerror: ((this: WebSocket, ev: Event) => unknown) | null = null
     onmessage: ((this: WebSocket, ev: MessageEvent) => unknown) | null = null
     onopen: ((this: WebSocket, ev: Event) => unknown) | null = null
-    readyState = MockWebSocket.CONNECTING
+    readyState: 0 | 1 | 2 | 3 = MockWebSocket.CONNECTING
     sent: SentWebSocketData[] = []
 
     constructor(url: string | URL) {

@@ -138,6 +138,8 @@
     "WAF": "Firewall Aplikasi Web",
     "SiteName": "Nama Situs",
     "DashboardOriginalHost": "Alamat koneksi Agen [nama domain/IP:port]",
+    "DashboardHost": "Host dashboard untuk callback OAuth2 [nama domain/IP:port]",
+    "DashboardHostHint": "Host publik dashboard yang dipakai untuk membangun URL callback OAuth2. Atur ini bila dashboard diakses pada domain yang berbeda dari alamat koneksi Agen. Kosongkan untuk mempercayai Host permintaan apa adanya.",
     "ReservedHosts": "Host khusus (dipisahkan koma; domain publik/reverse-proxy yang tidak boleh dipakai anggota sebagai domain NAT)",
     "ReservedHostsHint": "Di belakang reverse proxy, dasbor tidak melihat domain publiknya sendiri sehingga tidak terlindungi otomatis. Cantumkan setiap host entri publik di sini, atau anggota bisa mendaftarkannya sebagai domain NAT dan membajak perutean dasbor.",
     "ConfigTLS": "Gunakan TLS untuk menghubungkan Agen",

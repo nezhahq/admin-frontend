@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
 import { FetcherMethod, fetcher } from "../api/api"
 
-const realFetch = global.fetch
+const realFetch = globalThis.fetch
 
 function setCookie(value: string) {
     Object.defineProperty(document, "cookie", { value, configurable: true })
@@ -13,7 +13,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    global.fetch = realFetch
+    globalThis.fetch = realFetch
     vi.restoreAllMocks()
 })
 
@@ -40,7 +40,7 @@ function headerOf(init: RequestInit | undefined, name: string): string | null {
 test("POST sends X-CSRF-Token mirrored from nz-csrf cookie", async () => {
     setCookie("nz-csrf=abc123; other=1")
     const seen: { init?: RequestInit }[] = []
-    global.fetch = vi.fn(async (_input: any, init?: RequestInit) => {
+    globalThis.fetch = vi.fn(async (_input: any, init?: RequestInit) => {
         seen.push({ init })
         return jsonOk()
     }) as unknown as typeof fetch
@@ -53,7 +53,7 @@ test("POST sends X-CSRF-Token mirrored from nz-csrf cookie", async () => {
 test("DELETE sends X-CSRF-Token mirrored from nz-csrf cookie", async () => {
     setCookie("nz-csrf=del-token")
     const seen: { init?: RequestInit }[] = []
-    global.fetch = vi.fn(async (_input: any, init?: RequestInit) => {
+    globalThis.fetch = vi.fn(async (_input: any, init?: RequestInit) => {
         seen.push({ init })
         return jsonOk()
     }) as unknown as typeof fetch
@@ -68,7 +68,7 @@ test("auto refresh-token uses POST (backend route is POST)", async () => {
     const { FetcherMethod: M, fetcher: f } = await import("../api/api")
     setCookie("nz-jwt=sess; nz-csrf=c")
     const seen: { url: string; init?: RequestInit }[] = []
-    global.fetch = vi.fn(async (input: any, init?: RequestInit) => {
+    globalThis.fetch = vi.fn(async (input: any, init?: RequestInit) => {
         seen.push({ url: String(input), init })
         return jsonOk()
     }) as unknown as typeof fetch
@@ -83,13 +83,13 @@ test("auto refresh-token uses POST (backend route is POST)", async () => {
 // Revoke (DELETE) commonly returns 204 / empty body. The fetcher must not
 // blow up on response.json() of an empty body and must resolve successfully.
 test("DELETE tolerates an empty 204 response body", async () => {
-    global.fetch = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch
+    globalThis.fetch = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch
 
     await expect(fetcher(FetcherMethod.DELETE, "/api/v1/api-tokens/9")).resolves.toBeUndefined()
 })
 
 test("empty 200 body does not throw", async () => {
-    global.fetch = vi.fn(
+    globalThis.fetch = vi.fn(
         async () => new Response("", { status: 200 }),
     ) as unknown as typeof fetch
 

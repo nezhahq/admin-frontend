@@ -21,6 +21,7 @@ class TestResizeObserver implements ResizeObserver {
 class TestIntersectionObserver implements IntersectionObserver {
     readonly root: Element | Document | null = null
     readonly rootMargin = ""
+    readonly scrollMargin = ""
     readonly thresholds: ReadonlyArray<number> = []
 
     observe(): void {}

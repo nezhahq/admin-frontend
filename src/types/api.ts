@@ -719,6 +719,7 @@ export interface ModelSetting {
     ignored_ip_notification: string
     ignored_ip_notification_server_ids: Record<string, boolean>
     install_host: string
+    dashboard_host: string
     ip_change_notification_group_id: number
     /** 系统语言，默认 zh_CN */
     language: string
@@ -745,6 +746,7 @@ export interface ModelSettingForm {
     enable_mcp?: boolean
     ignored_ip_notification?: string
     install_host?: string
+    dashboard_host?: string
     reserved_hosts?: string
     /** IP变更提醒的通知组 */
     ip_change_notification_group_id: number

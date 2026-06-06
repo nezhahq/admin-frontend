@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
 import { FetcherMethod, fetcher } from "../api/api"
 
-const realFetch = global.fetch
+const realFetch = globalThis.fetch
 
 beforeEach(() => {
     // Avoid the auto refresh-token branch interfering with assertions.
@@ -10,7 +10,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    global.fetch = realFetch
+    globalThis.fetch = realFetch
     vi.restoreAllMocks()
 })
 
@@ -19,7 +19,7 @@ afterEach(() => {
 // DELETE route. The wire-level method must match the requested FetcherMethod.
 test("fetcher uses HTTP DELETE for FetcherMethod.DELETE", async () => {
     const seen: { url: string; init?: RequestInit }[] = []
-    global.fetch = vi.fn(async (input: any, init?: RequestInit) => {
+    globalThis.fetch = vi.fn(async (input: any, init?: RequestInit) => {
         seen.push({ url: String(input), init })
         return new Response(JSON.stringify({ success: true, data: null }), {
             status: 200,

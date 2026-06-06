@@ -146,6 +146,8 @@
     "CustomCodes": "自訂程式碼（樣式和腳本）",
     "CustomCodesDashboard": "儀表板的自訂程式碼",
     "DashboardOriginalHost": "Agent對接位址【網域名稱/IP:連接埠】",
+    "DashboardHost": "面板 OAuth2 回呼網域【網域名稱/IP:連接埠】",
+    "DashboardHostHint": "用於產生 OAuth2 回呼位址的面板對外網域。當面板存取網域與 Agent 對接位址不同時設定此項。留空則信任請求 Host，不做強制重寫。",
     "ReservedHosts": "保留 Host（逗號分隔；反代/公網網域，成員不可註冊為 NAT 網域）",
     "ReservedHostsHint": "反代部署下面板看不到自身的對外網域，無法自動保護。請在此列出所有公網入口網域，否則成員可將其註冊為 NAT 網域搶佔面板路由。",
     "ConfigTLS": "Agent 使用 TLS 連線",

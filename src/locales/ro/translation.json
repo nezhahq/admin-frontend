@@ -140,6 +140,8 @@
     "WAF": "Web Application Firewall",
     "SiteName": "Numele site-ului",
     "DashboardOriginalHost": "Adresa de conectare a agentului [numele domeniului/IP:port]",
+    "DashboardHost": "Host-ul panoului pentru callback-ul OAuth2 [numele domeniului/IP:port]",
+    "DashboardHostHint": "Host-ul public al panoului folosit pentru a construi URL-ul de callback OAuth2. Setați-l când panoul este accesat pe un domeniu diferit de adresa de conectare a agentului. Lăsați gol pentru a avea încredere în Host-ul cererii ca atare.",
     "ReservedHosts": "Host-uri reservate (separate prin virgulă; domeniile publice sau ale reverse proxy-urilor nu pot fi utilizate ca domenii NAT)",
     "ReservedHostsHint": "În spatele unui reverse proxy, dashboard-ul nu își poate vedea propriul domeniu public, prin urmare nu este protejat automat. Trebuie să menționați aici toate hostname-urile ale intrărilor publice; în caz contrar, un membru ar putea să le înregistreze ca domenii NAT și să deturneze rutarea către dashboard.",
     "ConfigTLS": "Folosește TLS pentru a conecta agentul",

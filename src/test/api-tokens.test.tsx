@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
 import { createApiToken, deleteApiToken, listApiTokens } from "../api/api-tokens"
 
-const realFetch = global.fetch
+const realFetch = globalThis.fetch
 
 function mockFetch(payload: unknown, ok = true, success = true) {
-    global.fetch = vi.fn(async () => {
+    globalThis.fetch = vi.fn(async () => {
         return new Response(JSON.stringify({ success, error: success ? "" : "boom", data: payload }), {
             status: ok ? 200 : 500,
             headers: { "Content-Type": "application/json" },
@@ -19,13 +19,13 @@ beforeEach(() => {
 
 afterEach(() => {
     vi.useRealTimers()
-    global.fetch = realFetch
+    globalThis.fetch = realFetch
     vi.restoreAllMocks()
 })
 
 test("listApiTokens GETs /api/v1/api-tokens and returns parsed array", async () => {
     const calls: Array<{ url: string; method: string }> = []
-    global.fetch = vi.fn(async (input: any, init?: any) => {
+    globalThis.fetch = vi.fn(async (input: any, init?: any) => {
         calls.push({ url: String(input), method: String(init?.method ?? "GET") })
         return new Response(
             JSON.stringify({
@@ -54,7 +54,7 @@ test("listApiTokens GETs /api/v1/api-tokens and returns parsed array", async () 
 
 test("createApiToken POSTs /api/v1/api-tokens and serializes scopes / server_ids / expires_in_days", async () => {
     let captured: { url: string; method: string; body: any } | null = null
-    global.fetch = vi.fn(async (input: any, init?: any) => {
+    globalThis.fetch = vi.fn(async (input: any, init?: any) => {
         captured = {
             url: String(input),
             method: String(init?.method ?? ""),
@@ -103,7 +103,7 @@ test("listApiTokens normalizes null scopes to an empty array so the table cannot
     // Backend APIToken.Scopes() returns nil for ScopesCSV=="" which JSON-encodes
     // as null; migrated/legacy/hand-edited rows hit this. Without normalization
     // the list page does tok.scopes.map(...) on null and the whole page crashes.
-    global.fetch = vi.fn(async () => {
+    globalThis.fetch = vi.fn(async () => {
         return new Response(
             JSON.stringify({
                 success: true,
@@ -122,7 +122,7 @@ test("listApiTokens normalizes null scopes to an empty array so the table cannot
 
 test("deleteApiToken DELETEs /api/v1/api-tokens/:id", async () => {
     const calls: Array<{ url: string; method: string }> = []
-    global.fetch = vi.fn(async (input: any, init?: any) => {
+    globalThis.fetch = vi.fn(async (input: any, init?: any) => {
         calls.push({ url: String(input), method: String(init?.method ?? "GET") })
         return new Response(JSON.stringify({ success: true, data: null }), {
             status: 200,

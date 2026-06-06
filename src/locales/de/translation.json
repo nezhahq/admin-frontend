@@ -148,6 +148,8 @@
     "Loading": "Laden",
     "Services": "Services",
     "DashboardOriginalHost": "Agent Verbindungsadresse [Domainname/IP:port]",
+    "DashboardHost": "Dashboard-Host für OAuth2-Callback [Domainname/IP:port]",
+    "DashboardHostHint": "Der öffentliche Host des Dashboards zum Erstellen der OAuth2-Callback-URL. Setzen Sie diesen Wert, wenn das Dashboard über eine andere Domain als die Agent-Verbindungsadresse erreichbar ist. Leer lassen, um dem Request-Host unverändert zu vertrauen.",
     "ReservedHosts": "Reservierte Hosts (kommagetrennt; öffentliche/Reverse-Proxy-Domains, die Mitglieder nicht als NAT-Domain nutzen dürfen)",
     "ReservedHostsHint": "Hinter einem Reverse-Proxy sieht das Dashboard seine eigene öffentliche Domain nicht und ist daher nicht automatisch geschützt. Tragen Sie hier jeden öffentlichen Eingangs-Hostnamen ein, sonst könnte ein Mitglied ihn als NAT-Domain registrieren und das Dashboard-Routing übernehmen.",
     "NavigateTo": "Navigieren",
