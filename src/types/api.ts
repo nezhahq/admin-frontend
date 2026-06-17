@@ -732,6 +732,16 @@ export interface ModelSetting {
     user_template: string
     /** 前端真实IP */
     web_real_ip_header: string
+
+    /** 内置 LLM Chat 配置 */
+    enable_llm?: boolean
+    llm_base_url?: string
+    llm_model?: string
+    /** 计算字段：API key 是否已配置（前端据此显示"已配置 / 未配置"） */
+    llm_api_key_set?: boolean
+    llm_system_prompt?: string
+    llm_max_tokens?: number
+    llm_temperature?: number
 }
 
 export interface ModelSettingForm {
@@ -758,6 +768,16 @@ export interface ModelSettingForm {
     user_template?: string
     /** 前端真实IP */
     web_real_ip_header?: string
+
+    /** LLM Chat 配置 */
+    enable_llm?: boolean
+    llm_base_url?: string
+    llm_model?: string
+    /** 留空 = 不修改；传新值 = 覆盖；显式清空 = " " 后端会置空 */
+    llm_api_key?: string
+    llm_system_prompt?: string
+    llm_max_tokens?: number
+    llm_temperature?: number
 }
 
 export interface ModelSettingResponse {
