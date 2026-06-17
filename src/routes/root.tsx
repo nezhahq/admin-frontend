@@ -1,4 +1,5 @@
 import Header from "@/components/header"
+import LLMChatWidget from "@/components/llm-chat-widget"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import useSetting from "@/hooks/useSetting"
@@ -50,6 +51,7 @@ export default function Root() {
                 </footer>
             </section>
             <Toaster />
+            <LLMChatWidget />
         </ThemeProvider>
     )
 }

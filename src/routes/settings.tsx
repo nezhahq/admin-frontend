@@ -1,4 +1,5 @@
 import { updateSettings } from "@/api/settings"
+import { testLLMConnection } from "@/api/llm"
 import { SettingsTab } from "@/components/settings-tab"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -29,6 +30,8 @@ import useSetting from "@/hooks/useSetting"
 import { asOptionalField, safeExternalHref } from "@/lib/utils"
 import { nezhaLang, settingCoverageTypes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2, Eye, EyeOff } from "lucide-react"
+import { useState } from "react"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -56,6 +59,18 @@ const settingFormSchema = z.object({
     enable_ip_change_notification: asOptionalField(z.boolean()),
     enable_plain_ip_in_notification: asOptionalField(z.boolean()),
     enable_mcp: asOptionalField(z.boolean()),
+
+    enable_llm: asOptionalField(z.boolean()),
+    llm_base_url: asOptionalField(z.string()),
+    llm_model: asOptionalField(z.string()),
+    llm_api_key: asOptionalField(z.string()),
+    llm_system_prompt: asOptionalField(z.string()),
+    llm_max_tokens: asOptionalField(
+        z.coerce.number().int().min(1).max(200000),
+    ),
+    llm_temperature: asOptionalField(
+        z.coerce.number().min(0).max(2),
+    ),
 })
 
 export default function SettingsPage() {
@@ -71,12 +86,26 @@ export default function SettingsPage() {
 
     const isAdmin = profile?.role === 0
 
+    // LLM 连接测试按钮的 loading 态。
+    const [llmTesting, setLlmTesting] = useState(false)
+
     // 所有 hooks 必须在条件 return 之前调用，否则违反 rules-of-hooks。
     const form = useForm({
         resolver: zodResolver(settingFormSchema) as any,
         defaultValues: config
             ? {
                 ...config.config,
+                // LLMAPIKey 明文从不回显，输入框始终为空；是否存在由
+                // llm_api_key_set 决定。
+                llm_api_key: "",
+                llm_max_tokens:
+                    config.config?.llm_max_tokens && config.config.llm_max_tokens > 0
+                        ? config.config.llm_max_tokens
+                        : 2048,
+                llm_temperature:
+                    typeof config.config?.llm_temperature === "number"
+                        ? config.config.llm_temperature
+                        : 0.7,
                 user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
@@ -88,6 +117,10 @@ export default function SettingsPage() {
                 site_name: "",
                 language: "",
                 user_template: "user-dist",
+                enable_llm: false,
+                llm_max_tokens: 2048,
+                llm_temperature: 0.7,
+                llm_api_key: "",
             },
         resetOptions: {
             keepDefaultValues: false,
@@ -96,7 +129,25 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (config?.config) {
-            form.reset(config?.config)
+            // LLM API key 服务端永远不回显明文（仅 llm_api_key_set 标志）。
+            // 如果用从服务端拿到的 config.config 直接 reset，会把用户刚输入的
+            // api_key 又冲成 ""，造成"明明保存了却看不见"的错觉。
+            // 这里保留当前表单里的值；只有初次加载（表单为空）时才用默认 ""。
+            const currentKey = form.getValues("llm_api_key") as string | undefined
+            const currentSet = config?.config?.llm_api_key_set ?? false
+            form.reset({
+                ...config.config,
+                llm_api_key: currentKey ?? "",
+                llm_max_tokens:
+                    (config.config.llm_max_tokens && config.config.llm_max_tokens > 0)
+                        ? config.config.llm_max_tokens
+                        : 2048,
+                llm_temperature:
+                    typeof config.config.llm_temperature === "number"
+                        ? config.config.llm_temperature
+                        : 0.7,
+                _llmApiKeySetSeen: currentSet,
+            } as any)
         }
     }, [config?.config, form])
 
@@ -109,7 +160,14 @@ export default function SettingsPage() {
 
     const onSubmit = async (values: any) => {
         try {
-            await updateSettings(values)
+            // LLM API key：空字符串 = "不修改"。如果客户端把 "" 原样提交，
+            // 服务端的 PatchYAMLField 会清掉已存的 key。前端先剔除。
+            // 用户想清空请编辑 data/config.yaml（API key 不支持 UI 清空以避免误删）。
+            const payload = { ...values }
+            if (typeof payload.llm_api_key === "string" && payload.llm_api_key === "") {
+                delete payload.llm_api_key
+            }
+            await updateSettings(payload)
             form.reset()
             await mutate()
         } catch (e) {
@@ -124,6 +182,24 @@ export default function SettingsPage() {
             i18n.changeLanguage(values.language)
         }
         toast(t("Success"))
+    }
+
+    const onTestLLM = async () => {
+        setLlmTesting(true)
+        try {
+            const result = await testLLMConnection()
+            toast(t("LLMTestSuccess"), {
+                description: result.reply
+                    ? `${result.reply.slice(0, 80)} · ${result.latency_ms}ms · ${result.model ?? ""}`
+                    : `${result.latency_ms}ms · ${result.model ?? ""}`,
+            })
+        } catch (e: any) {
+            toast(t("LLMTestFailed"), {
+                description: e?.toString?.() ?? String(e),
+            })
+        } finally {
+            setLlmTesting(false)
+        }
     }
 
     return (
@@ -561,10 +637,217 @@ export default function SettingsPage() {
                                 </FormItem>
                             )}
                         />
+
+                        {/* LLM Chat 设置区块：参考 IPChangeNotification 卡片分组。 */}
+                        <FormItem>
+                            <FormLabel>{t("LLMTitle")}</FormLabel>
+                            <Card className="w-full">
+                                <CardContent>
+                                    <div className="flex flex-col space-y-4 mt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="enable_llm"
+                                            render={({ field }) => (
+                                                <FormItem className="flex items-center space-x-2">
+                                                    <FormControl>
+                                                        <div className="flex items-center gap-2">
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                            <Label className="text-sm">
+                                                                {t("EnableLLM")}
+                                                            </Label>
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="llm_base_url"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("LLMBaseURL")}</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="https://api.openai.com/v1"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        {t("LLMBaseURLHint")}
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="llm_model"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("LLMModel")}</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="gpt-4o-mini / deepseek-chat / ..."
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="llm_api_key"
+                                            render={({ field }) => {
+                                                const apiKeyConfigured =
+                                                    config?.config?.llm_api_key_set ?? false
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>{t("LLMApiKey")}</FormLabel>
+                                                        <FormControl>
+                                                            <ApiKeyInput
+                                                                value={field.value ?? ""}
+                                                                onChange={field.onChange}
+                                                                configured={apiKeyConfigured}
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription>
+                                                            {apiKeyConfigured
+                                                                ? t("LLMApiKeyHintConfigured")
+                                                                : t("LLMApiKeyHint")}
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="llm_system_prompt"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("LLMSystemPrompt")}</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            className="resize-y min-h-20"
+                                                            placeholder="You are a Nezha assistant."
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="llm_max_tokens"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>{t("LLMMaxTokens")}</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                min={1}
+                                                                max={200000}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="llm_temperature"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>{t("LLMTemperature")}</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                step={0.1}
+                                                                min={0}
+                                                                max={2}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={onTestLLM}
+                                                disabled={llmTesting}
+                                            >
+                                                {llmTesting && (
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                )}
+                                                {t("LLMTestButton")}
+                                            </Button>
+                                            <span className="text-xs text-muted-foreground">
+                                                {config?.config?.llm_api_key_set
+                                                    ? t("LLMApiKeySet")
+                                                    : t("LLMApiKeyNotSet")}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </FormItem>
                         <Button type="submit">{t("Confirm")}</Button>
                     </form>
                 </Form>
             </div>
+        </div>
+    )
+}
+
+// ApiKeyInput 是带显示切换的密码输入；输入框始终为 password 类型避免
+// 浏览器自动填充 / 历史泄露；点眼睛按钮临时切换为 text。
+function ApiKeyInput({
+    value,
+    onChange,
+    configured,
+}: {
+    value: string
+    onChange: (v: string) => void
+    configured: boolean
+}) {
+    const [show, setShow] = useState(false)
+    // placeholder 暗示当前是否已配置；提示文案由父组件的 FormDescription 承担。
+    const placeholder = configured
+        ? "••••••••（已配置，留空表示不修改）"
+        : "未配置"
+    return (
+        <div className="flex items-center gap-2">
+            <Input
+                type={show ? "text" : "password"}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                autoComplete="off"
+                spellCheck={false}
+                className="flex-1"
+            />
+            <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setShow((s) => !s)}
+                aria-label={show ? "hide" : "show"}
+                title={show ? "hide" : "show"}
+            >
+                {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
         </div>
     )
 }
