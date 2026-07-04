@@ -4,6 +4,7 @@ import { ProfileCard } from "@/components/profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { OAuthProviderIcon } from "@/components/ui/icon"
 import { useMainStore } from "@/hooks/useMainStore"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { useServer } from "@/hooks/useServer"
@@ -107,8 +108,15 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className="text-lg font-semibold">
                                 {settingData?.config?.oauth2_providers?.map((provider) => (
-                                    <div className="flex justify-between items-center flex-wrap gap-2">
+                                    <div
+                                        key={provider}
+                                        className="flex justify-between items-center flex-wrap gap-2"
+                                    >
                                         <section className="flex gap-2 items-center">
+                                            <OAuthProviderIcon
+                                                provider={provider}
+                                                className="size-4 text-muted-foreground"
+                                            />
                                             <p>{provider}: </p>
                                             {profile.oauth2_bind?.[provider.toLowerCase()] && (
                                                 <p className=" bg-muted px-1.5 py-0.5 text-sm rounded-full">
