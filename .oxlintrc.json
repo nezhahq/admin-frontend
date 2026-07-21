@@ -1,0 +1,25 @@
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "categories": {
+        "correctness": "error"
+    },
+    "env": {
+        "browser": true
+    },
+    "ignorePatterns": ["dist"],
+    "plugins": ["eslint", "typescript", "react"],
+    "rules": {
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "warn",
+        "typescript/no-explicit-any": "off",
+        "react/only-export-components": "off"
+    },
+    "overrides": [
+        {
+            "files": ["tests/e2e/fixtures.ts"],
+            "rules": {
+                "react/rules-of-hooks": "off"
+            }
+        }
+    ]
+}
