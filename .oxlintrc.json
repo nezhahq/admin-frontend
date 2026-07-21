@@ -9,15 +9,76 @@
     "ignorePatterns": ["dist"],
     "plugins": ["eslint", "typescript", "react"],
     "rules": {
+        "no-case-declarations": "error",
+        "no-empty": "error",
+        "no-fallthrough": "error",
+        "no-prototype-builtins": "error",
+        "no-regex-spaces": "error",
+        "no-unexpected-multiline": "error",
+        "no-useless-assignment": "error",
+        "preserve-caught-error": "error",
+        "no-array-constructor": "error",
+        "no-var": "error",
+        "prefer-const": "error",
+        "prefer-rest-params": "error",
+        "prefer-spread": "error",
+        "typescript/ban-ts-comment": "error",
+        "typescript/no-empty-object-type": "error",
+        "typescript/no-namespace": "error",
+        "typescript/no-require-imports": "error",
+        "typescript/no-unnecessary-type-constraint": "error",
+        "typescript/no-unsafe-function-type": "error",
         "react/rules-of-hooks": "error",
         "react/exhaustive-deps": "warn",
         "typescript/no-explicit-any": "off",
-        "react/only-export-components": "off"
+        "react/only-export-components": "off",
+        // React Compiler lint stays opt-in until the compiler is adopted.
+        "react/react-compiler": "off"
     },
     "overrides": [
         {
+            "files": [
+                "vite.config.ts",
+                "vitest.config.ts",
+                "playwright.config.ts",
+                "postcss.config.js",
+                "tailwind.config.js"
+            ],
+            "env": {
+                "browser": false,
+                "node": true
+            }
+        },
+        {
+            "files": ["src/test/**/*.{ts,tsx}"],
+            "env": {
+                "browser": true,
+                "node": true,
+                "vitest": true
+            }
+        },
+        {
+            "files": ["tests/e2e/**/*.ts"],
+            "env": {
+                "browser": false,
+                "node": true
+            }
+        },
+        {
+            "files": [
+                "src/components/server-config.tsx",
+                "src/components/server-config-batch.tsx",
+                "src/routes/server.tsx"
+            ],
+            "rules": {
+                // Existing migration debt remains visible without blocking lint.
+                "no-useless-assignment": "warn"
+            }
+        },
+        {
             "files": ["tests/e2e/fixtures.ts"],
             "rules": {
+                // Playwright fixture callbacks are not React hooks.
                 "react/rules-of-hooks": "off"
             }
         }
