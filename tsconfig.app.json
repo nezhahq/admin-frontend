@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "ignoreDeprecations": "6.0",
-        "baseUrl": ".",
+        // TypeScript 7 resolves paths relative to this config; baseUrl was removed.
         "paths": {
             "@/*": ["./src/*"]
         },
