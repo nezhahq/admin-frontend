@@ -1,3 +1,4 @@
+import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
@@ -25,8 +26,6 @@ const batchMoveServer = vi.fn()
 vi.mock("@/api/server", () => ({
     batchMoveServer: (...args: unknown[]) => batchMoveServer(...args),
 }))
-
-import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
 
 beforeEach(() => {
     toastCalls.length = 0

@@ -98,7 +98,10 @@ export default function ApiTokensPage() {
                         </TableRow>
                     ) : !data || data.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                            <TableCell
+                                colSpan={6}
+                                className="h-24 text-center text-muted-foreground"
+                            >
                                 {t("NoResults")}
                             </TableCell>
                         </TableRow>
@@ -119,10 +122,14 @@ export default function ApiTokensPage() {
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-xs">
-                                    {tok.server_ids?.length ? tok.server_ids.join(", ") : t("ApiTokenAllServers")}
+                                    {tok.server_ids?.length
+                                        ? tok.server_ids.join(", ")
+                                        : t("ApiTokenAllServers")}
                                 </TableCell>
                                 <TableCell className="text-xs">
-                                    {tok.expires_at ? new Date(tok.expires_at).toLocaleString() : t("ApiTokenNever")}
+                                    {tok.expires_at
+                                        ? new Date(tok.expires_at).toLocaleString()
+                                        : t("ApiTokenNever")}
                                 </TableCell>
                                 <TableCell className="text-xs">
                                     {tok.last_used_at
@@ -239,7 +246,8 @@ function CreateApiTokenDialog({
                         <Label>{t("Scopes")}</Label>
                         <div className="max-h-72 space-y-2 overflow-y-auto pr-2">
                             {SCOPE_OPTIONS.map((s) => {
-                                const adminOnly = s.value === "nezha:*" || s.value === "nezha:admin:*"
+                                const adminOnly =
+                                    s.value === "nezha:*" || s.value === "nezha:admin:*"
                                 const disabled = adminOnly && !isAdmin
                                 return (
                                     <label
@@ -248,12 +256,16 @@ function CreateApiTokenDialog({
                                     >
                                         <Checkbox
                                             checked={scopes.includes(s.value)}
-                                            onCheckedChange={() => !disabled && toggleScope(s.value)}
+                                            onCheckedChange={() =>
+                                                !disabled && toggleScope(s.value)
+                                            }
                                             disabled={disabled}
                                         />
                                         <div className="flex flex-col">
                                             <span className="font-mono text-xs">{s.value}</span>
-                                            <span className="text-xs text-muted-foreground">{s.desc}</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {s.desc}
+                                            </span>
                                         </div>
                                     </label>
                                 )

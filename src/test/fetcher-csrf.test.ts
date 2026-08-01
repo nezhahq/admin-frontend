@@ -83,7 +83,9 @@ test("auto refresh-token uses POST (backend route is POST)", async () => {
 // Revoke (DELETE) commonly returns 204 / empty body. The fetcher must not
 // blow up on response.json() of an empty body and must resolve successfully.
 test("DELETE tolerates an empty 204 response body", async () => {
-    globalThis.fetch = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch
+    globalThis.fetch = vi.fn(
+        async () => new Response(null, { status: 204 }),
+    ) as unknown as typeof fetch
 
     await expect(fetcher(FetcherMethod.DELETE, "/api/v1/api-tokens/9")).resolves.toBeUndefined()
 })

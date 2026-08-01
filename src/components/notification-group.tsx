@@ -48,13 +48,13 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
         resolver: zodResolver(notificationGroupFormSchema),
         defaultValues: data
             ? {
-                name: data.group.name,
-                notifications: data.notifications,
-            }
+                  name: data.group.name,
+                  notifications: data.notifications,
+              }
             : {
-                name: "",
-                notifications: [],
-            },
+                  name: "",
+                  notifications: [],
+              },
         resetOptions: {
             keepDefaultValues: false,
         },

@@ -64,34 +64,35 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
     type NotificationFormInput = z.input<typeof notificationFormSchema>
     type NotificationFormData = z.output<typeof notificationFormSchema>
-    type NotificationDefaults = ModelNotification & Partial<Pick<NotificationFormData, "skip_check">>
+    type NotificationDefaults = ModelNotification &
+        Partial<Pick<NotificationFormData, "skip_check">>
     const notificationDefaults: NotificationDefaults | undefined = data
 
     const form = useForm<NotificationFormInput, unknown, NotificationFormData>({
         resolver: zodResolver(notificationFormSchema),
         defaultValues: data
             ? {
-                name: data.name ?? "",
-                url: data.url ?? "",
-                request_method: data.request_method ?? 1,
-                request_type: data.request_type ?? 1,
-                request_header: data.request_header ?? "",
-                request_body: data.request_body ?? "",
-                verify_tls: data.verify_tls ?? false,
-                skip_check: notificationDefaults?.skip_check ?? false,
-                format_metric_units: data.format_metric_units ?? false,
-            }
+                  name: data.name ?? "",
+                  url: data.url ?? "",
+                  request_method: data.request_method ?? 1,
+                  request_type: data.request_type ?? 1,
+                  request_header: data.request_header ?? "",
+                  request_body: data.request_body ?? "",
+                  verify_tls: data.verify_tls ?? false,
+                  skip_check: notificationDefaults?.skip_check ?? false,
+                  format_metric_units: data.format_metric_units ?? false,
+              }
             : {
-                name: "",
-                url: "",
-                request_method: 1,
-                request_type: 1,
-                request_header: "",
-                request_body: "",
-                verify_tls: false,
-                skip_check: false,
-                format_metric_units: false,
-            },
+                  name: "",
+                  url: "",
+                  request_method: 1,
+                  request_type: 1,
+                  request_header: "",
+                  request_body: "",
+                  verify_tls: false,
+                  skip_check: false,
+                  format_metric_units: false,
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -133,10 +134,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className="space-y-2 my-2"
-                            >
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                                 <FormField
                                     control={form.control}
                                     name="name"

@@ -1,6 +1,8 @@
 import { act, render, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
+import { FMComponent } from "../components/fm"
+
 type DivProps = React.ComponentPropsWithoutRef<"div"> & { asChild?: boolean }
 type ButtonProps = React.ComponentPropsWithoutRef<"button"> & {
     asChild?: boolean
@@ -105,8 +107,6 @@ vi.mock("@/lib/utils", () => ({
     fmWorker: new Worker(""),
     formatPath: (path: string) => path,
 }))
-
-import { FMComponent } from "../components/fm"
 
 const webSockets: MockWebSocket[] = []
 
@@ -235,7 +235,10 @@ test("FM websocket lifecycle reuses the socket on path changes", async () => {
 
     socket.sent.length = 0
     await act(async () => {
-        await socket.onmessage?.call(socket, new MessageEvent("message", { data: encodeCompleteMessage() }))
+        await socket.onmessage?.call(
+            socket,
+            new MessageEvent("message", { data: encodeCompleteMessage() }),
+        )
     })
 
     expect(webSockets).toHaveLength(1)

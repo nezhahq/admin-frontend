@@ -48,13 +48,13 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
         resolver: zodResolver(serverGroupFormSchema),
         defaultValues: data
             ? {
-                name: data.group.name,
-                servers: data.servers,
-            }
+                  name: data.group.name,
+                  servers: data.servers,
+              }
             : {
-                name: "",
-                servers: [],
-            },
+                  name: "",
+                  servers: [],
+              },
         resetOptions: {
             keepDefaultValues: false,
         },

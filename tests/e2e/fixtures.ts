@@ -1,4 +1,4 @@
-import { Page, Request, expect, test as base } from "@playwright/test"
+import { Page, Request, test as base, expect } from "@playwright/test"
 
 export type LoginContext = {
     username: string
@@ -39,7 +39,8 @@ export async function csrfHeaders(page: Page): Promise<Record<string, string>> {
     await expect
         .poll(
             async () => {
-                value = (await page.context().cookies()).find((c) => c.name === "nz-csrf")?.value ?? ""
+                value =
+                    (await page.context().cookies()).find((c) => c.name === "nz-csrf")?.value ?? ""
                 return value
             },
             { timeout: 10_000 },

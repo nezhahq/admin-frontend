@@ -26,7 +26,11 @@ export const deleteServer = async (id: number[]): Promise<void> => {
 export const batchMoveServer = async (
     data: ModelBatchMoveServerForm,
 ): Promise<ModelBatchMoveServerResult[]> => {
-    return fetcher<ModelBatchMoveServerResult[]>(FetcherMethod.POST, "/api/v1/batch-move/server", data)
+    return fetcher<ModelBatchMoveServerResult[]>(
+        FetcherMethod.POST,
+        "/api/v1/batch-move/server",
+        data,
+    )
 }
 
 export const forceUpdateServer = async (id: number[]): Promise<ModelServerTaskResponse> => {

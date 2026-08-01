@@ -47,7 +47,9 @@ vi.mock("@/hooks/useNotfication", () => ({
 }))
 
 const updateSettings = vi.fn()
-vi.mock("@/api/settings", () => ({ updateSettings: (...args: unknown[]) => updateSettings(...args) }))
+vi.mock("@/api/settings", () => ({
+    updateSettings: (...args: unknown[]) => updateSettings(...args),
+}))
 
 beforeEach(() => {
     toastCalls.length = 0

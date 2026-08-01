@@ -467,8 +467,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     {publicNoteObj.billingDataMod
                                                                         ?.startDate
                                                                         ? new Date(
-                                                                              publicNoteObj.billingDataMod!.startDate!,
-                                                                        ).toLocaleDateString()
+                                                                              publicNoteObj
+                                                                                  .billingDataMod!
+                                                                                  .startDate!,
+                                                                          ).toLocaleDateString()
                                                                         : "YYYY-MM-DD"}
                                                                 </Button>
                                                             </PopoverTrigger>
@@ -492,8 +494,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                                 .billingDataMod
                                                                                 ?.startDate
                                                                                 ? new Date(
-                                                                                      publicNoteObj.billingDataMod!.startDate!,
-                                                                                )
+                                                                                      publicNoteObj
+                                                                                          .billingDataMod!
+                                                                                          .startDate!,
+                                                                                  )
                                                                                 : undefined
                                                                         }
                                                                         onSelect={(d) => {
@@ -560,17 +564,17 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                     {publicNoteObj.billingDataMod
                                                                         ?.endDate
                                                                         ? publicNoteObj
-                                                                            .billingDataMod
-                                                                            ?.endDate ===
+                                                                              .billingDataMod
+                                                                              ?.endDate ===
                                                                           "0000-00-00T23:59:59+08:00"
                                                                             ? t(
-                                                                                "PublicNote.NoExpiry",
-                                                                            )
+                                                                                  "PublicNote.NoExpiry",
+                                                                              )
                                                                             : new Date(
                                                                                   publicNoteObj
                                                                                       .billingDataMod
                                                                                       ?.endDate as string,
-                                                                            ).toLocaleDateString()
+                                                                              ).toLocaleDateString()
                                                                         : "YYYY-MM-DD"}
                                                                 </Button>
                                                             </PopoverTrigger>
@@ -601,7 +605,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                                                       publicNoteObj
                                                                                           .billingDataMod
                                                                                           ?.endDate as string,
-                                                                                )
+                                                                                  )
                                                                                 : undefined
                                                                         }
                                                                         onSelect={(d) => {

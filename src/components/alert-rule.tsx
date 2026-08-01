@@ -102,22 +102,22 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
         resolver: zodResolver(alertRuleFormSchema),
         defaultValues: data
             ? {
-                ...data,
-                rules_raw: JSON.stringify(data.rules),
-                fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
-                recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
-            }
+                  ...data,
+                  rules_raw: JSON.stringify(data.rules),
+                  fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
+                  recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
+              }
             : {
-                name: "",
-                rules_raw: "",
-                rules: [],
-                fail_trigger_tasks: [],
-                fail_trigger_tasks_raw: "",
-                recover_trigger_tasks: [],
-                recover_trigger_tasks_raw: "",
-                notification_group_id: 0,
-                trigger_mode: 0,
-            },
+                  name: "",
+                  rules_raw: "",
+                  rules: [],
+                  fail_trigger_tasks: [],
+                  fail_trigger_tasks_raw: "",
+                  recover_trigger_tasks: [],
+                  recover_trigger_tasks_raw: "",
+                  notification_group_id: 0,
+                  trigger_mode: 0,
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -195,10 +195,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className="space-y-2 my-2"
-                            >
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -369,9 +366,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                             ...next[idx],
                                                                             min: e.target.value
                                                                                 ? Number(
-                                                                                    e.target
-                                                                                        .value,
-                                                                                )
+                                                                                      e.target
+                                                                                          .value,
+                                                                                  )
                                                                                 : undefined,
                                                                         }
                                                                         setRulesUI(next)
@@ -392,9 +389,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                             ...next[idx],
                                                                             max: e.target.value
                                                                                 ? Number(
-                                                                                    e.target
-                                                                                        .value,
-                                                                                )
+                                                                                      e.target
+                                                                                          .value,
+                                                                                  )
                                                                                 : undefined,
                                                                         }
                                                                         setRulesUI(next)
@@ -456,8 +453,8 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                     try {
                                                                         return r.ignore
                                                                             ? JSON.stringify(
-                                                                                r.ignore,
-                                                                            )
+                                                                                  r.ignore,
+                                                                              )
                                                                             : ""
                                                                     } catch {
                                                                         return ""
@@ -468,8 +465,8 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                     try {
                                                                         const obj = e.target.value
                                                                             ? JSON.parse(
-                                                                                e.target.value,
-                                                                            )
+                                                                                  e.target.value,
+                                                                              )
                                                                             : undefined
                                                                         next[idx] = {
                                                                             ...next[idx],
@@ -523,9 +520,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                             cycle_interval: e.target
                                                                                 .value
                                                                                 ? Number(
-                                                                                    e.target
-                                                                                        .value,
-                                                                                )
+                                                                                      e.target
+                                                                                          .value,
+                                                                                  )
                                                                                 : undefined,
                                                                         }
                                                                         setRulesUI(next)

@@ -47,20 +47,56 @@ export const deleteApiToken = async (id: number): Promise<void> => {
 }
 
 export const SCOPE_OPTIONS = [
-    { value: "nezha:inventory:read", label: "Inventory: read", desc: "List servers & groups (server.list)" },
-    { value: "nezha:inventory:delete", label: "Inventory: delete", desc: "Delete servers & server groups" },
+    {
+        value: "nezha:inventory:read",
+        label: "Inventory: read",
+        desc: "List servers & groups (server.list)",
+    },
+    {
+        value: "nezha:inventory:delete",
+        label: "Inventory: delete",
+        desc: "Delete servers & server groups",
+    },
     { value: "nezha:inventory:*", label: "Inventory: all", desc: "List + delete servers & groups" },
-    { value: "nezha:server:read", label: "Server: read", desc: "Inspect a server, read files & metrics (needs server id)" },
+    {
+        value: "nezha:server:read",
+        label: "Server: read",
+        desc: "Inspect a server, read files & metrics (needs server id)",
+    },
     { value: "nezha:server:write", label: "Server: write", desc: "Edit a server, push files" },
     { value: "nezha:server:delete", label: "Server: delete", desc: "Delete files on a server" },
     { value: "nezha:server:exec", label: "Server: exec", desc: "Run shell commands on servers" },
-    { value: "nezha:server:*", label: "Server: all", desc: "Every server operation (read+write+delete+exec)" },
-    { value: "nezha:service:read", label: "Service monitor: read", desc: "List service monitors & history" },
-    { value: "nezha:service:write", label: "Service monitor: write", desc: "Create / edit service monitors" },
-    { value: "nezha:service:delete", label: "Service monitor: delete", desc: "Delete service monitors" },
-    { value: "nezha:service:*", label: "Service monitor: all", desc: "Every service monitor permission" },
+    {
+        value: "nezha:server:*",
+        label: "Server: all",
+        desc: "Every server operation (read+write+delete+exec)",
+    },
+    {
+        value: "nezha:service:read",
+        label: "Service monitor: read",
+        desc: "List service monitors & history",
+    },
+    {
+        value: "nezha:service:write",
+        label: "Service monitor: write",
+        desc: "Create / edit service monitors",
+    },
+    {
+        value: "nezha:service:delete",
+        label: "Service monitor: delete",
+        desc: "Delete service monitors",
+    },
+    {
+        value: "nezha:service:*",
+        label: "Service monitor: all",
+        desc: "Every service monitor permission",
+    },
     { value: "nezha:alertrule:read", label: "Alert rule: read", desc: "List alert rules" },
-    { value: "nezha:alertrule:write", label: "Alert rule: write", desc: "Create / edit alert rules" },
+    {
+        value: "nezha:alertrule:write",
+        label: "Alert rule: write",
+        desc: "Create / edit alert rules",
+    },
     { value: "nezha:alertrule:delete", label: "Alert rule: delete", desc: "Delete alert rules" },
     { value: "nezha:alertrule:*", label: "Alert rule: all", desc: "Every alert-rule permission" },
     { value: "nezha:cron:read", label: "Cron: read", desc: "List scheduled tasks" },
@@ -69,13 +105,41 @@ export const SCOPE_OPTIONS = [
     { value: "nezha:cron:exec", label: "Cron: trigger", desc: "Manually trigger scheduled tasks" },
     { value: "nezha:cron:*", label: "Cron: all", desc: "Every cron permission" },
     { value: "nezha:notification:read", label: "Notification: read", desc: "List notifications" },
-    { value: "nezha:notification:write", label: "Notification: write", desc: "Create / edit notifications" },
-    { value: "nezha:notification:delete", label: "Notification: delete", desc: "Delete notifications" },
-    { value: "nezha:notification:*", label: "Notification: all", desc: "Every notification permission" },
-    { value: "nezha:notification-group:read", label: "Notification group: read", desc: "List notification groups" },
-    { value: "nezha:notification-group:write", label: "Notification group: write", desc: "Create / edit groups" },
-    { value: "nezha:notification-group:delete", label: "Notification group: delete", desc: "Delete groups" },
-    { value: "nezha:notification-group:*", label: "Notification group: all", desc: "Every notification-group permission" },
+    {
+        value: "nezha:notification:write",
+        label: "Notification: write",
+        desc: "Create / edit notifications",
+    },
+    {
+        value: "nezha:notification:delete",
+        label: "Notification: delete",
+        desc: "Delete notifications",
+    },
+    {
+        value: "nezha:notification:*",
+        label: "Notification: all",
+        desc: "Every notification permission",
+    },
+    {
+        value: "nezha:notification-group:read",
+        label: "Notification group: read",
+        desc: "List notification groups",
+    },
+    {
+        value: "nezha:notification-group:write",
+        label: "Notification group: write",
+        desc: "Create / edit groups",
+    },
+    {
+        value: "nezha:notification-group:delete",
+        label: "Notification group: delete",
+        desc: "Delete groups",
+    },
+    {
+        value: "nezha:notification-group:*",
+        label: "Notification group: all",
+        desc: "Every notification-group permission",
+    },
     { value: "nezha:ddns:read", label: "DDNS: read", desc: "List DDNS profiles" },
     { value: "nezha:ddns:write", label: "DDNS: write", desc: "Create / edit DDNS profiles" },
     { value: "nezha:ddns:delete", label: "DDNS: delete", desc: "Delete DDNS profiles" },
@@ -86,21 +150,27 @@ export const SCOPE_OPTIONS = [
     { value: "nezha:nat:*", label: "NAT: all", desc: "Every NAT permission" },
     { value: "nezha:transfer:read", label: "Transfer: read", desc: "Read server transfer state" },
     { value: "nezha:transfer:write", label: "Transfer: write", desc: "Cancel / retry transfers" },
-    { value: "nezha:transfer:delete", label: "Transfer: delete", desc: "Delete server transfer records" },
+    {
+        value: "nezha:transfer:delete",
+        label: "Transfer: delete",
+        desc: "Delete server transfer records",
+    },
     { value: "nezha:transfer:*", label: "Transfer: all", desc: "Every transfer permission" },
-    { value: "nezha:admin:*", label: "Admin: all (admin only)", desc: "User / WAF / Setting / Online-user management" },
+    {
+        value: "nezha:admin:*",
+        label: "Admin: all (admin only)",
+        desc: "User / WAF / Setting / Online-user management",
+    },
     { value: "nezha:*", label: "Everything (admin only)", desc: "Full access to all resources" },
 ] as const
 
 export type Scope = (typeof SCOPE_OPTIONS)[number]["value"]
 
 export type ParseServerIDsResult =
-    | { ok: true; value: number[] | undefined }
-    | { ok: false; error: string }
+    { ok: true; value: number[] | undefined } | { ok: false; error: string }
 
 export type ParseExpiresInDaysResult =
-    | { ok: true; value: number | undefined }
-    | { ok: false; error: string }
+    { ok: true; value: number | undefined } | { ok: false; error: string }
 
 // Validates the "expires in days" field before it is sent to the backend.
 // The backend model field is `ExpiresInDays int`, so a fractional value would
@@ -130,7 +200,8 @@ export function parseServerIDsInput(raw: string): ParseServerIDsResult {
         // Server IDs are uint64 on the backend; reject values that lose
         // precision as a JS number, otherwise the PAT could bind to a
         // different server than the operator typed.
-        if (!Number.isSafeInteger(n) || n <= 0) return { ok: false, error: `invalid server id: ${p}` }
+        if (!Number.isSafeInteger(n) || n <= 0)
+            return { ok: false, error: `invalid server id: ${p}` }
         if (seen.has(n)) continue
         seen.add(n)
         out.push(n)

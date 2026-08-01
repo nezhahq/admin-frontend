@@ -1,6 +1,13 @@
 import { expect } from "@playwright/test"
 
-import { csrfRequest, defaultAdmin, expectAuthenticated, expectUnauthenticated, loginAs, test } from "./fixtures"
+import {
+    csrfRequest,
+    defaultAdmin,
+    expectAuthenticated,
+    expectUnauthenticated,
+    loginAs,
+    test,
+} from "./fixtures"
 
 test("login persists session via cookie and getProfile succeeds", async ({ page }) => {
     await loginAs(page, defaultAdmin)
@@ -51,7 +58,10 @@ test("password change rotates TokenVersion and revokes existing session", async 
                     reject_password: false,
                 },
             })
-            expect(restoreResp.ok(), "password restore must succeed so other suites can still log in").toBeTruthy()
+            expect(
+                restoreResp.ok(),
+                "password restore must succeed so other suites can still log in",
+            ).toBeTruthy()
         }
     }
 })
