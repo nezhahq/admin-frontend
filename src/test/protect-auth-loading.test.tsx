@@ -32,15 +32,11 @@ function renderAtPath(path: string, child: React.ReactNode) {
                     <Routes>
                         <Route
                             path="/dashboard/login"
-                            element={
-                                <ProtectedRoute>{child}</ProtectedRoute>
-                            }
+                            element={<ProtectedRoute>{child}</ProtectedRoute>}
                         />
                         <Route
                             path="/dashboard/*"
-                            element={
-                                <ProtectedRoute>{child}</ProtectedRoute>
-                            }
+                            element={<ProtectedRoute>{child}</ProtectedRoute>}
                         />
                     </Routes>
                 </MemoryRouter>,
@@ -50,18 +46,12 @@ function renderAtPath(path: string, child: React.ReactNode) {
 }
 
 test("ProtectedRoute does not mount children for protected paths while auth is loading", async () => {
-    await renderAtPath(
-        "/dashboard",
-        <div data-testid="protected-child">protected</div>,
-    )
+    await renderAtPath("/dashboard", <div data-testid="protected-child">protected</div>)
     expect(document.querySelector("[data-testid='protected-child']")).toBeNull()
 })
 
 test("ProtectedRoute renders children on the login page even while auth is loading", async () => {
-    await renderAtPath(
-        "/dashboard/login",
-        <div data-testid="login-child">login</div>,
-    )
+    await renderAtPath("/dashboard/login", <div data-testid="login-child">login</div>)
     expect(document.querySelector("[data-testid='login-child']")).not.toBeNull()
 })
 
@@ -100,9 +90,6 @@ test("ProtectedRoute redirects unauthenticated users without mounting protected 
 test("ProtectedRoute renders children once an authenticated profile resolves", async () => {
     mockLoading = false
     mockProfile = { id: 1, role: 0 }
-    await renderAtPath(
-        "/dashboard",
-        <div data-testid="protected-child">protected</div>,
-    )
+    await renderAtPath("/dashboard", <div data-testid="protected-child">protected</div>)
     expect(document.querySelector("[data-testid='protected-child']")).not.toBeNull()
 })

@@ -1,3 +1,4 @@
+import type { ModelServerTransfer } from "@/types"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
@@ -46,8 +47,6 @@ vi.mock("@/hooks/useMainStore", () => ({
         return selector ? selector(store) : store
     },
 }))
-
-import type { ModelServerTransfer } from "@/types"
 
 let mockedRows: ModelServerTransfer[] = []
 
@@ -127,10 +126,7 @@ test("non-admin member who is only the ToUserID or InitiatorID sees neither Canc
 
 test("admin sees both Cancel for pending and Retry for terminal", async () => {
     mockProfile = { id: 1, role: 0 }
-    mockedRows = [
-        makeRow({ id: 1, status: 0 }),
-        makeRow({ id: 2, status: 2 }),
-    ]
+    mockedRows = [makeRow({ id: 1, status: 0 }), makeRow({ id: 2, status: 2 })]
 
     await renderPage()
 

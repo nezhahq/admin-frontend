@@ -9,8 +9,7 @@ const setProfileSpy = vi.fn((p: any) => {
 
 vi.mock("./useMainStore", () => ({}))
 vi.mock("@/hooks/useMainStore", () => ({
-    useMainStore: (selector: any) =>
-        selector({ profile: profileStore, setProfile: setProfileSpy }),
+    useMainStore: (selector: any) => selector({ profile: profileStore, setProfile: setProfileSpy }),
 }))
 
 vi.mock("react-i18next", () => ({

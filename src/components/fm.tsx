@@ -71,7 +71,10 @@ const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
     return true
 }
 
-export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ wsUrl, ...props }) => {
+export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
+    wsUrl,
+    ...props
+}) => {
     const { t } = useTranslation()
     const fmRef = useRef<HTMLDivElement>(null)
     const wsRef = useRef<WebSocket | null>(null)
@@ -162,30 +165,30 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ 
     useEffect(() => {
         worker.onmessage = async (event: MessageEvent<FMWorkerData>) => {
             switch (event.data.type) {
-            case FMWorkerOpcode.Error: {
-                console.error("Error from worker", event.data.error)
-                break
-            }
-            case FMWorkerOpcode.Progress: {
-                handleReady.current = true
-                break
-            }
-            case FMWorkerOpcode.Result: {
-                handleReady.current = false
-
-                if (event.data.blob && event.data.fileName) {
-                    const url = URL.createObjectURL(event.data.blob)
-                    const anchor = document.createElement("a")
-                    anchor.href = url
-                    anchor.download = event.data.fileName
-                    anchor.click()
-                    URL.revokeObjectURL(url)
+                case FMWorkerOpcode.Error: {
+                    console.error("Error from worker", event.data.error)
+                    break
                 }
+                case FMWorkerOpcode.Progress: {
+                    handleReady.current = true
+                    break
+                }
+                case FMWorkerOpcode.Result: {
+                    handleReady.current = false
 
-                firstChunk.current = true
-                if (dOpen) setdOpen(false)
-                break
-            }
+                    if (event.data.blob && event.data.fileName) {
+                        const url = URL.createObjectURL(event.data.blob)
+                        const anchor = document.createElement("a")
+                        anchor.href = url
+                        anchor.download = event.data.fileName
+                        anchor.click()
+                        URL.revokeObjectURL(url)
+                    }
+
+                    firstChunk.current = true
+                    if (dOpen) setdOpen(false)
+                    break
+                }
             }
         }
 
@@ -342,7 +345,10 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({ 
                                     try {
                                         await copyToClipboard(formatPath(currentPath))
                                     } catch (error) {
-                                        const description = error instanceof Error ? error.message : t("Results.UnExpectedError")
+                                        const description =
+                                            error instanceof Error
+                                                ? error.message
+                                                : t("Results.UnExpectedError")
                                         toast("FM" + " " + t("Error"), {
                                             description,
                                         })

@@ -6,10 +6,13 @@ const realFetch = globalThis.fetch
 
 function mockFetch(payload: unknown, ok = true, success = true) {
     globalThis.fetch = vi.fn(async () => {
-        return new Response(JSON.stringify({ success, error: success ? "" : "boom", data: payload }), {
-            status: ok ? 200 : 500,
-            headers: { "Content-Type": "application/json" },
-        })
+        return new Response(
+            JSON.stringify({ success, error: success ? "" : "boom", data: payload }),
+            {
+                status: ok ? 200 : 500,
+                headers: { "Content-Type": "application/json" },
+            },
+        )
     }) as unknown as typeof fetch
 }
 
@@ -94,9 +97,9 @@ test("createApiToken POSTs /api/v1/api-tokens and serializes scopes / server_ids
 
 test("createApiToken surfaces server error via thrown Error", async () => {
     mockFetch(null, true, false)
-    await expect(
-        createApiToken({ name: "x", scopes: ["nezha:server:read"] }),
-    ).rejects.toThrow("boom")
+    await expect(createApiToken({ name: "x", scopes: ["nezha:server:read"] })).rejects.toThrow(
+        "boom",
+    )
 })
 
 test("listApiTokens normalizes null scopes to an empty array so the table cannot crash", async () => {
@@ -107,9 +110,7 @@ test("listApiTokens normalizes null scopes to an empty array so the table cannot
         return new Response(
             JSON.stringify({
                 success: true,
-                data: [
-                    { id: 1, name: "legacy", scopes: null, created_at: "2025-01-01T00:00:00Z" },
-                ],
+                data: [{ id: 1, name: "legacy", scopes: null, created_at: "2025-01-01T00:00:00Z" }],
             }),
             { status: 200, headers: { "Content-Type": "application/json" } },
         )

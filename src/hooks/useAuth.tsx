@@ -53,27 +53,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const navigate = useNavigate()
 
-    const login = useCallback(async (username: string, password: string) => {
-        try {
-            await loginRequest(username, password)
-            const user = await getProfile()
-            authEpoch.current++
-            user.role = normalizeRole(user.role)
-            setProfile(user)
-            navigate("/dashboard")
-        } catch (error: any) {
-            const msg = error?.message
-            if (msg === "ApiErrorUnauthorized" || msg === "Unauthorized") {
-                toast(t("InvalidUsernameOrPassword"))
-            } else {
-                toast(msg || t("NetworkError"))
+    const login = useCallback(
+        async (username: string, password: string) => {
+            try {
+                await loginRequest(username, password)
+                const user = await getProfile()
+                authEpoch.current++
+                user.role = normalizeRole(user.role)
+                setProfile(user)
+                navigate("/dashboard")
+            } catch (error: any) {
+                const msg = error?.message
+                if (msg === "ApiErrorUnauthorized" || msg === "Unauthorized") {
+                    toast(t("InvalidUsernameOrPassword"))
+                } else {
+                    toast(msg || t("NetworkError"))
+                }
+            } finally {
+                // An explicit login resolves auth regardless of the still-pending
+                // mount probe; clear loading so ProtectedRoute stops blanking.
+                setLoading(false)
             }
-        } finally {
-            // An explicit login resolves auth regardless of the still-pending
-            // mount probe; clear loading so ProtectedRoute stops blanking.
-            setLoading(false)
-        }
-    }, [navigate, setProfile, t])
+        },
+        [navigate, setProfile, t],
+    )
 
     const loginOauth2 = useCallback(async () => {
         try {

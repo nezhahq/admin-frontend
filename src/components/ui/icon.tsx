@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
 
 type SVGProps = React.ComponentPropsWithoutRef<"svg">
-type IconMarkupState =
-    | { status: "ready"; icon: ParsedIconMarkup }
-    | { status: "missing" }
+type IconMarkupState = { status: "ready"; icon: ParsedIconMarkup } | { status: "missing" }
 
 type ParsedIconMarkup = {
     title?: string
@@ -26,7 +24,10 @@ const iconLoadersBySlug = Object.fromEntries(
 const iconMarkupCache = new Map<string, IconMarkupState>()
 
 function toProviderSlug(provider: string) {
-    return provider.trim().replace(/[^a-z0-9]+/gi, "").toLowerCase()
+    return provider
+        .trim()
+        .replace(/[^a-z0-9]+/gi, "")
+        .toLowerCase()
 }
 
 function loadProviderIconMarkup(provider: string) {

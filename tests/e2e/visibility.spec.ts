@@ -2,7 +2,10 @@ import { expect } from "@playwright/test"
 
 import { csrfHeaders, test } from "./fixtures"
 
-test("server-group hides guest-empty groups from anonymous callers", async ({ adminPage: page, browser }) => {
+test("server-group hides guest-empty groups from anonymous callers", async ({
+    adminPage: page,
+    browser,
+}) => {
     const tag = Date.now().toString(36)
     const visibleName = `e2e-visible-${tag}`
     const hiddenName = `e2e-hidden-${tag}`
@@ -12,7 +15,9 @@ test("server-group hides guest-empty groups from anonymous callers", async ({ ad
     // scenario boils down to "no group is guest-visible", which the assertion below still covers.
     const serversResp = await page.request.get("/api/v1/server")
     expect(serversResp.ok()).toBeTruthy()
-    const serversBody = (await serversResp.json()) as { data: Array<{ id: number; hide_for_guest?: boolean }> }
+    const serversBody = (await serversResp.json()) as {
+        data: Array<{ id: number; hide_for_guest?: boolean }>
+    }
     const publicServer = serversBody.data?.find((s) => !s.hide_for_guest)
 
     const createdGroupIDs: number[] = []
@@ -40,9 +45,14 @@ test("server-group hides guest-empty groups from anonymous callers", async ({ ad
                 data: Array<{ group: { name: string }; servers: number[] }>
             }
             const names = (guestBody.data || []).map((it) => it.group.name)
-            expect(names, "guest must NOT see groups with zero visible servers").not.toContain(hiddenName)
+            expect(names, "guest must NOT see groups with zero visible servers").not.toContain(
+                hiddenName,
+            )
             if (publicServer) {
-                expect(names, "guest still sees groups that contain a guest-visible server").toContain(visibleName)
+                expect(
+                    names,
+                    "guest still sees groups that contain a guest-visible server",
+                ).toContain(visibleName)
             }
         } finally {
             await guestCtx.close()

@@ -76,19 +76,19 @@ export default function SettingsPage() {
         resolver: zodResolver(settingFormSchema) as any,
         defaultValues: config
             ? {
-                ...config.config,
-                user_template:
+                  ...config.config,
+                  user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
                       "user-dist",
-            }
+              }
             : {
-                ip_change_notification_group_id: 0,
-                cover: 1,
-                site_name: "",
-                language: "",
-                user_template: "user-dist",
-            },
+                  ip_change_notification_group_id: 0,
+                  cover: 1,
+                  site_name: "",
+                  language: "",
+                  user_template: "user-dist",
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
@@ -224,9 +224,13 @@ export default function SettingsPage() {
                                                             </div>
                                                         </SelectItem>
                                                         <div className="px-8 py-1">
-                                                            {safeExternalHref(template.repository) ? (
+                                                            {safeExternalHref(
+                                                                template.repository,
+                                                            ) ? (
                                                                 <a
-                                                                    href={safeExternalHref(template.repository)}
+                                                                    href={safeExternalHref(
+                                                                        template.repository,
+                                                                    )}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
@@ -552,9 +556,7 @@ export default function SettingsPage() {
                                                 checked={field.value}
                                                 onCheckedChange={field.onChange}
                                             />
-                                            <Label className="text-sm">
-                                                {t("EnableMCP")}
-                                            </Label>
+                                            <Label className="text-sm">{t("EnableMCP")}</Label>
                                         </div>
                                     </FormControl>
                                     <FormMessage />

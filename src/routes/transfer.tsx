@@ -1,7 +1,7 @@
 import { swrFetcher } from "@/api/api"
 import { cancelServerTransfer, retryServerTransfer } from "@/api/transfer"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
     Table,
     TableBody,
@@ -45,10 +45,7 @@ export default function TransferPage() {
     const { profile } = useAuth()
     const isAdmin = profile?.role === 0
     const callerID = profile?.id
-    const { data, mutate, error } = useSWR<ModelServerTransfer[]>(
-        "/api/v1/transfer",
-        swrFetcher,
-    )
+    const { data, mutate, error } = useSWR<ModelServerTransfer[]>("/api/v1/transfer", swrFetcher)
 
     useEffect(() => {
         if (error) {
@@ -182,9 +179,7 @@ export default function TransferPage() {
     return (
         <div className="px-3">
             <h1 className="mt-6 text-2xl font-semibold">{t("Transfer.Title")}</h1>
-            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-                {t("Transfer.PageHint")}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{t("Transfer.PageHint")}</p>
             <Table className="mt-6">
                 <TableHeader>
                     <TableRow>

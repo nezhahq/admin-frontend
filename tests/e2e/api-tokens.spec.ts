@@ -85,7 +85,10 @@ test("an API token can authenticate /mcp", async ({ page }) => {
         headers: await csrfHeaders(page),
         data: { ...baseSettings, enable_mcp: true },
     })
-    expect(enableResp.ok(), "PATCH /api/v1/setting must succeed to enable MCP for the test").toBeTruthy()
+    expect(
+        enableResp.ok(),
+        "PATCH /api/v1/setting must succeed to enable MCP for the test",
+    ).toBeTruthy()
 
     try {
         const apiResp = await page.request.post("/api/v1/api-tokens", {

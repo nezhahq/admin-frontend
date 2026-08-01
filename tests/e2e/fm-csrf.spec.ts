@@ -17,6 +17,9 @@ test("file manager creation only accepts POST", async ({ adminPage: page }) => {
     })
     expect(postResp.status()).toBe(200)
     const body = await postResp.json()
-    expect(body.success, "without a connected agent server the POST surfaces a Service error, but the route is reachable").not.toBe(true)
+    expect(
+        body.success,
+        "without a connected agent server the POST surfaces a Service error, but the route is reachable",
+    ).not.toBe(true)
     expect(body.error).toBeTruthy()
 })

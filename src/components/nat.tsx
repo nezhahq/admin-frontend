@@ -55,19 +55,19 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
         resolver: zodResolver(natFormSchema),
         defaultValues: data
             ? {
-                name: data.name ?? "",
-                enabled: data.enabled ?? false,
-                server_id: data.server_id ?? 0,
-                host: data.host ?? "",
-                domain: data.domain ?? "",
-            }
+                  name: data.name ?? "",
+                  enabled: data.enabled ?? false,
+                  server_id: data.server_id ?? 0,
+                  host: data.host ?? "",
+                  domain: data.domain ?? "",
+              }
             : {
-                name: "",
-                enabled: false,
-                server_id: 0,
-                host: "",
-                domain: "",
-            },
+                  name: "",
+                  enabled: false,
+                  server_id: 0,
+                  host: "",
+                  domain: "",
+              },
         resetOptions: {
             keepDefaultValues: false,
         },
