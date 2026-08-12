@@ -35,7 +35,6 @@
         "@tanstack/react-table": "^8.21.3",
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "@types/luxon": "^3.7.3",
-        "@xterm/addon-attach": "^0.12.0",
         "@xterm/addon-fit": "^0.11.0",
         "@xterm/xterm": "^6.0.0",
         "class-variance-authority": "^0.7.1",
