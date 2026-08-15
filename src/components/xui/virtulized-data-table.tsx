@@ -3,16 +3,16 @@
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
+import { virtualizedTableFeatures } from "@/lib/table"
 import { cn } from "@/lib/utils"
 import {
     ColumnDef,
     Row,
+    RowData,
     SortDirection,
     SortingState,
     flexRender,
-    getCoreRowModel,
-    getSortedRowModel,
-    useReactTable,
+    useTable,
 } from "@tanstack/react-table"
 import { HTMLAttributes, JSX, forwardRef, useEffect, useRef, useState } from "react"
 import { TableVirtuoso } from "react-virtuoso"
@@ -26,7 +26,9 @@ const TableComponent = forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTab
 )
 TableComponent.displayName = "TableComponent"
 
-const TableRowComponent = <TData,>(rows: Row<TData>[]) =>
+const TableRowComponent = <TData extends RowData>(
+    rows: Row<typeof virtualizedTableFeatures, TData>[],
+) =>
     function getTableRow(props: HTMLAttributes<HTMLTableRowElement>) {
         // @ts-expect-error data-index is a valid attribute
         const index = props["data-index"]
@@ -64,34 +66,33 @@ function SortingIndicator({ isSorted }: { isSorted: SortDirection | false }) {
     )
 }
 
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
+interface DataTableProps<TData extends RowData> {
+    columns: ColumnDef<typeof virtualizedTableFeatures, TData>[]
     data: TData[]
     rowComponent?: (
-        rows: Row<TData>[],
+        rows: Row<typeof virtualizedTableFeatures, TData>[],
     ) => (props: HTMLAttributes<HTMLTableRowElement>) => JSX.Element | null
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData>({
     columns,
     data,
     rowComponent,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
     const [sorting, setSorting] = useState<SortingState>([
         {
             id: "type",
             desc: true,
         },
     ])
-    const table = useReactTable({
+    const table = useTable({
+        features: virtualizedTableFeatures,
         data,
         columns,
         state: {
             sorting,
         },
         onSortingChange: setSorting,
-        getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
     })
 
     const { rows } = table.getRowModel()

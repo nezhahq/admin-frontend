@@ -14,8 +14,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelAlertRule, triggerModes } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -37,7 +38,7 @@ export default function AlertRulePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<ModelAlertRule>[] = [
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelAlertRule>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -57,7 +58,6 @@ export default function AlertRulePage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -131,10 +131,10 @@ export default function AlertRulePage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

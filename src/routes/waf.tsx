@@ -22,13 +22,14 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
+import { selectableTableFeatures } from "@/lib/table"
 import {
     GithubComNezhahqNezhaModelValueArrayModelWAFApiMock,
     ModelWAFApiMock,
     wafBlockIdentifiers,
     wafBlockReasons,
 } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
@@ -61,7 +62,7 @@ export default function WAFPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    let columns: ColumnDef<ModelWAFApiMock>[] = [
+    let columns: ColumnDef<typeof selectableTableFeatures, ModelWAFApiMock>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -81,7 +82,6 @@ export default function WAFPage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -147,10 +147,10 @@ export default function WAFPage() {
         return data?.value ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

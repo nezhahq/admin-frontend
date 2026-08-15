@@ -15,8 +15,9 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useNotification } from "@/hooks/useNotfication"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelNotification } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -40,7 +41,7 @@ export default function NotificationPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<ModelNotification>[] = [
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelNotification>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -60,7 +61,6 @@ export default function NotificationPage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -127,10 +127,10 @@ export default function NotificationPage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

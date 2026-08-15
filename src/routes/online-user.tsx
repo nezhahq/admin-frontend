@@ -22,8 +22,9 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelOnlineUser, ModelOnlineUserApi } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
@@ -55,7 +56,7 @@ export default function OnlineUserPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    let columns: ColumnDef<ModelOnlineUser>[] = [
+    let columns: ColumnDef<typeof selectableTableFeatures, ModelOnlineUser>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -75,7 +76,6 @@ export default function OnlineUserPage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -128,10 +128,10 @@ export default function OnlineUserPage() {
         return data?.value ?? []
     }, [data])
 
-    const table = useReactTable<ModelOnlineUser>({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
+import { virtualizedTableFeatures } from "@/lib/table"
 import { copyToClipboard, fm, formatPath, fmWorker as worker } from "@/lib/utils"
 import {
     FMEntry,
@@ -84,7 +85,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
     const [dOpen, setdOpen] = useState(false)
     const [uOpen, setuOpen] = useState(false)
 
-    const columns: ColumnDef<FMEntry>[] = [
+    const columns: ColumnDef<typeof virtualizedTableFeatures, FMEntry>[] = [
         {
             id: "type",
             header: () => <span>{t("Type")}</span>,
@@ -122,7 +123,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         },
     ]
 
-    const tableRowComponent = (rows: Row<FMEntry>[]) =>
+    const tableRowComponent = (rows: Row<typeof virtualizedTableFeatures, FMEntry>[]) =>
         function getTableRow(props: VirtualizedTableRowProps) {
             const index = Number(props["data-index"])
             const row = rows[index]

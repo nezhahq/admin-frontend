@@ -13,12 +13,18 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelNotificationGroupResponseItem } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
+
+type NotificationGroupColumn = ColumnDef<
+    typeof selectableTableFeatures,
+    ModelNotificationGroupResponseItem
+>
 
 export default function NotificationGroupPage() {
     const { t } = useTranslation()
@@ -37,7 +43,7 @@ export default function NotificationGroupPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<ModelNotificationGroupResponseItem>[] = [
+    const columns: NotificationGroupColumn[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -57,7 +63,6 @@ export default function NotificationGroupPage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -112,10 +117,10 @@ export default function NotificationGroupPage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

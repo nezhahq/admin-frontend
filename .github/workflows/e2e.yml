@@ -21,6 +21,8 @@ jobs:
     timeout-minutes: 25
 
     env:
+      AGENT_REPO: nezhahq/agent
+      AGENT_REF: main
       NEZHA_REPO: nezhahq/nezha
       NEZHA_REF: master
       NZ_LISTENHOST: 127.0.0.1
@@ -31,6 +33,7 @@ jobs:
       NZ_DEBUG: "true"
       E2E_ADMIN_USER: admin
       E2E_ADMIN_PASS: admin
+      E2E_AGENT_UUID: 11111111-2222-4333-8444-555555555555
       E2E_BASE_URL: http://127.0.0.1:5173
 
     steps:
@@ -46,6 +49,13 @@ jobs:
           ref: ${{ env.NEZHA_REF }}
           path: nezha
 
+      - name: Checkout Nezha Agent
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ env.AGENT_REPO }}
+          ref: ${{ env.AGENT_REF }}
+          path: agent
+
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
@@ -57,7 +67,9 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
-          cache-dependency-path: nezha/go.sum
+          cache-dependency-path: |
+            agent/go.sum
+            nezha/go.sum
 
       - name: Install frontend dependencies
         working-directory: admin-frontend
@@ -76,6 +88,10 @@ jobs:
           go install github.com/swaggo/swag/cmd/swag@latest
           "$(go env GOPATH)/bin/swag" init --pd -d cmd/dashboard -g main.go -o cmd/dashboard/docs
           go build -o /tmp/nezha-dashboard ./cmd/dashboard
+
+      - name: Build Agent
+        working-directory: agent
+        run: go build -o /tmp/nezha-agent ./cmd/agent
 
       - name: Start backend
         working-directory: nezha
@@ -101,6 +117,19 @@ jobs:
           cat /tmp/dashboard.log || true
           exit 1
 
+      - name: Start Agent
+        working-directory: agent
+        env:
+          NZ_SERVER: 127.0.0.1:8008
+          NZ_CLIENT_SECRET: ${{ env.NZ_AGENTSECRETKEY }}
+          NZ_UUID: ${{ env.E2E_AGENT_UUID }}
+          NZ_TLS: "false"
+          NZ_DISABLE_AUTO_UPDATE: "true"
+        run: |
+          nohup /tmp/nezha-agent -c /tmp/nezha-agent-config.yml \
+            > /tmp/agent.log 2>&1 &
+          echo $! > /tmp/agent.pid
+
       - name: Run Playwright tests
         working-directory: admin-frontend
         env:
@@ -122,6 +151,21 @@ jobs:
           name: dashboard-log
           path: /tmp/dashboard.log
           retention-days: 7
+
+      - name: Upload Agent log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: agent-log
+          path: /tmp/agent.log
+          retention-days: 7
+
+      - name: Stop Agent
+        if: always()
+        run: |
+          if [ -f /tmp/agent.pid ]; then
+            kill "$(cat /tmp/agent.pid)" || true
+          fi
 
       - name: Stop backend
         if: always()

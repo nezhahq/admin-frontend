@@ -1,8 +1,10 @@
 import { expect } from "@playwright/test"
 
-import { csrfHeaders, test } from "./fixtures"
+import { csrfRequest, test } from "./fixtures"
 
-test("file manager creation only accepts POST", async ({ adminPage: page }) => {
+test("file manager creation only accepts POST and reaches the connected Agent", async ({
+    adminPage: page,
+}) => {
     const getResp = await page.request.get("/api/v1/file?id=1", {
         failOnStatusCode: false,
     })
@@ -11,15 +13,16 @@ test("file manager creation only accepts POST", async ({ adminPage: page }) => {
         `GET /api/v1/file must no longer be routable (got ${getResp.status()})`,
     ).toBeTruthy()
 
-    const postResp = await page.request.post("/api/v1/file?id=1", {
+    const postResp = await csrfRequest(page, "post", "/api/v1/file?id=1", {
         failOnStatusCode: false,
-        headers: await csrfHeaders(page),
     })
     expect(postResp.status()).toBe(200)
-    const body = await postResp.json()
-    expect(
-        body.success,
-        "without a connected agent server the POST surfaces a Service error, but the route is reachable",
-    ).not.toBe(true)
-    expect(body.error).toBeTruthy()
+    const body = (await postResp.json()) as {
+        data?: { session_id?: string }
+        success?: boolean
+    }
+    expect(body.success, "POST must create a file-manager session through the real Agent").toBe(
+        true,
+    )
+    expect(body.data?.session_id).toBeTruthy()
 })

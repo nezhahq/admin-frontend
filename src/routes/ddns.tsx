@@ -12,8 +12,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelDDNSProfile } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -45,7 +46,7 @@ export default function DDNSPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<ModelDDNSProfile>[] = [
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelDDNSProfile>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -65,7 +66,6 @@ export default function DDNSPage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -136,10 +136,10 @@ export default function DDNSPage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

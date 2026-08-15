@@ -13,8 +13,9 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { UserCard } from "@/components/user"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelUser } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -34,7 +35,7 @@ export default function UserPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<ModelUser>[] = [
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelUser>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -54,7 +55,6 @@ export default function UserPage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -105,10 +105,10 @@ export default function UserPage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
