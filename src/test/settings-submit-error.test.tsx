@@ -35,6 +35,7 @@ const validConfig = {
         user_template: "user-dist",
         cover: 1,
         ip_change_notification_group_id: 0,
+        online_stats_days: 7,
     },
     frontend_templates: [],
 }

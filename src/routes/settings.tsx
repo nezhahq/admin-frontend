@@ -41,6 +41,7 @@ const settingFormSchema = z.object({
     ignored_ip_notification: asOptionalField(z.string()),
     ip_change_notification_group_id: z.coerce.number().int().min(0),
     cover: z.coerce.number().int().min(1),
+    online_stats_days: z.coerce.number().int().min(7).max(3650),
     site_name: z.string().min(1),
     language: z.string().min(2),
     user_template: z.string().min(1),
@@ -85,6 +86,7 @@ export default function SettingsPage() {
             : {
                   ip_change_notification_group_id: 0,
                   cover: 1,
+                  online_stats_days: 7,
                   site_name: "",
                   language: "",
                   user_template: "user-dist",
@@ -559,6 +561,26 @@ export default function SettingsPage() {
                                             <Label className="text-sm">{t("EnableMCP")}</Label>
                                         </div>
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="online_stats_days"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("OnlineStatsDays")}</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            min={7}
+                                            max={3650}
+                                            placeholder="7"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>{t("OnlineStatsDaysHint")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
