@@ -15,6 +15,10 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.head_ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  # 本 workflow 的用途就是检出 PR(含 fork)分支做自动格式化；
+                  # checkout@v7 默认拒绝在 pull_request_target 里拉取 fork 代码，
+                  # 需显式放行，否则所有 fork PR 的 Auto Format 都会在 checkout 失败
+                  allow-unsafe-pr-checkout: true
 
             - name: Set up Bun
               uses: oven-sh/setup-bun@v2
