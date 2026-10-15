@@ -78,6 +78,9 @@ export default function SettingsPage() {
         defaultValues: config
             ? {
                   ...config.config,
+                  // 兼容尚未包含 online_stats_days 的旧后端：字段缺省时回退
+                  // 默认值，避免必填校验拦截其他设置的提交
+                  online_stats_days: config.config?.online_stats_days ?? 7,
                   user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
@@ -98,7 +101,11 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (config?.config) {
-            form.reset(config?.config)
+            // 与 defaultValues 同一兼容口径：旧后端缺字段时回退默认值
+            form.reset({
+                ...config.config,
+                online_stats_days: config.config?.online_stats_days ?? 7,
+            })
         }
     }, [config?.config, form])
 
