@@ -41,6 +41,7 @@ const settingFormSchema = z.object({
     ignored_ip_notification: asOptionalField(z.string()),
     ip_change_notification_group_id: z.coerce.number().int().min(0),
     cover: z.coerce.number().int().min(1),
+    online_stats_days: z.coerce.number().int().min(7).max(3650),
     site_name: z.string().min(1),
     language: z.string().min(2),
     user_template: z.string().min(1),
@@ -77,6 +78,9 @@ export default function SettingsPage() {
         defaultValues: config
             ? {
                   ...config.config,
+                  // 兼容尚未包含 online_stats_days 的旧后端：字段缺省时回退
+                  // 默认值，避免必填校验拦截其他设置的提交
+                  online_stats_days: config.config?.online_stats_days ?? 7,
                   user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
@@ -85,6 +89,7 @@ export default function SettingsPage() {
             : {
                   ip_change_notification_group_id: 0,
                   cover: 1,
+                  online_stats_days: 7,
                   site_name: "",
                   language: "",
                   user_template: "user-dist",
@@ -96,7 +101,11 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (config?.config) {
-            form.reset(config?.config)
+            // 与 defaultValues 同一兼容口径：旧后端缺字段时回退默认值
+            form.reset({
+                ...config.config,
+                online_stats_days: config.config?.online_stats_days ?? 7,
+            })
         }
     }, [config?.config, form])
 
@@ -559,6 +568,26 @@ export default function SettingsPage() {
                                             <Label className="text-sm">{t("EnableMCP")}</Label>
                                         </div>
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="online_stats_days"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("OnlineStatsDays")}</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            min={7}
+                                            max={3650}
+                                            placeholder="7"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>{t("OnlineStatsDaysHint")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}

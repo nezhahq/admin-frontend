@@ -224,6 +224,8 @@
         "StatusCancelled": "已取消"
     },
     "EnableMCP": "啟用 MCP 端點（預設關閉；啟用前請先檢查 API token 範圍與伺服器允許清單）",
+    "OnlineStatsDays": "線上統計範圍（天）",
+    "OnlineStatsDaysHint": "裝置線上時間段的統計與保留視窗，超出範圍的紀錄會在每日清理時刪除。",
     "ApiTokens": "API Token",
     "CreateApiToken": "建立 API token",
     "CreateApiTokenDescription": "Token 會代表你對 MCP 與外部用戶端進行驗證，其權限不會超過你本身的權限。",

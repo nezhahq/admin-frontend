@@ -166,6 +166,8 @@
     "IPChangeNotification": "IP变更通知",
     "FullIPNotification": "在通知消息中显示完整的 IP 地址",
     "EnableMCP": "启用 MCP 接入（默认关闭；启用前请确认已审阅 API 令牌 scope 与服务器白名单）",
+    "OnlineStatsDays": "在线统计范围（天）",
+    "OnlineStatsDaysHint": "设备在线时间段的统计与保留窗口，超出范围的记录会在每日清理时删除。",
     "LoginFailed": "登录失败",
     "BruteForceAttackingToken": "暴力攻击令牌",
     "BruteForceAttackingAgentSecret": "暴力攻击代理秘密",

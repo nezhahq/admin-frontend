@@ -159,6 +159,8 @@
     "IPChangeNotification": "IP Change Notification",
     "FullIPNotification": "Show Full IP Address in Notification Messages",
     "EnableMCP": "Enable MCP endpoint (off by default; review API token scopes and server allow-list first)",
+    "OnlineStatsDays": "Online stats range (days)",
+    "OnlineStatsDaysHint": "Retention and query window for per-server online periods; sessions outside the range are removed by the daily cleanup job.",
     "EditService": "Edit Service",
     "CreateService": "Create Service",
     "EditTask": "Edit Task",

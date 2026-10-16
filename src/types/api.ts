@@ -726,6 +726,8 @@ export interface ModelSetting {
     oauth2_providers: string[]
     /** 反代部署下声明对外域名（逗号分隔），防止成员注册冲突 NAT 域名抢占路由 */
     reserved_hosts: string
+    /** 设备在线时间段统计范围（天），最小 7，最大 3650 */
+    online_stats_days: number
     site_name: string
     /** 用于前端判断生成的安装命令是否启用 TLS */
     tls: boolean
@@ -752,6 +754,8 @@ export interface ModelSettingForm {
     ip_change_notification_group_id: number
     /** @minLength 2 */
     language: string
+    /** 设备在线时间段统计范围（天），最小 7，最大 3650 */
+    online_stats_days?: number
     /** @minLength 1 */
     site_name: string
     tls?: boolean
