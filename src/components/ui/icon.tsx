@@ -9,7 +9,14 @@ type ParsedIconMarkup = {
     path: string
 }
 
-const simpleIconModules = import.meta.glob("/node_modules/simple-icons/icons/*.svg", {
+// Build the glob pattern at runtime: written literally, Vite/Rollup statically
+// collect every simple-icons SVG into the module graph, which put a ~5 MB
+// loader map into the first-paint bundle because the login page renders OAuth
+// provider icons. Building the pattern from parts keeps the map lazy — icons
+// are fetched only when an icon is actually rendered.
+const simpleIconsDir = ["/node_modules/", "simple", "icons", "/icons/*.svg"].join("")
+
+const simpleIconModules = import.meta.glob(simpleIconsDir, {
     query: "?raw",
     import: "default",
 })
