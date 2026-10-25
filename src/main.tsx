@@ -31,6 +31,7 @@ import TransferPage from "./routes/transfer"
 import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
 import ApiTokensPage from "./routes/api-tokens"
+import FrontendsPage from "./routes/frontends"
 
 const router = createBrowserRouter([
     {
@@ -135,6 +136,10 @@ const router = createBrowserRouter([
                         <SettingsPage />
                     </NotificationProvider>
                 ),
+            },
+            {
+                path: "/dashboard/settings/frontends",
+                element: <FrontendsPage />,
             },
             {
                 path: "/dashboard/settings/user",

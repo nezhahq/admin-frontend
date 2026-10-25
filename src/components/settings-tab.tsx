@@ -8,15 +8,20 @@ export const SettingsTab = ({ className }: { className?: string }) => {
     const { profile } = useAuth()
 
     const isAdmin = profile?.role === 0
-    const colsClass = isAdmin ? "grid-cols-5" : "grid-cols-1"
+    const colsClass = isAdmin ? "grid-cols-3 gap-1 sm:grid-cols-6" : "grid-cols-1"
 
     return (
         <Tabs defaultValue={window.location.pathname} className={className}>
-            <TabsList className={`grid w-full ${colsClass}`}>
+            <TabsList className={`grid h-auto w-full ${colsClass}`}>
                 {isAdmin && (
                     <>
                         <TabsTrigger value="/dashboard/settings" asChild>
                             <Link to="/dashboard/settings">{t("Settings")}</Link>
+                        </TabsTrigger>
+                        <TabsTrigger value="/dashboard/settings/frontends" asChild>
+                            <Link to="/dashboard/settings/frontends">
+                                {t("FrontendManager.Tab")}
+                            </Link>
                         </TabsTrigger>
                         <TabsTrigger value="/dashboard/settings/user" asChild>
                             <Link to="/dashboard/settings/user">{t("User")}</Link>

@@ -319,5 +319,31 @@
     "Copy": "Copy",
     "Copied": "Copied to clipboard",
     "Done": "Done",
-    "Scopes": "Scopes"
+    "Scopes": "Scopes",
+    "FrontendManager": {
+        "Tab": "Frontends",
+        "Title": "Frontend management",
+        "Description": "Install a release for the user site or administration dashboard, then switch without restarting. Built-in frontends remain available.",
+        "Target": "Frontend type",
+        "User": "User frontend",
+        "Admin": "Admin frontend",
+        "Repository": "Repository or release API URL",
+        "RepositoryHint": "Supports GitHub, Gitee and AtomGit repositories. For other compatible services, enter the repository API URL ending in /repos/owner/repository.",
+        "LoadReleases": "Read releases",
+        "Working": "Processing…",
+        "Releases": "Available releases",
+        "NoReleases": "No releases with dist.zip on this page.",
+        "Prerelease": "Pre-release",
+        "Install": "Install",
+        "Installed": "Installed. You can now activate this version.",
+        "Activated": "Frontend activated",
+        "Previous": "Previous page",
+        "Next": "Next page",
+        "Available": "Installed and built-in frontends",
+        "Loading": "Loading frontends…",
+        "Custom": "Installed release",
+        "BuiltIn": "Built-in",
+        "Active": "Active",
+        "Activate": "Activate"
+    }
 }

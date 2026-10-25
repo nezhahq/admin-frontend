@@ -317,5 +317,31 @@
     "NameRequired": "名称必填。",
     "Revoke": "吊销",
     "Copied": "已复制到剪贴板",
-    "Scopes": "权限"
+    "Scopes": "权限",
+    "FrontendManager": {
+        "Tab": "前端管理",
+        "Title": "前端管理",
+        "Description": "为用户页面或管理后台安装发布版本，安装后无需重启即可切换。内置前端始终保留，可随时切回。",
+        "Target": "前端类型",
+        "User": "用户前端",
+        "Admin": "管理后台前端",
+        "Repository": "仓库地址或 Release API 地址",
+        "RepositoryHint": "支持 GitHub、Gitee、AtomGit 仓库。其他兼容服务请填写以 /repos/所有者/仓库 结尾的仓库 API 地址。",
+        "LoadReleases": "读取发布版本",
+        "Working": "正在处理…",
+        "Releases": "可安装版本",
+        "NoReleases": "本页没有包含 dist.zip 的发布版本。",
+        "Prerelease": "预发布",
+        "Install": "安装",
+        "Installed": "安装完成，现在可以启用此版本。",
+        "Activated": "前端已切换",
+        "Previous": "上一页",
+        "Next": "下一页",
+        "Available": "已安装与内置前端",
+        "Loading": "正在加载前端列表…",
+        "Custom": "已安装版本",
+        "BuiltIn": "内置",
+        "Active": "正在使用",
+        "Activate": "启用"
+    }
 }
