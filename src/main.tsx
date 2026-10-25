@@ -32,6 +32,8 @@ import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
 import ApiTokensPage from "./routes/api-tokens"
 import FrontendsPage from "./routes/frontends"
+import MCPOAuthAuthorizePage from "./routes/mcp-oauth-authorize"
+import MCPOAuthManagementPage from "./routes/mcp-oauth-management"
 
 const router = createBrowserRouter([
     {
@@ -45,6 +47,7 @@ const router = createBrowserRouter([
         ),
         errorElement: <ErrorPage />,
         children: [
+            { path: "/dashboard/mcp/authorize", element: <MCPOAuthAuthorizePage /> },
             {
                 path: "/dashboard/login",
                 element: <LoginPage />,
@@ -156,6 +159,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/settings/api-tokens",
                 element: <ApiTokensPage />,
+            },
+            {
+                path: "/dashboard/settings/mcp-oauth",
+                element: <MCPOAuthManagementPage />,
             },
             {
                 path: "/dashboard/transfer",

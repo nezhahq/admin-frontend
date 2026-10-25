@@ -148,3 +148,41 @@ test("logout() clears loading even while the initial profile probe is still pend
 
     expect(captured.auth!.loading).toBe(false)
 })
+
+test.each(["login", "loginOauth2"] as const)(
+    "%s returns to the complete MCP authorization request",
+    async (method) => {
+        const { AuthProvider, useAuth } = await import("@/hooks/useAuth")
+        const { rememberMCPOAuthReturn } = await import("@/lib/mcp-oauth-navigation")
+        const returnPath =
+            "/dashboard/mcp/authorize?client_id=chatgpt&state=state%2Bvalue&code_challenge=pkce"
+        rememberMCPOAuthReturn(returnPath)
+        const captured: { auth?: ReturnType<typeof useAuth> } = {}
+        function Capture() {
+            captured.auth = useAuth()
+            return null
+        }
+        await act(async () => {
+            render(
+                <AuthProvider>
+                    <Capture />
+                </AuthProvider>,
+            )
+        })
+        const history = vi.spyOn(window.history, "replaceState")
+        await act(async () => {
+            if (method === "login") await captured.auth!.login("u", "p")
+            else await captured.auth!.loginOauth2()
+        })
+        expect(navigate).toHaveBeenCalledWith(returnPath)
+        expect(captured.auth!.loading).toBe(false)
+        if (method === "loginOauth2") {
+            expect(
+                history.mock.invocationCallOrder[history.mock.invocationCallOrder.length - 1],
+            ).toBeLessThan(
+                navigate.mock.invocationCallOrder[navigate.mock.invocationCallOrder.length - 1],
+            )
+        }
+        history.mockRestore()
+    },
+)

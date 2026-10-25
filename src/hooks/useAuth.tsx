@@ -1,4 +1,5 @@
 import { getProfile, login as loginRequest } from "@/api/user"
+import { clearMCPOAuthReturn, consumeMCPOAuthReturn } from "@/lib/mcp-oauth-navigation"
 import { AuthContextProps } from "@/types"
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 authEpoch.current++
                 user.role = normalizeRole(user.role)
                 setProfile(user)
-                navigate("/dashboard")
+                navigate(consumeMCPOAuthReturn())
             } catch (error: any) {
                 const msg = error?.message
                 if (msg === "ApiErrorUnauthorized" || msg === "Unauthorized") {
@@ -84,16 +85,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             authEpoch.current++
             user.role = normalizeRole(user.role)
             setProfile(user)
-            navigate("/dashboard")
+            // Remove the provider callback flag before navigation, otherwise
+            // cleanup would strip the new MCP authorization query parameters.
+            window.history.replaceState({}, document.title, window.location.pathname)
+            navigate(consumeMCPOAuthReturn())
         } catch (error: any) {
             toast(error.message)
         } finally {
             setLoading(false)
-            window.history.replaceState({}, document.title, window.location.pathname)
         }
     }, [navigate, setProfile])
 
     const logout = useCallback(() => {
+        clearMCPOAuthReturn()
         authEpoch.current++
         document.cookie.split(";").forEach(function (c) {
             document.cookie = c

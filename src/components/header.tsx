@@ -56,7 +56,8 @@ export default function Header() {
     const { t } = useTranslation()
     const { logout } = useAuth()
     const profile = useMainStore((store) => store.profile)
-    const isAdmin = profile?.role === 0
+    // Members also need Settings to reach API Token and OAuth revocation.
+    // The settings page itself keeps administrator-only configuration protected.
 
     const location = useLocation()
     const isDesktop = useMediaQuery("(min-width: 890px)")
@@ -144,20 +145,18 @@ export default function Header() {
                                                         {t("Profile")}
                                                     </div>
                                                 </DropdownMenuItem>
-                                                {isAdmin && (
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            setDropdownOpen(false)
-                                                            navigate("/dashboard/settings")
-                                                        }}
-                                                        className="cursor-pointer"
-                                                    >
-                                                        <div className="flex items-center gap-2 w-full">
-                                                            <Settings />
-                                                            {t("Settings")}
-                                                        </div>
-                                                    </DropdownMenuItem>
-                                                )}
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setDropdownOpen(false)
+                                                        navigate("/dashboard/settings")
+                                                    }}
+                                                    className="cursor-pointer"
+                                                >
+                                                    <div className="flex items-center gap-2 w-full">
+                                                        <Settings />
+                                                        {t("Settings")}
+                                                    </div>
+                                                </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem
@@ -347,20 +346,18 @@ export default function Header() {
                                             {t("Profile")}
                                         </div>
                                     </DropdownMenuItem>
-                                    {isAdmin && (
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                setDropdownOpen(false)
-                                                navigate("/dashboard/settings")
-                                            }}
-                                            className="cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-2 w-full">
-                                                <Settings />
-                                                {t("Settings")}
-                                            </div>
-                                        </DropdownMenuItem>
-                                    )}
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            setDropdownOpen(false)
+                                            navigate("/dashboard/settings")
+                                        }}
+                                        className="cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-2 w-full">
+                                            <Settings />
+                                            {t("Settings")}
+                                        </div>
+                                    </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={logout} className="cursor-pointer">

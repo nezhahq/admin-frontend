@@ -343,5 +343,53 @@
         "BuiltIn": "内置",
         "Active": "正在使用",
         "Activate": "启用"
+    },
+    "MCPOAuth": {
+        "Title": "授权 MCP 访问",
+        "Loading": "正在读取授权请求…",
+        "Client": "应用：{{name}}",
+        "UnverifiedClient": "应用名称由请求方提供，请核对返回地址后再授权。",
+        "Account": "当前账号：{{name}}",
+        "Callback": "返回地址",
+        "Resource": "哪吒 MCP 地址",
+        "Permissions": "允许的权限",
+        "ReadInventory": "列出可访问的服务器",
+        "ReadServer": "读取服务器信息和文件",
+        "WriteServer": "创建或覆盖文件",
+        "DeleteFiles": "删除文件",
+        "ExecuteCommands": "在服务器上执行命令",
+        "Servers": "可访问的服务器",
+        "AllServers": "我有权访问的所有服务器，包括未来新增的服务器",
+        "NoServers": "没有可访问的服务器。",
+        "RevokeHint": "授权有效期为 30 天。可随时在设置 → OAuth 授权中撤销，也可在 API Token 页面删除对应记录。",
+        "Deny": "拒绝",
+        "Allow": "同意授权"
+    },
+    "MCPOAuthManager": {
+        "Title": "OAuth 授权",
+        "Description": "管理通过 OAuth 连接 MCP 的应用。撤销后，应用必须重新获得你的授权。应用名称由注册方自行填写，不代表身份认证。",
+        "Mine": "我的授权",
+        "All": "全站授权",
+        "Clients": "客户端管理",
+        "Application": "应用",
+        "Lifetime": "授权时间与到期时间",
+        "AuthorizedAt": "授权时间",
+        "Pagination": "第 {{page}} 页，共 {{total}} 条",
+        "Previous": "上一页",
+        "Next": "下一页",
+        "ConfirmRevoke": "撤销「{{name}}」的授权？该授权的访问和刷新令牌将立即失效。",
+        "ConfirmDisable": "禁用「{{name}}」？这会撤销该客户端所有用户的授权和待兑换授权码，重新启用也不会恢复。",
+        "ConfirmEnable": "重新启用「{{name}}」？用户需要重新授权，旧令牌不会恢复。",
+        "ClientPolicy": "禁用针对具体客户端 ID，会撤销该客户端所有用户的授权。它不代表封禁应用提供方：动态注册仍可产生新的客户端 ID。",
+        "GrantCount": "授权记录数",
+        "Disabled": "已禁用",
+        "Enabled": "已启用",
+        "Disable": "禁用",
+        "Enable": "启用",
+        "Status": {
+            "active": "有效",
+            "expired": "已过期",
+            "unavailable": "不可用"
+        }
     }
 }

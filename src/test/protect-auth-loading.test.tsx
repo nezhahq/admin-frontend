@@ -93,3 +93,35 @@ test("ProtectedRoute renders children once an authenticated profile resolves", a
     await renderAtPath("/dashboard", <div data-testid="protected-child">protected</div>)
     expect(document.querySelector("[data-testid='protected-child']")).not.toBeNull()
 })
+
+test("unauthenticated MCP consent saves the full query before navigating to login", async () => {
+    mockLoading = false
+    const { default: ProtectedRoute } = await import("@/routes/protect")
+    const { clearMCPOAuthReturn, consumeMCPOAuthReturn } =
+        await import("@/lib/mcp-oauth-navigation")
+    clearMCPOAuthReturn()
+    const authorizationPath = "/dashboard/mcp/authorize?client_id=registered&state=preserve%2Bstate"
+    await act(async () => {
+        render(
+            <MemoryRouter initialEntries={[authorizationPath]}>
+                <Routes>
+                    <Route
+                        path="/dashboard/login"
+                        element={<div data-testid="oauth-login">login</div>}
+                    />
+                    <Route
+                        path="/dashboard/mcp/authorize"
+                        element={
+                            <ProtectedRoute>
+                                <div data-testid="oauth-consent">consent</div>
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </MemoryRouter>,
+        )
+    })
+    expect(document.querySelector("[data-testid='oauth-consent']")).toBeNull()
+    expect(document.querySelector("[data-testid='oauth-login']")).not.toBeNull()
+    expect(consumeMCPOAuthReturn()).toBe(authorizationPath)
+})

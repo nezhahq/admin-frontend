@@ -8,7 +8,7 @@ export const SettingsTab = ({ className }: { className?: string }) => {
     const { profile } = useAuth()
 
     const isAdmin = profile?.role === 0
-    const colsClass = isAdmin ? "grid-cols-3 gap-1 sm:grid-cols-6" : "grid-cols-1"
+    const colsClass = isAdmin ? "grid-cols-3 gap-1 sm:grid-cols-7" : "grid-cols-2"
 
     return (
         <Tabs defaultValue={window.location.pathname} className={className}>
@@ -36,6 +36,9 @@ export const SettingsTab = ({ className }: { className?: string }) => {
                 )}
                 <TabsTrigger value="/dashboard/settings/api-tokens" asChild>
                     <Link to="/dashboard/settings/api-tokens">{t("ApiTokens")}</Link>
+                </TabsTrigger>
+                <TabsTrigger value="/dashboard/settings/mcp-oauth" asChild>
+                    <Link to="/dashboard/settings/mcp-oauth">{t("MCPOAuthManager.Title")}</Link>
                 </TabsTrigger>
             </TabsList>
         </Tabs>

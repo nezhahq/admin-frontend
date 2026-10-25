@@ -1,11 +1,17 @@
 import { useAuth } from "@/hooks/useAuth"
+import { MCP_OAUTH_CONSENT_PATH, rememberMCPOAuthReturn } from "@/lib/mcp-oauth-navigation"
+import { useEffect } from "react"
 import { Navigate, useLocation } from "react-router-dom"
 
 const LOGIN_PATH = "/dashboard/login"
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { profile, loading } = useAuth()
-    const { pathname } = useLocation()
+    const { pathname, search } = useLocation()
+    useEffect(() => {
+        if (!loading && !profile && pathname === MCP_OAUTH_CONSENT_PATH)
+            rememberMCPOAuthReturn(pathname + search)
+    }, [loading, profile, pathname, search])
 
     // While AuthProvider's initial getProfile() round-trip is in flight we
     // can't yet decide between "render protected subtree" and "redirect to
