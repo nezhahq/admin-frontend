@@ -208,5 +208,31 @@
     "Revoke": "Revoke",
     "Copy": "Copy",
     "Copied": "Copied to clipboard",
-    "Scopes": "Scopes"
+    "Scopes": "Scopes",
+    "InvalidUsernameOrPassword": "Ungültiger Benutzername oder Passwort",
+    "NetworkError": "Netzwerkfehler",
+    "Terminal": "Konsole",
+    "Config": "Koniguration",
+    "Add": "Hinzufügen",
+    "Delete": "Löschen",
+    "AdvancedJSON": "Erweiterte JSON",
+    "Save": "Speichern",
+    "Owner": "Besitzer",
+    "UnknownUser": "Unbekannter Nutzer (#{{id}})",
+    "OverrideDDNSDomains": "DDNS-Domains überschreiben (per Konfiguration)",
+    "EditServerConfig": "Serverkonfiguration bearbeiten",
+    "Option": "Option",
+    "Value": "Wert",
+    "Preview": "Vorschau",
+    "PublicNote": {
+        "Label": "Öffentliche Notiz",
+        "Billing": "Rechnungsstellung",
+        "Plan": "Plan",
+        "StartDate": "Startdatum",
+        "EndDate": "Enddatum",
+        "AutoRenewal": "Automatische Verlängerung",
+        "Cycle": "Zyklus",
+        "Bandwidth": "Bandbreite",
+        "TrafficVolume": "Netzwerkaufkommen"
+    }
 }
