@@ -148,6 +148,8 @@
     "DashboardOriginalHost": "Agent對接位址【網域名稱/IP:連接埠】",
     "DashboardHost": "面板 OAuth2 回呼網域【網域名稱/IP:連接埠】",
     "DashboardHostHint": "用於產生 OAuth2 回呼位址的面板對外網域。當面板存取網域與 Agent 對接位址不同時設定此項。留空則信任請求 Host，不做強制重寫。",
+    "NATMemberDomains": "成員 NAT 網域清單（每行一個）",
+    "NATMemberDomainsHint": "僅支援完整網域，不支援萬用字元。留空停用成員 NAT，包括既有記錄；啟用前須填寫面板對外網域。清單內網域供所有成員共用，並非按使用者分配。管理員不受清單限制，但所有使用者都不能使用面板保留網域。",
     "ReservedHosts": "保留 Host（逗號分隔；反代/公網網域，成員不可註冊為 NAT 網域）",
     "ReservedHostsHint": "反代部署下面板看不到自身的對外網域，無法自動保護。請在此列出所有公網入口網域，否則成員可將其註冊為 NAT 網域搶佔面板路由。",
     "ConfigTLS": "Agent 使用 TLS 連線",

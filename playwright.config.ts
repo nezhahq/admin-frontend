@@ -24,7 +24,7 @@ export default defineConfig({
     webServer: process.env.E2E_SKIP_WEBSERVER
         ? undefined
         : {
-              command: "npm run dev -- --host 127.0.0.1",
+              command: "bun run dev -- --host 127.0.0.1",
               url: baseURL + "/dashboard/login",
               reuseExistingServer: !process.env.CI,
               timeout: 120_000,

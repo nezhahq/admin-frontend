@@ -48,6 +48,7 @@ const settingFormSchema = z.object({
     install_host: asOptionalField(z.string()),
     dashboard_host: asOptionalField(z.string()),
     reserved_hosts: asOptionalField(z.string()),
+    nat_member_domains: z.string(),
     custom_code: asOptionalField(z.string()),
     custom_code_dashboard: asOptionalField(z.string()),
     web_real_ip_header: asOptionalField(z.string()),
@@ -81,6 +82,7 @@ export default function SettingsPage() {
                   // 兼容尚未包含 online_stats_days 的旧后端：字段缺省时回退
                   // 默认值，避免必填校验拦截其他设置的提交
                   online_stats_days: config.config?.online_stats_days ?? 7,
+                  nat_member_domains: (config.config?.nat_member_domains ?? []).join("\n"),
                   user_template:
                       config.config?.user_template ||
                       Object.keys(config.frontend_templates?.filter((t) => !t.is_admin) || {})[0] ||
@@ -90,6 +92,7 @@ export default function SettingsPage() {
                   ip_change_notification_group_id: 0,
                   cover: 1,
                   online_stats_days: 7,
+                  nat_member_domains: "",
                   site_name: "",
                   language: "",
                   user_template: "user-dist",
@@ -105,6 +108,7 @@ export default function SettingsPage() {
             form.reset({
                 ...config.config,
                 online_stats_days: config.config?.online_stats_days ?? 7,
+                nat_member_domains: (config.config?.nat_member_domains ?? []).join("\n"),
             })
         }
     }, [config?.config, form])
@@ -118,7 +122,14 @@ export default function SettingsPage() {
 
     const onSubmit = async (values: any) => {
         try {
-            await updateSettings(values)
+            await updateSettings({
+                ...values,
+                // Send [] when cleared: omitting the field preserves the server's previous policy.
+                nat_member_domains: values.nat_member_domains
+                    .split("\n")
+                    .map((domain: string) => domain.trim())
+                    .filter(Boolean),
+            })
             form.reset()
             await mutate()
         } catch (e) {
@@ -336,6 +347,20 @@ export default function SettingsPage() {
                                         <Input {...field} />
                                     </FormControl>
                                     <FormDescription>{t("ReservedHostsHint")}</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="nat_member_domains"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("NATMemberDomains")}</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="tunnel.example.com" {...field} />
+                                    </FormControl>
+                                    <FormDescription>{t("NATMemberDomainsHint")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}

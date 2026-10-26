@@ -63,6 +63,11 @@ jobs:
           cache: npm
           cache-dependency-path: admin-frontend/package-lock.json
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "latest"
+
       - name: Setup Go
         uses: actions/setup-go@v7
         with:

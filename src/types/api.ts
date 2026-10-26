@@ -724,6 +724,8 @@ export interface ModelSetting {
     /** 系统语言，默认 zh_CN */
     language: string
     oauth2_providers: string[]
+    /** 成员可使用的完整 NAT 域名；空名单禁用成员 NAT */
+    nat_member_domains?: string[]
     /** 反代部署下声明对外域名（逗号分隔），防止成员注册冲突 NAT 域名抢占路由 */
     reserved_hosts: string
     /** 设备在线时间段统计范围（天），最小 7，最大 3650 */
@@ -749,6 +751,7 @@ export interface ModelSettingForm {
     ignored_ip_notification?: string
     install_host?: string
     dashboard_host?: string
+    nat_member_domains?: string[]
     reserved_hosts?: string
     /** IP变更提醒的通知组 */
     ip_change_notification_group_id: number
