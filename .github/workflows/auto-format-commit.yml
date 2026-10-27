@@ -24,6 +24,58 @@ jobs:
             - name: Install dependencies
               run: bun install
 
+            - name: Complete lockfile metadata
+              run: |
+                  node --input-type=module <<'EOF'
+                  import { readFileSync, writeFileSync } from "node:fs";
+
+                  const file = "package-lock.json";
+                  const lock = JSON.parse(readFileSync(file, "utf8"));
+
+                  const missing = Object.entries(lock.packages).filter(
+                      ([path, pkg]) =>
+                          path.startsWith("node_modules/") &&
+                          !pkg.link &&
+                          !pkg.inBundle &&
+                          (!pkg.resolved || !pkg.integrity)
+                  );
+
+                  for (let i = 0; i < missing.length; i += 8) {
+                      await Promise.all(missing.slice(i, i + 8).map(async ([path, pkg]) => {
+                          const name = pkg.name ?? path.split("node_modules/").at(-1);
+                          const url = `https://registry.npmjs.org/${encodeURIComponent(name)}/${encodeURIComponent(pkg.version)}`;
+                          const response = await fetch(url, {
+                              signal: AbortSignal.timeout(15000)
+                          });
+
+                          if (!response.ok) throw new Error(`Failed to fetch ${name}@${pkg.version}`);
+
+                          const metadata = await response.json();
+                          if (
+                              metadata.name !== name ||
+                              metadata.version !== pkg.version ||
+                              !metadata.dist?.tarball ||
+                              !metadata.dist?.integrity
+                          ) {
+                              throw new Error(`Invalid metadata for ${name}@${pkg.version}`);
+                          }
+
+                          pkg.resolved ||= metadata.dist.tarball;
+                          pkg.integrity ||= metadata.dist.integrity;
+                      }));
+                  }
+
+                  if (missing.some(([, pkg]) => !pkg.resolved || !pkg.integrity)) {
+                      throw new Error("Lockfile metadata is incomplete");
+                  }
+
+                  if (missing.length) {
+                      writeFileSync(file, JSON.stringify(lock, null, 4) + "\n");
+                  }
+
+                  console.log(`Completed metadata for ${missing.length} packages`);
+                  EOF
+
             - name: Run formatter
               run: bun run format
 
