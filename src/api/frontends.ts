@@ -44,3 +44,6 @@ export const installFrontend = (repository: string, tag: string, is_admin: boole
 
 export const activateFrontend = (path: string, is_admin: boolean) =>
     fetcher<void>(FetcherMethod.POST, "/api/v1/frontend/activate", { path, is_admin })
+
+export const removeFrontend = (path: string, is_admin: boolean) =>
+    fetcher<void>(FetcherMethod.POST, "/api/v1/frontend/remove", { path, is_admin })

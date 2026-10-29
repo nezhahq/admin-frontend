@@ -344,7 +344,10 @@
         "Custom": "Installed release",
         "BuiltIn": "Built-in",
         "Active": "Active",
-        "Activate": "Activate"
+        "Activate": "Activate",
+        "Remove": "Delete",
+        "ConfirmRemove": "Delete “{{name}} · {{version}}” and its files? This cannot be undone. To use it again, reinstall it.",
+        "Removed": "Frontend deleted."
     },
     "MCPOAuth": {
         "Title": "Authorize MCP access",

@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
     query: vi.fn(),
     install: vi.fn(),
     activate: vi.fn(),
+    remove: vi.fn(),
     refresh: vi.fn(),
     refreshSettings: vi.fn(),
     swr: vi.fn(),
@@ -26,6 +27,7 @@ vi.mock("@/api/frontends", () => ({
     listFrontendReleases: mocks.query,
     installFrontend: mocks.install,
     activateFrontend: mocks.activate,
+    removeFrontend: mocks.remove,
 }))
 vi.mock("swr", () => ({ default: mocks.swr, mutate: mocks.refreshSettings }))
 
@@ -68,7 +70,10 @@ beforeEach(() => {
     })
 })
 
-afterEach(cleanup)
+afterEach(() => {
+    cleanup()
+    vi.restoreAllMocks()
+})
 
 function renderPage() {
     return render(
@@ -178,4 +183,51 @@ test("failed activation is not reported as successful", async () => {
     await waitFor(() => expect(mocks.error).toHaveBeenCalled())
     expect(mocks.success).not.toHaveBeenCalled()
     expect(mocks.refresh).not.toHaveBeenCalled()
+})
+
+test.each([false, true])(
+    "removes only confirmed inactive custom frontends (admin=%s)",
+    async (admin) => {
+        const state = mocks.swr.getMockImplementation()!()
+        state.data.templates[1].is_admin = admin
+        const confirm = vi.spyOn(window, "confirm").mockReturnValue(false)
+        renderPage()
+        fireEvent.change(screen.getByLabelText("FrontendManager.Target"), {
+            target: { value: admin ? "admin" : "user" },
+        })
+        const buttons = screen.getAllByRole("button", { name: "FrontendManager.Remove" })
+        expect(buttons).toHaveLength(1)
+        fireEvent.click(buttons[0])
+        expect(confirm).toHaveBeenCalledWith("FrontendManager.ConfirmRemove")
+        expect(mocks.remove).not.toHaveBeenCalled()
+        confirm.mockReturnValue(true)
+        fireEvent.click(buttons[0])
+        await waitFor(() => expect(mocks.success).toHaveBeenCalledWith("FrontendManager.Removed"))
+        expect(mocks.remove).toHaveBeenCalledExactlyOnceWith("installed-user", admin)
+        expect(mocks.refresh).toHaveBeenCalledOnce()
+        expect(mocks.refreshSettings).toHaveBeenCalledWith("/api/v1/setting")
+        expect(mocks.activate).not.toHaveBeenCalled()
+    },
+)
+
+test("hides removal for active custom frontends", () => {
+    const state = mocks.swr.getMockImplementation()!()
+    state.data.user_template = "installed-user"
+    renderPage()
+    expect(screen.queryByRole("button", { name: "FrontendManager.Remove" })).toBeNull()
+})
+
+test("failed removal keeps the catalog and does not report success", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true)
+    mocks.remove.mockRejectedValue(new Error("Cannot delete frontend"))
+    renderPage()
+    fireEvent.click(screen.getByRole("button", { name: "FrontendManager.Remove" }))
+    await waitFor(() =>
+        expect(mocks.error).toHaveBeenCalledWith("Error", {
+            description: "Error: Cannot delete frontend",
+        }),
+    )
+    expect(mocks.success).not.toHaveBeenCalled()
+    expect(mocks.refresh).not.toHaveBeenCalled()
+    expect(screen.getByText(/Installed user/)).toBeTruthy()
 })

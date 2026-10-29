@@ -2,9 +2,11 @@ import { swrFetcher } from "@/api/api"
 import {
     FrontendReleasePage,
     FrontendStatus,
+    FrontendTemplate,
     activateFrontend,
     installFrontend,
     listFrontendReleases,
+    removeFrontend,
 } from "@/api/frontends"
 import { SettingsTab } from "@/components/settings-tab"
 import { Button } from "@/components/ui/button"
@@ -68,6 +70,27 @@ export default function FrontendsPage() {
             toast.success(t("FrontendManager.Activated"))
             if (isAdminFrontend) window.location.assign("/dashboard/")
         })
+
+    const remove = (template: FrontendTemplate) => {
+        if (
+            busy ||
+            !window.confirm(
+                t("FrontendManager.ConfirmRemove", {
+                    name: template.name,
+                    version: template.version,
+                }),
+            )
+        )
+            return
+        // Installation keeps previous versions for rollback; removal is explicit
+        // and the backend rechecks active-version protection before deleting files.
+        void perform(async () => {
+            await removeFrontend(template.path, !!template.is_admin)
+            await mutate()
+            await mutateCache("/api/v1/setting")
+            toast.success(t("FrontendManager.Removed"))
+        })
+    }
 
     const selected = isAdminFrontend ? data?.admin_template : data?.user_template
     const templates =
@@ -205,14 +228,28 @@ export default function FrontendsPage() {
                                         {template.repository}
                                     </a>
                                 </div>
-                                <Button
-                                    disabled={busy || selected === template.path}
-                                    onClick={() => void activate(template.path)}
-                                >
-                                    {selected === template.path
-                                        ? t("FrontendManager.Active")
-                                        : t("FrontendManager.Activate")}
-                                </Button>
+                                <div className="flex gap-2">
+                                    {template.custom &&
+                                        !template.is_official &&
+                                        data?.user_template !== template.path &&
+                                        data?.admin_template !== template.path && (
+                                            <Button
+                                                variant="destructive"
+                                                disabled={busy}
+                                                onClick={() => remove(template)}
+                                            >
+                                                {t("FrontendManager.Remove")}
+                                            </Button>
+                                        )}
+                                    <Button
+                                        disabled={busy || selected === template.path}
+                                        onClick={() => void activate(template.path)}
+                                    >
+                                        {selected === template.path
+                                            ? t("FrontendManager.Active")
+                                            : t("FrontendManager.Activate")}
+                                    </Button>
+                                </div>
                             </div>
                         ))}
                     </section>

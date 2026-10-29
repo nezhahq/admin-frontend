@@ -344,7 +344,10 @@
         "Custom": "已安装版本",
         "BuiltIn": "内置",
         "Active": "正在使用",
-        "Activate": "启用"
+        "Activate": "启用",
+        "Remove": "删除",
+        "ConfirmRemove": "删除「{{name}} · {{version}}」及其文件？此操作无法撤销，如需再次使用，请重新安装。",
+        "Removed": "主题已删除。"
     },
     "MCPOAuth": {
         "Title": "授权 MCP 访问",
