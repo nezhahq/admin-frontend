@@ -62,6 +62,9 @@ function csrfHeaders(method: FetcherMethod, path: string): Record<string, string
 // 非 2xx 时优先取后端 JSON 里的 error：HTTP/2 没有 statusText（恒为空串），
 // 只抛 statusText 会让所有 toast(error.message) 弹出空白提示。
 async function failedResponseMessage(response: Response): Promise<string> {
+    // 401 保持原来的报法：登录流程靠 "Unauthorized" 这个固定文案识别“用户名或密码错误”，
+    // 响应体里的文案换掉它会让旧版面板、反向代理返回的 401 不再被识别。
+    if (response.status === 401 && response.statusText) return response.statusText
     try {
         const body: unknown = JSON.parse(await response.text())
         if (body && typeof body === "object" && "error" in body) {
