@@ -1,4 +1,7 @@
-import { act, render, waitFor } from "@testing-library/react"
+import { fmWorker } from "@/lib/utils"
+import { FMWorkerOpcode } from "@/types"
+import { act, fireEvent, render, waitFor } from "@testing-library/react"
+import { toast } from "sonner"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
 
 import { FMComponent } from "../components/fm"
@@ -103,6 +106,8 @@ vi.mock("@/lib/utils", () => ({
 
             return { path: new TextDecoder().decode(pathBytes), fmList: [] }
         },
+        buildUploadHeader: () => new Uint8Array([2]).buffer,
+        readFileAsArrayBuffer: async (blob: Blob) => blob.arrayBuffer(),
     },
     fmWorker: new Worker(""),
     formatPath: (path: string) => path,
@@ -246,4 +251,114 @@ test("FM websocket lifecycle reuses the socket on path changes", async () => {
 
     unmount()
     expect(socket.readyState).toBe(MockWebSocket.CLOSED)
+})
+
+const encodeDownloadHeader = (totalBytes: number) => {
+    const payload = new Uint8Array(12)
+    payload.set([0x4e, 0x5a, 0x54, 0x44], 0)
+    new DataView(payload.buffer).setBigUint64(4, BigInt(totalBytes), false)
+    return payload.buffer
+}
+
+const encodeErrorMessage = (message: string) => {
+    const messageBytes = new TextEncoder().encode(message)
+    const payload = new Uint8Array(4 + messageBytes.length)
+    payload.set([0x4e, 0x45, 0x52, 0x52], 0)
+    payload.set(messageBytes, 4)
+    return payload.buffer
+}
+
+const receive = (socket: MockWebSocket, data: ArrayBufferLike) => {
+    // Deliberately not awaited: a stuck handler must fail the assertion, not hang the test.
+    void socket.onmessage?.call(socket, new MessageEvent("message", { data }))
+}
+
+const emitFromWorker = (data: { type: FMWorkerOpcode; error?: string }) => {
+    fmWorker.onmessage?.call(fmWorker, new MessageEvent("message", { data }))
+}
+
+const openFileManager = async () => {
+    const view = render(<FMComponent wsUrl="/ws/file/test" />)
+    await waitFor(() => {
+        expect(webSockets).toHaveLength(1)
+    })
+    const socket = webSockets[0]
+    act(() => {
+        socket.open()
+    })
+    socket.sent.length = 0
+    return { socket, ...view }
+}
+
+test("a worker failure ends the download and later listings still work", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(6))
+    })
+    expect(postToWorker).toHaveBeenLastCalledWith(expect.objectContaining({ operation: 1 }))
+
+    act(() => {
+        emitFromWorker({ type: FMWorkerOpcode.Error, error: "storage unavailable" })
+    })
+    expect(toast).toHaveBeenLastCalledWith("FM Error", { description: "storage unavailable" })
+
+    postToWorker.mockClear()
+    act(() => {
+        // The agent keeps streaming the rest of the file; it must be dropped, not written.
+        receive(socket, new Uint8Array([1, 2, 3]).buffer)
+        receive(socket, new Uint8Array([4, 5, 6]).buffer)
+        receive(socket, encodeFileNameMessage("/after/failure"))
+    })
+
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe("/after/failure")
+    })
+    expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 2 }))
+    unmount()
+})
+
+test("an error frame during a download resets the transfer state", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(1024))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+    })
+    postToWorker.mockClear()
+
+    act(() => {
+        receive(socket, encodeErrorMessage("read failed"))
+    })
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
+    })
+
+    act(() => {
+        receive(socket, encodeFileNameMessage("/after/error"))
+    })
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe("/after/error")
+    })
+    expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 2 }))
+    unmount()
+})
+
+test("upload sends nothing once the websocket is closed", async () => {
+    const { socket, container, unmount } = await openFileManager()
+    socket.readyState = MockWebSocket.CLOSED
+
+    const fileInput = container.querySelector('input[type="file"]')
+    if (!fileInput) throw new Error("file input not found")
+    await act(async () => {
+        fireEvent.change(fileInput, {
+            target: { files: [new File([new Uint8Array(16)], "upload.bin")] },
+        })
+    })
+
+    expect(socket.sent).toHaveLength(0)
+    expect(toast).toHaveBeenCalledWith("FM Error", expect.anything())
+    unmount()
 })

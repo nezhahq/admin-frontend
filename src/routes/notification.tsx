@@ -131,6 +131,9 @@ export default function NotificationPage() {
         features: selectableTableFeatures,
         data: dataCache,
         columns,
+        // 行标识必须取业务主键：默认按数组下标，删除或翻页后勾选状态会落到
+        // 顶上来的另一条记录上，再次批量操作就会误删、误封。
+        getRowId: (row) => String(row.id),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

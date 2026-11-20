@@ -4,9 +4,17 @@ on:
     pull_request_target:
         types: [opened, synchronize]
 
+# pull_request_target 在主仓库上下文运行并持有可写 token，而下面的 bun install /
+# bun run format 会执行 PR 分支里的脚本（package.json 生命周期脚本、prettier 插件）。
+# 因此只允许同仓库分支触发：fork PR 一旦放行，外部贡献者就能拿写权限 token 推代码、打 tag。
+# GITHUB_TOKEN 本来也推不到 fork 分支，所以对 fork PR 没有功能损失。
+permissions:
+    contents: write
+    pull-requests: write
+
 jobs:
     auto-fix:
-        if: github.actor != 'weblate'
+        if: github.actor != 'weblate' && github.event.pull_request.head.repo.full_name == github.repository
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code

@@ -28,7 +28,9 @@ export default function Root() {
         }
     }, [settingData?.config?.language])
 
-    if (error) {
+    // 只在从未拿到过设置时才进错误页：SWR 重新验证失败时 data 仍是上一次的值，
+    // 一次瞬时的网络错误不应该把整个后台连同未保存的表单一起卸载。
+    if (error && !settingData) {
         throw error
     }
 

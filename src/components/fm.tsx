@@ -64,6 +64,8 @@ type VirtualizedTableRowProps = HTMLAttributes<HTMLTableRowElement> & {
     "data-index"?: number | string
 }
 
+const uploadBufferLimitBytes = 8 * 1048576
+
 const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
     if (a.length !== b.length) return false
     for (let i = 0; i < a.length; i++) {
@@ -156,11 +158,37 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
     const firstChunk = useRef(true)
     const handleReady = useRef(false)
     const currentBasename = useRef("temp")
+    // 下载协议的分片没有帧头，只能靠首帧声明的总长度判断哪些帧仍属于本次下载。
+    const downloadRemainingBytes = useRef(0)
+    const discardingDownloadChunks = useRef(false)
+    const uploadAborted = useRef(false)
+
+    const resetDownloadState = () => {
+        firstChunk.current = true
+        handleReady.current = false
+        discardingDownloadChunks.current = false
+        downloadRemainingBytes.current = 0
+    }
+
+    // Worker 写入失败后 agent 仍会把剩余分片发完：这些帧必须按长度丢弃，
+    // 否则要么永远等待句柄就绪（弹窗关不掉），要么被当成目录列表解析。
+    const failDownload = (description: string) => {
+        if (downloadRemainingBytes.current > 0) {
+            discardingDownloadChunks.current = true
+            handleReady.current = false
+        } else {
+            resetDownloadState()
+        }
+        setdOpen(false)
+        toast("FM" + " " + tRef.current("Error"), { description })
+    }
 
     const waitForHandleReady = async () => {
         while (!handleReady.current) {
+            if (firstChunk.current || discardingDownloadChunks.current) return false
             await new Promise((resolve) => setTimeout(resolve, 10))
         }
+        return true
     }
 
     useEffect(() => {
@@ -168,6 +196,9 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
             switch (event.data.type) {
                 case FMWorkerOpcode.Error: {
                     console.error("Error from worker", event.data.error)
+                    if (!firstChunk.current) {
+                        failDownload(event.data.error || tRef.current("Results.UnExpectedError"))
+                    }
                     break
                 }
                 case FMWorkerOpcode.Progress: {
@@ -186,8 +217,8 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                         URL.revokeObjectURL(url)
                     }
 
-                    firstChunk.current = true
-                    if (dOpen) setdOpen(false)
+                    resetDownloadState()
+                    setdOpen(false)
                     break
                 }
             }
@@ -203,7 +234,8 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload)
         }
-    }, [dOpen])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const [currentPath, setPath] = useState("")
     const currentPathRef = useRef(currentPath)
@@ -233,6 +265,14 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         }
         ws.onclose = (e) => {
             console.log("WebSocket connection closed:", e)
+            // 连接断开后不会再有完成帧或剩余分片，进行中的传输必须在这里收尾。
+            uploadAborted.current = true
+            if (!firstChunk.current) {
+                worker.postMessage({ operation: 4 })
+                resetDownloadState()
+            }
+            setdOpen(false)
+            setuOpen(false)
         }
         ws.onerror = (e) => {
             console.error(e)
@@ -242,7 +282,8 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         }
         ws.onmessage = async (e: MessageEvent<ArrayBufferLike>) => {
             try {
-                const identifier = new Uint8Array(e.data, 0, 4)
+                // 文件末尾的分片可能不足 4 字节，直接取标识会抛 RangeError。
+                const identifier = new Uint8Array(e.data, 0, Math.min(4, e.data.byteLength))
                 if (arraysEqual(identifier, FMIdentifier.error)) {
                     const errBytes = e.data.slice(4)
                     const errMsg = new TextDecoder("utf-8").decode(errBytes)
@@ -250,6 +291,9 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                 }
                 if (firstChunk.current) {
                     if (arraysEqual(identifier, FMIdentifier.file)) {
+                        const totalBytes = Number(new DataView(e.data).getBigUint64(4, false))
+                        downloadRemainingBytes.current = totalBytes - (e.data.byteLength - 12)
+                        discardingDownloadChunks.current = false
                         worker.postMessage({
                             operation: 1,
                             arrayBuffer: e.data,
@@ -268,7 +312,12 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                         throw new Error(tRef.current("Results.UnknownIdentifier"))
                     }
                 } else {
-                    await waitForHandleReady()
+                    downloadRemainingBytes.current -= e.data.byteLength
+                    if (discardingDownloadChunks.current) {
+                        if (downloadRemainingBytes.current <= 0) resetDownloadState()
+                        return
+                    }
+                    if (!(await waitForHandleReady())) return
                     worker.postMessage({
                         operation: 2,
                         arrayBuffer: e.data,
@@ -280,6 +329,13 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                 toast("FM" + " " + tRef.current("Error"), {
                     description: tRef.current("Results.UnExpectedError"),
                 })
+                // agent 报错后不会再发剩余分片：不复位的话后续目录列表会被当成
+                // 文件分片写进临时文件，上传循环也会继续发送无人接收的数据。
+                uploadAborted.current = true
+                if (!firstChunk.current) {
+                    worker.postMessage({ operation: 4 })
+                    resetDownloadState()
+                }
                 setdOpen(false)
                 setuOpen(false)
             }
@@ -315,15 +371,36 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         const chunkSize = 1048576 // 1MB chunk
         let offset = 0
 
+        // 连接断开后 send 只会静默丢数据，弹窗也永远等不到完成帧。
+        const ws = wsRef.current
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            setuOpen(false)
+            toast("FM" + " " + t("Error"), { description: t("Results.UnExpectedError") })
+            return
+        }
+        uploadAborted.current = false
+
         // Send header
         const header = fm.buildUploadHeader({ path: currentPath, file: file })
-        wsRef.current?.send(header)
+        ws.send(header)
 
         // Send data chunks
         while (offset < file.size) {
+            // 不看 bufferedAmount 会把整个文件堆进浏览器发送缓冲区。
+            while (
+                ws.bufferedAmount > uploadBufferLimitBytes &&
+                ws.readyState === WebSocket.OPEN &&
+                !uploadAborted.current
+            ) {
+                await new Promise((resolve) => setTimeout(resolve, 20))
+            }
+            if (uploadAborted.current || ws.readyState !== WebSocket.OPEN) {
+                setuOpen(false)
+                return
+            }
             const chunk = file.slice(offset, offset + chunkSize)
             const arrayBuffer = await fm.readFileAsArrayBuffer(chunk)
-            if (arrayBuffer) wsRef.current?.send(arrayBuffer)
+            if (arrayBuffer) ws.send(arrayBuffer)
             offset += chunkSize
         }
     }

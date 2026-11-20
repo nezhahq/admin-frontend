@@ -112,7 +112,12 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Password")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                {/* 密码框必须是 type="password"，否则会明文显示并进入输入历史 */}
+                                                <Input
+                                                    type="password"
+                                                    autoComplete="new-password"
+                                                    {...field}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

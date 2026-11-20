@@ -59,6 +59,21 @@ function csrfHeaders(method: FetcherMethod, path: string): Record<string, string
     return token ? { [csrfHeaderName]: token } : {}
 }
 
+// 非 2xx 时优先取后端 JSON 里的 error：HTTP/2 没有 statusText（恒为空串），
+// 只抛 statusText 会让所有 toast(error.message) 弹出空白提示。
+async function failedResponseMessage(response: Response): Promise<string> {
+    try {
+        const body: unknown = JSON.parse(await response.text())
+        if (body && typeof body === "object" && "error" in body) {
+            const message = (body as { error: unknown }).error
+            if (typeof message === "string" && message !== "") return message
+        }
+    } catch {
+        // 响应体不是 JSON（例如反向代理的错误页）
+    }
+    return response.statusText || `HTTP ${response.status}`
+}
+
 export async function fetcher<T>(method: FetcherMethod, path: string, data?: any): Promise<T> {
     let response
     if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {
@@ -77,7 +92,7 @@ export async function fetcher<T>(method: FetcherMethod, path: string, data?: any
         })
     }
     if (!response.ok) {
-        throw new Error(response.statusText)
+        throw new Error(await failedResponseMessage(response))
     }
     const text = await response.text()
     if (text !== "") {
