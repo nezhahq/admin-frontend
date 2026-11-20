@@ -1,3 +1,4 @@
+import { revokeServerSession } from "@/api/api"
 import { getProfile, login as loginRequest } from "@/api/user"
 import { clearMCPOAuthReturn, consumeMCPOAuthReturn } from "@/lib/mcp-oauth-navigation"
 import { AuthContextProps } from "@/types"
@@ -96,9 +97,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [navigate, setProfile])
 
-    const logout = useCallback(() => {
+    const logout = useCallback(async () => {
         clearMCPOAuthReturn()
         authEpoch.current++
+        // 界面状态立即更新，不等网络；cookie 必须留到吊销请求返回之后再清。
+        setLoading(false)
+        await revokeServerSession()
         document.cookie.split(";").forEach(function (c) {
             document.cookie = c
                 .replace(/^ +/, "")

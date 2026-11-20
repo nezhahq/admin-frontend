@@ -16,17 +16,21 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Set up Bun
-              uses: oven-sh/setup-bun@v2
+            # 发版必须和 CI 用同一套工具、同一份锁文件安装依赖。仓库只有 package-lock.json，
+            # 用最新版 bun 现场解析会装出和 CI 测过的不一样的依赖树，发出去的包等于没测过。
+            - name: Setup Node
+              uses: actions/setup-node@v7
               with:
-                  bun-version: "latest"
+                  node-version: 22.22.2
+                  cache: npm
+                  cache-dependency-path: package-lock.json
 
             - name: Install dependencies
-              run: bun install
+              run: npm ci
 
             - name: Build static export
               run: |
-                  bun run build-ignore-error
+                  npm run build-ignore-error
 
             - name: Compress dist folder
               run: zip -r dist.zip dist
@@ -38,6 +42,6 @@ jobs:
                   generate_release_notes: true
 
             - name: Changelog
-              run: bun x changelogithub
+              run: npx --yes changelogithub
               env:
                   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

@@ -8,6 +8,11 @@ on:
         branches:
             - main
 
+# 仓库的默认 workflow 权限是可写；这里只需要读代码，显式收紧，
+# 避免构建和测试执行的依赖脚本拿到能推代码、打 tag 的 token。
+permissions:
+    contents: read
+
 jobs:
     build-and-test:
         runs-on: ubuntu-latest

@@ -133,6 +133,25 @@ function triggerAutoRefresh() {
     }
 }
 
+// 通知后端吊销当前登录会话。只在浏览器端删 cookie 结束不了会话：事先被复制出去的
+// token 在过期前一直有效。
+//
+// 调用方必须等它返回后再清 cookie——请求靠 nz-jwt 认证，还需要 nz-csrf。
+// 任何失败都只是静默返回：没有 /logout 接口的旧版面板会回 404，这种情况下
+// 登出仍要像以前一样完成本地清理；超时是为了后端无响应时不把用户卡在登出上。
+export async function revokeServerSession(timeoutMs = 3000): Promise<void> {
+    const path = "/api/v1/logout"
+    try {
+        await fetch(path, {
+            method: FetcherMethod.POST,
+            headers: csrfHeaders(FetcherMethod.POST, path),
+            signal: AbortSignal.timeout(timeoutMs),
+        })
+    } catch {
+        // 网络失败或超时：继续本地登出
+    }
+}
+
 export async function swrFetcher<T>(input: string | URL | globalThis.Request, init?: RequestInit) {
     // SWR 默认不带 init，method 为 undefined：必须落到 GET，否则 fetcher 会走
     // 带 body 的分支并对只读请求附加 CSRF 头，把 token 暴露到 GET 请求上。

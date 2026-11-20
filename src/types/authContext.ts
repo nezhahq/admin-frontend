@@ -5,5 +5,5 @@ export interface AuthContextProps {
     loading: boolean
     login: (username: string, password: string) => void
     loginOauth2: () => void
-    logout: () => void
+    logout: () => void | Promise<void>
 }
