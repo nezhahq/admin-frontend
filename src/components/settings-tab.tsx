@@ -8,7 +8,7 @@ export const SettingsTab = ({ className }: { className?: string }) => {
     const { profile } = useAuth()
 
     const isAdmin = profile?.role === 0
-    const colsClass = isAdmin ? "grid-cols-3 gap-1 sm:grid-cols-7" : "grid-cols-2"
+    const colsClass = isAdmin ? "grid-cols-3 gap-1 sm:grid-cols-8" : "grid-cols-2"
 
     return (
         <Tabs defaultValue={window.location.pathname} className={className}>
@@ -22,6 +22,9 @@ export const SettingsTab = ({ className }: { className?: string }) => {
                             <Link to="/dashboard/settings/frontends">
                                 {t("FrontendManager.Tab")}
                             </Link>
+                        </TabsTrigger>
+                        <TabsTrigger value="/dashboard/settings/backup" asChild>
+                            <Link to="/dashboard/settings/backup">{t("Backup.Tab")}</Link>
                         </TabsTrigger>
                         <TabsTrigger value="/dashboard/settings/user" asChild>
                             <Link to="/dashboard/settings/user">{t("User")}</Link>
