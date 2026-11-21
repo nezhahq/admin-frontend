@@ -284,7 +284,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                 description: tRef.current("Results.UnExpectedError"),
             })
         }
-        ws.onmessage = async (e: MessageEvent<ArrayBufferLike>) => {
+        const handleFrame = async (e: MessageEvent<ArrayBufferLike>) => {
             try {
                 // 文件末尾的分片可能不足 4 字节，直接取标识会抛 RangeError。
                 const identifier = new Uint8Array(e.data, 0, Math.min(4, e.data.byteLength))
@@ -352,6 +352,13 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                 setdOpen(false)
                 setuOpen(false)
             }
+        }
+        // 文件分片不带偏移量，worker 按收到的顺序追加写入，所以帧必须严格按到达顺序
+        // 逐个处理。handleFrame 里有 await（等 worker 打开临时文件），直接把它当
+        // onmessage 用时，先到的分片可能比后到的分片晚醒来：文件大小正确、内容错乱。
+        let frameQueue = Promise.resolve()
+        ws.onmessage = (e: MessageEvent<ArrayBufferLike>) => {
+            frameQueue = frameQueue.then(() => handleFrame(e))
         }
 
         return () => {

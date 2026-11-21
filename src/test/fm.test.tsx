@@ -297,7 +297,9 @@ test("a worker failure ends the download and later listings still work", async (
     act(() => {
         receive(socket, encodeDownloadHeader(6))
     })
-    expect(postToWorker).toHaveBeenLastCalledWith(expect.objectContaining({ operation: 1 }))
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenLastCalledWith(expect.objectContaining({ operation: 1 }))
+    })
 
     act(() => {
         emitFromWorker({ type: FMWorkerOpcode.Error, error: "storage unavailable" })
@@ -381,6 +383,45 @@ test("file content that begins with the error marker is written, not treated as 
     })
     expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
     expect(toast).not.toHaveBeenCalledWith("FM Error", expect.anything())
+    unmount()
+})
+
+// Chunks carry no offset, so the worker appends them in the order it is handed
+// them. Chunks that arrive while the worker is still opening its temporary file
+// used to wait in independent polling loops, and whichever loop woke first after
+// the file was ready went first: the download had the right size and the wrong
+// content.
+test("chunks that arrive before the worker is ready are written in arrival order", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+    const firstChunk = new Uint8Array([1, 1, 1]).buffer
+    const secondChunk = new Uint8Array([2, 2, 2]).buffer
+    const thirdChunk = new Uint8Array([3, 3, 3]).buffer
+
+    vi.useFakeTimers()
+    try {
+        receive(socket, encodeDownloadHeader(9))
+        receive(socket, firstChunk)
+        await vi.advanceTimersByTimeAsync(4)
+        receive(socket, secondChunk)
+        await vi.advanceTimersByTimeAsync(3)
+        receive(socket, thirdChunk)
+        // The first chunk has polled once by now; the other two would poll sooner than its next turn.
+        await vi.advanceTimersByTimeAsync(4)
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+        await vi.advanceTimersByTimeAsync(100)
+    } finally {
+        vi.useRealTimers()
+    }
+
+    const writtenChunks = postToWorker.mock.calls
+        .map(([message]) => message as { operation: number; arrayBuffer: ArrayBuffer })
+        .filter((message) => message.operation === 2)
+        .map((message) => message.arrayBuffer)
+    expect(writtenChunks).toHaveLength(3)
+    expect(writtenChunks[0]).toBe(firstChunk)
+    expect(writtenChunks[1]).toBe(secondChunk)
+    expect(writtenChunks[2]).toBe(thirdChunk)
     unmount()
 })
 
