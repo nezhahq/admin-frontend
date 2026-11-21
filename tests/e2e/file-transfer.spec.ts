@@ -234,7 +234,8 @@ test.describe("file manager transfers through the real Agent", () => {
                     "starts-with-NZFN.bin",
                     Buffer.concat([
                         Buffer.from("NZFN"),
-                        randomBytes(chunkBytes),
+                        randomBytes(chunkBytes - 4),
+                        // Exactly at the start of the second chunk.
                         Buffer.from("NZFN"),
                         randomBytes(9),
                     ]),

@@ -56,73 +56,74 @@ export default function OnlineUserPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    let columns: ColumnDef<typeof selectableTableFeatures, ModelOnlineUser>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableHiding: false,
-        },
-        {
-            header: "IP",
-            accessorKey: "ip",
-            accessorFn: (row) => row.ip ?? "",
-        },
-        {
-            header: t("UserId"),
-            accessorKey: "user_id",
-            accessorFn: (row) => row.user_id || "",
-        },
-        {
-            header: t("ConnectedAt"),
-            accessorKey: "connected_at",
-            accessorFn: (row) => row.connected_at,
-            cell: ({ row }) => {
-                const s = row.original
-                const date = new Date(s.connected_at)
-                return <span>{date.toISOString()}</span>
+    // 列定义必须保持同一个引用：每次渲染都重建的话，表格会把每一行的单元格
+    // 卸载重建，行内已经打开的确认框跟着被关掉。这两页的数据刷新最频繁。
+    const columns = useMemo(() => {
+        const allColumns: ColumnDef<typeof selectableTableFeatures, ModelOnlineUser>[] = [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableHiding: false,
             },
-        },
-        {
-            id: "actions",
-            header: "Actions",
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <BlockButtonGroup
-                        className="flex gap-2"
-                        block={{
-                            fn: blockUser,
-                            id: s.ip ?? "",
-                            mutate: mutate,
-                        }}
-                    >
-                        <></>
-                    </BlockButtonGroup>
-                )
+            {
+                header: "IP",
+                accessorKey: "ip",
+                accessorFn: (row) => row.ip ?? "",
             },
-        },
-    ]
-
-    if (!isAdmin) {
+            {
+                header: t("UserId"),
+                accessorKey: "user_id",
+                accessorFn: (row) => row.user_id || "",
+            },
+            {
+                header: t("ConnectedAt"),
+                accessorKey: "connected_at",
+                accessorFn: (row) => row.connected_at,
+                cell: ({ row }) => {
+                    const s = row.original
+                    const date = new Date(s.connected_at)
+                    return <span>{date.toISOString()}</span>
+                },
+            },
+            {
+                id: "actions",
+                header: "Actions",
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <BlockButtonGroup
+                            className="flex gap-2"
+                            block={{
+                                fn: blockUser,
+                                id: s.ip ?? "",
+                                mutate: mutate,
+                            }}
+                        >
+                            <></>
+                        </BlockButtonGroup>
+                    )
+                },
+            },
+        ]
         // 非管理员隐藏操作列
-        columns = columns.filter((c) => c.id !== "actions")
-    }
+        return isAdmin ? allColumns : allColumns.filter((c) => c.id !== "actions")
+    }, [mutate, t, isAdmin])
 
     const dataCache = useMemo(() => {
         return data?.value ?? []
