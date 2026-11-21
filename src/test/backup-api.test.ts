@@ -148,7 +148,7 @@ test("upload restore sends multipart with CSRF and parses CommonResponse", async
     globalThis.XMLHttpRequest = FakeXHR as unknown as typeof XMLHttpRequest
     const progress = vi.fn()
     const file = new File(["data"], "b.nzbak")
-    const p = prepareRestoreUpload(file, { password: "pw-123456789012" }, progress)
+    const p = prepareRestoreUpload(file, { password: "example-password" }, progress)
     const xhr = FakeXHR.last as FakeXHR
     expect(xhr.method).toBe("POST")
     expect(xhr.url).toBe("/api/v1/backup/restore/prepare")
