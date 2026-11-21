@@ -159,7 +159,12 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
 
     const [fmEntires, setFMEntries] = useState<FMEntry[]>([])
 
+    // firstChunk 为 true 表示下一帧是协议帧（目录列表、下载头、上传完成），
+    // 为 false 表示下一帧是当前下载的文件分片。
     const firstChunk = useRef(true)
+    // 从收到下载头到 worker 交出文件（或下载失败）为止。最后一片交给 worker 之后
+    // firstChunk 就回到 true，但 worker 还在写盘，这段时间只能靠它判断下载是否仍在进行。
+    const downloadActive = useRef(false)
     const handleReady = useRef(false)
     const currentBasename = useRef("temp")
     // 下载协议的分片没有帧头，只能靠首帧声明的总长度判断哪些帧仍属于本次下载。
@@ -169,6 +174,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
 
     const resetDownloadState = () => {
         firstChunk.current = true
+        downloadActive.current = false
         handleReady.current = false
         discardingDownloadChunks.current = false
         downloadRemainingBytes.current = 0
@@ -189,7 +195,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
 
     const waitForHandleReady = async () => {
         while (!handleReady.current) {
-            if (firstChunk.current || discardingDownloadChunks.current) return false
+            if (!downloadActive.current || discardingDownloadChunks.current) return false
             await new Promise((resolve) => setTimeout(resolve, 10))
         }
         return true
@@ -200,7 +206,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
             switch (event.data.type) {
                 case FMWorkerOpcode.Error: {
                     console.error("Error from worker", event.data.error)
-                    if (!firstChunk.current) {
+                    if (downloadActive.current) {
                         failDownload(event.data.error || tRef.current("Results.UnExpectedError"))
                     }
                     break
@@ -264,6 +270,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         const ws = new WebSocket(url)
         wsRef.current = ws
         ws.binaryType = "arraybuffer"
+        let connectionClosed = false
         ws.onopen = () => {
             listFile()
         }
@@ -271,7 +278,8 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
             console.log("WebSocket connection closed:", e)
             // 连接断开后不会再有完成帧或剩余分片，进行中的传输必须在这里收尾。
             uploadAborted.current = true
-            if (!firstChunk.current) {
+            connectionClosed = true
+            if (downloadActive.current) {
                 worker.postMessage({ operation: 4 })
                 resetDownloadState()
             }
@@ -285,6 +293,9 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
             })
         }
         const handleFrame = async (e: MessageEvent<ArrayBufferLike>) => {
+            // 连接关闭时下载状态已经复位，还排在队列里的分片不能再处理：
+            // 它们会被当成协议帧解析，逐个弹出“未知标识”错误。
+            if (connectionClosed) return
             try {
                 // 文件末尾的分片可能不足 4 字节，直接取标识会抛 RangeError。
                 const identifier = new Uint8Array(e.data, 0, Math.min(4, e.data.byteLength))
@@ -307,6 +318,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                         const totalBytes = Number(new DataView(e.data).getBigUint64(4, false))
                         downloadRemainingBytes.current = totalBytes - (e.data.byteLength - 12)
                         discardingDownloadChunks.current = false
+                        downloadActive.current = true
                         worker.postMessage({
                             operation: 1,
                             arrayBuffer: e.data,
@@ -336,6 +348,10 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                         arrayBuffer: e.data,
                         fileName: currentBasename.current,
                     })
+                    // 最后一片已经交出去，协议上这次下载结束了：后面到达的帧是协议帧。
+                    // 等 worker 回报完成才切换的话，这期间到达的帧会被当成分片
+                    // 发给已经关闭文件的 worker。
+                    if (downloadRemainingBytes.current <= 0) firstChunk.current = true
                 }
             } catch (error) {
                 console.error("Error processing received data:", error)
@@ -345,7 +361,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                 // agent 报错后不会再发剩余分片：不复位的话后续目录列表会被当成
                 // 文件分片写进临时文件，上传循环也会继续发送无人接收的数据。
                 uploadAborted.current = true
-                if (!firstChunk.current) {
+                if (downloadActive.current) {
                     worker.postMessage({ operation: 4 })
                     resetDownloadState()
                 }
@@ -362,6 +378,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         }
 
         return () => {
+            connectionClosed = true
             ws.close()
             if (wsRef.current === ws) {
                 wsRef.current = null

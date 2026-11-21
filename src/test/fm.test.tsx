@@ -441,3 +441,68 @@ test("upload sends nothing once the websocket is closed", async () => {
     expect(toast).toHaveBeenCalledWith("FM Error", expect.anything())
     unmount()
 })
+
+// Closing the connection resets the download. Chunks still waiting in the queue
+// used to be handled afterwards as protocol frames, one error toast per chunk.
+test("chunks still queued when the connection closes are dropped", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+
+    vi.useFakeTimers()
+    try {
+        receive(socket, encodeDownloadHeader(6))
+        receive(socket, new Uint8Array([1, 2, 3]).buffer)
+        receive(socket, new Uint8Array([4, 5, 6]).buffer)
+        await vi.advanceTimersByTimeAsync(5)
+        postToWorker.mockClear()
+        act(() => {
+            socket.onclose?.call(socket, new CloseEvent("close"))
+        })
+        await vi.advanceTimersByTimeAsync(100)
+    } finally {
+        vi.useRealTimers()
+    }
+
+    expect(postToWorker).toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
+    expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 2 }))
+    expect(toast).not.toHaveBeenCalled()
+    unmount()
+})
+
+// Once the last chunk is handed to the worker the download is over on the wire.
+// A frame that arrives before the worker reports the finished file used to be
+// sent to the worker as one more chunk.
+test("a frame after the last chunk is a protocol frame even before the worker finishes", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+    const onlyChunk = new Uint8Array([1, 2, 3]).buffer
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(3))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+        receive(socket, onlyChunk)
+    })
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(
+            expect.objectContaining({ operation: 2, arrayBuffer: onlyChunk }),
+        )
+    })
+    postToWorker.mockClear()
+
+    act(() => {
+        receive(socket, encodeFileNameMessage("/listed/before/worker/result"))
+    })
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe(
+            "/listed/before/worker/result",
+        )
+    })
+    expect(postToWorker).not.toHaveBeenCalled()
+
+    // A worker failure on the last write is still reported for this download.
+    act(() => {
+        emitFromWorker({ type: FMWorkerOpcode.Error, error: "disk full" })
+    })
+    expect(toast).toHaveBeenLastCalledWith("FM Error", { description: "disk full" })
+    unmount()
+})

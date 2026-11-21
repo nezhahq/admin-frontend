@@ -342,6 +342,38 @@ test.describe("file manager transfers through the real Agent", () => {
         await expect(page.getByText("FM Error")).toHaveCount(0)
     })
 
+    test("an upload the Agent cannot store fails cleanly and the connection keeps working", async ({
+        adminPage: page,
+    }) => {
+        // A directory with the upload's name makes the Agent fail to create the file.
+        const blockedName = "taken-by-a-directory"
+        mkdirSync(path.join(agentDirectory, blockedName))
+        await openFileManager(page)
+        await goToDirectory(page, agentDirectory)
+        await expect(fileRow(page, blockedName)).toBeVisible()
+
+        // Upload content has no frame header. If the Agent stopped reading after
+        // the failure, this content would reach its command loop and read as
+        // "list the nested directory", and the listing below would change.
+        const contentReadingAsListCommand = Buffer.concat([
+            Buffer.from([0x00]),
+            Buffer.from(path.join(agentDirectory, "nested directory")),
+        ])
+        await upload(page, blockedName, contentReadingAsListCommand)
+
+        await expect(page.getByText("FM Error").first()).toBeVisible()
+        expect(statSync(path.join(agentDirectory, blockedName)).isDirectory()).toBe(true)
+        await expect(fileRow(page, blockedName)).toBeVisible()
+        await expect(fileRow(page, "inside.txt")).toHaveCount(0)
+
+        // The same connection accepts the next upload and stores it intact.
+        const next = randomBytes(chunkBytes + 3)
+        await upload(page, "after-the-failure.bin", next)
+        await expect(fileRow(page, "after-the-failure.bin")).toBeVisible()
+        expectStoredByAgent(agentDirectory, "after-the-failure.bin", next)
+        await expect(fileRow(page, "inside.txt")).toHaveCount(0)
+    })
+
     test("an upload replaces an existing file completely and can be downloaded back", async ({
         adminPage: page,
     }) => {
