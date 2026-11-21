@@ -345,6 +345,44 @@ test("an error frame during a download resets the transfer state", async () => {
     expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 2 }))
     unmount()
 })
+// File content is sent as raw chunks with no frame header, so a chunk can begin
+// with the same four bytes as an error frame. Such a file used to abort at that
+// chunk. A chunk is told apart by its size: the agent sends full 1 MiB reads
+// and then exactly the remainder, while an error frame is a short message.
+test("file content that begins with the error marker is written, not treated as an error", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+    const fullChunkBytes = 1024 * 1024
+    const fullChunk = new Uint8Array(fullChunkBytes)
+    fullChunk.set([0x4e, 0x45, 0x52, 0x52], 0)
+    const lastChunk = new Uint8Array([0x4e, 0x45, 0x52, 0x52, 0x21])
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(fullChunkBytes + lastChunk.byteLength))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+    })
+    postToWorker.mockClear()
+
+    act(() => {
+        receive(socket, fullChunk.buffer)
+    })
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(
+            expect.objectContaining({ operation: 2, arrayBuffer: fullChunk.buffer }),
+        )
+    })
+    act(() => {
+        receive(socket, lastChunk.buffer)
+    })
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(
+            expect.objectContaining({ operation: 2, arrayBuffer: lastChunk.buffer }),
+        )
+    })
+    expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
+    expect(toast).not.toHaveBeenCalledWith("FM Error", expect.anything())
+    unmount()
+})
 
 test("upload sends nothing once the websocket is closed", async () => {
     const { socket, container, unmount } = await openFileManager()

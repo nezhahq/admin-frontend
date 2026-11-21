@@ -66,6 +66,10 @@ type VirtualizedTableRowProps = HTMLAttributes<HTMLTableRowElement> & {
 
 const uploadBufferLimitBytes = 8 * 1048576
 
+// agent 的错误帧是 4 字节标识加一条错误文本（路径、系统错误信息），远小于这个长度；
+// 而文件分片除最后一片外都是 1MiB。
+const maxErrorFrameBytes = 16 * 1024
+
 const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
     if (a.length !== b.length) return false
     for (let i = 0; i < a.length; i++) {
@@ -284,7 +288,16 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
             try {
                 // 文件末尾的分片可能不足 4 字节，直接取标识会抛 RangeError。
                 const identifier = new Uint8Array(e.data, 0, Math.min(4, e.data.byteLength))
-                if (arraysEqual(identifier, FMIdentifier.error)) {
+                // 文件内容是不带帧头的原始分片，分片开头完全可能恰好是错误标识的 4 个字节。
+                // 下载进行中只能靠长度区分：agent 每次读满 1MiB 就发一片，最后一片正好是
+                // 剩余字节数；错误帧则是“标识 + 一小段错误文本”。所以长度等于剩余字节数、
+                // 或明显超过错误文本长度的帧是文件内容，不能当成错误中止下载。
+                const isDownloadContent =
+                    !firstChunk.current &&
+                    downloadRemainingBytes.current > 0 &&
+                    (e.data.byteLength === downloadRemainingBytes.current ||
+                        e.data.byteLength > maxErrorFrameBytes)
+                if (!isDownloadContent && arraysEqual(identifier, FMIdentifier.error)) {
                     const errBytes = e.data.slice(4)
                     const errMsg = new TextDecoder("utf-8").decode(errBytes)
                     throw new Error(errMsg)
