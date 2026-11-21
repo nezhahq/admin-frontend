@@ -143,6 +143,7 @@ export default function ServerGroupPage() {
                         fn: deleteServerGroups,
                         id: selectedRows.map((r) => r.original.group.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <ServerGroupCard mutate={mutate} />

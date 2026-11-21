@@ -145,6 +145,7 @@ export default function NotificationGroupPage() {
                         fn: deleteNotificationGroups,
                         id: selectedRows.map((r) => r.original.group.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <NotificationGroupCard mutate={mutate} />

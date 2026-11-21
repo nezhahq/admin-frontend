@@ -162,6 +162,7 @@ export default function DDNSPage() {
                         fn: deleteDDNSProfiles,
                         id: selectedRows.map((r) => r.original.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <DDNSCard mutate={mutate} providers={providers} />

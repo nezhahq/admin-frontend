@@ -145,6 +145,7 @@ export default function NATPage() {
                         fn: deleteNAT,
                         id: selectedRows.map((r) => r.original.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <NATCard mutate={mutate} />

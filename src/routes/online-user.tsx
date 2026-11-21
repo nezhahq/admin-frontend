@@ -252,6 +252,7 @@ export default function OnlineUserPage() {
                             fn: blockUser,
                             id: selectedRows.map((r) => r.original.ip ?? ""),
                             mutate: mutate,
+                            clearSelection: () => table.resetRowSelection(),
                         }}
                     >
                         <></>

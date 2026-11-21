@@ -271,6 +271,7 @@ export default function WAFPage() {
                             fn: deleteWAF,
                             id: selectedRows.map((r) => r.original.ip || ""),
                             mutate: mutate,
+                            clearSelection: () => table.resetRowSelection(),
                         }}
                     >
                         <></>

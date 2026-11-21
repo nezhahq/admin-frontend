@@ -18,7 +18,7 @@ import { useNotification } from "@/hooks/useNotfication"
 import { selectableTableFeatures } from "@/lib/table"
 import { ModelNotification } from "@/types"
 import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
@@ -30,6 +30,11 @@ export default function NotificationPage() {
         swrFetcher,
     )
     const { notifierGroup } = useNotification()
+    // 分组是进页之后才拉回来的，而且每次切换路由都会重新拉。列定义不能依赖它：
+    // 分组一到，列定义就得重建，这之前已经打开的编辑弹窗会被关掉（见下面的说明）。
+    // 所以列里通过 ref 读取最新的分组，分组变化时改为让数据换一个引用来重算各行的值。
+    const notifierGroupRef = useRef(notifierGroup)
+    notifierGroupRef.current = notifierGroup
 
     useEffect(() => {
         if (error)
@@ -85,7 +90,7 @@ export default function NotificationPage() {
                 accessorKey: "groups",
                 accessorFn: (row) => {
                     return (
-                        notifierGroup
+                        notifierGroupRef.current
                             ?.filter((ng) => ng.notifications?.includes(row.id))
                             .map((ng) => ng.group.id) || []
                     )
@@ -125,12 +130,13 @@ export default function NotificationPage() {
                 },
             },
         ],
-        [mutate, notifierGroup, t],
+        [mutate, t],
     )
 
     const dataCache = useMemo(() => {
-        return data ?? []
-    }, [data])
+        return data ? [...data] : []
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, notifierGroup])
 
     const table = useTable({
         features: selectableTableFeatures,
@@ -153,6 +159,7 @@ export default function NotificationPage() {
                         fn: deleteNotification,
                         id: selectedRows.map((r) => r.original.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <NotifierCard mutate={mutate} />

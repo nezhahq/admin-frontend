@@ -131,6 +131,7 @@ export default function UserPage() {
                         fn: deleteUser,
                         id: selectedRows.map((r) => r.original.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <UserCard mutate={mutate} />

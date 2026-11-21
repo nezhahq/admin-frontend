@@ -18,25 +18,39 @@ import { KeyedMutator } from "swr"
 interface ButtonGroupProps<E, U> {
     className?: string
     children?: React.ReactNode
-    delete: { fn: (id: E[]) => Promise<void>; id: E[]; mutate: KeyedMutator<U> }
+    delete: {
+        fn: (id: E[]) => Promise<void>
+        id: E[]
+        mutate: KeyedMutator<U>
+        // 操作成功后清空勾选。行标识是业务主键，勾选状态会跨刷新、跨翻页保留：
+        // 不清的话，同一个标识之后再出现（例如被解封的 IP 再次进入列表）就是已勾选的，
+        // 下一次批量操作会把它带进去。
+        clearSelection?: () => void
+    }
 }
 
 interface ButtonBlockGroupProps<E, U> {
     className?: string
     children?: React.ReactNode
-    block: { fn: (id: E[]) => Promise<void>; id: E[]; mutate: KeyedMutator<U> }
+    block: {
+        fn: (id: E[]) => Promise<void>
+        id: E[]
+        mutate: KeyedMutator<U>
+        clearSelection?: () => void
+    }
 }
 
 export function HeaderButtonGroup<E, U>({
     className,
     children,
-    delete: { fn, id, mutate },
+    delete: { fn, id, mutate, clearSelection },
 }: ButtonGroupProps<E, U>) {
     const { t } = useTranslation()
 
     const handleDelete = async () => {
         try {
             await fn(id)
+            clearSelection?.()
         } catch (error: any) {
             toast(t("Error"), {
                 description: error.message,
@@ -97,13 +111,14 @@ export function HeaderButtonGroup<E, U>({
 export function HeaderBlockButtonGroup<E, U>({
     className,
     children,
-    block: { fn, id, mutate },
+    block: { fn, id, mutate, clearSelection },
 }: ButtonBlockGroupProps<E, U>) {
     const { t } = useTranslation()
 
     const handleBlock = async () => {
         try {
             await fn(id)
+            clearSelection?.()
         } catch (error: any) {
             toast(t("Error"), {
                 description: error.message,

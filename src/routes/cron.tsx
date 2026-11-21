@@ -225,6 +225,7 @@ export default function CronPage() {
                         fn: deleteCron,
                         id: selectedRows.map((r) => r.original.id),
                         mutate: mutate,
+                        clearSelection: () => table.resetRowSelection(),
                     }}
                 >
                     <CronCard mutate={mutate} />
