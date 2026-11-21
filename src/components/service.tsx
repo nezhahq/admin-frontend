@@ -76,14 +76,16 @@ const serviceFormSchema = z.object({
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm({
-        resolver: zodResolver(serviceFormSchema) as any,
-        defaultValues: data
+    // 表单要显示的值。打开编辑弹窗时会用它重置表单（见 handleOpenChange）。
+    const formValuesOf = (source: typeof data) =>
+        source
             ? {
-                  ...data,
-                  fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
-                  recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
-                  skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
+                  ...source,
+                  fail_trigger_tasks_raw: conv.arrToStr(source.fail_trigger_tasks),
+                  recover_trigger_tasks_raw: conv.arrToStr(source.recover_trigger_tasks),
+                  skip_servers_raw: conv.recordToStrArr(
+                      source.skip_servers ? source.skip_servers : {},
+                  ),
               }
             : {
                   type: 1,
@@ -101,13 +103,27 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                   recover_trigger_tasks_raw: "",
                   skip_servers: {},
                   skip_servers_raw: [],
-              },
+              }
+
+    const form = useForm({
+        resolver: zodResolver(serviceFormSchema) as any,
+        defaultValues: formValuesOf(data),
         resetOptions: {
             keepDefaultValues: false,
         },
     })
 
     const [open, setOpen] = useState(false)
+
+    // 编辑弹窗每次打开都要用当前这一行的数据重置表单。表单的初始值只在组件挂载时
+    // 读取一次，而这个组件会跨列表刷新一直存活：不重置的话，保存后再打开看到的
+    // 还是修改前的旧值，直接保存就把新数据盖回去了。
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen && data) {
+            form.reset(formValuesOf(data))
+        }
+        setOpen(nextOpen)
+    }
 
     const onSubmit = async (values: any) => {
         values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
@@ -146,7 +162,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     })) || [{ value: "", label: "" }]
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>

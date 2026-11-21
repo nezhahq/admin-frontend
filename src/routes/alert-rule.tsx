@@ -38,94 +38,99 @@ export default function AlertRulePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<typeof selectableTableFeatures, ModelAlertRule>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableHiding: false,
-        },
-        {
-            header: "ID",
-            accessorKey: "id",
-            accessorFn: (row) => row.id,
-        },
-        {
-            header: t("Name"),
-            accessorKey: "name",
-            accessorFn: (row) => row.name,
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
+    // 列定义必须保持引用稳定：每次渲染都新建的话，单元格渲染函数在 React 眼里是
+    // 新组件，整行会被卸载重挂，列表一刷新就把正在填写的编辑弹窗关掉、输入清空。
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelAlertRule>[] = useMemo(
+        () => [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableHiding: false,
             },
-        },
-        {
-            header: t("NotifierGroup"),
-            accessorKey: "ngroup",
-            accessorFn: (row) => row.notification_group_id,
-        },
-        {
-            header: t("TriggerMode"),
-            accessorKey: "trigger Mode",
-            accessorFn: (row) => triggerModes[row.trigger_mode] || "",
-        },
-        {
-            header: t("Rules"),
-            cell: ({ row }) => {
-                const s = row.original
-                return <CopyButton text={JSON.stringify(s.rules)} />
+            {
+                header: "ID",
+                accessorKey: "id",
+                accessorFn: (row) => row.id,
             },
-        },
-        {
-            header: t("TasksToTriggerOnAlert"),
-            accessorKey: "failTriggerTasks",
-            accessorFn: (row) => row.fail_trigger_tasks,
-        },
-        {
-            header: t("TasksToTriggerAfterRecovery"),
-            accessorKey: "recoverTriggerTasks",
-            accessorFn: (row) => row.recover_trigger_tasks,
-        },
-        {
-            header: t("Enable"),
-            accessorKey: "enable",
-            accessorFn: (row) => row.enable,
-        },
-        {
-            id: "actions",
-            header: t("Actions"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <ActionButtonGroup
-                        className="flex gap-2"
-                        delete={{
-                            fn: deleteAlertRules,
-                            id: s.id,
-                            mutate: mutate,
-                        }}
-                    >
-                        <AlertRuleCard mutate={mutate} data={s} />
-                    </ActionButtonGroup>
-                )
+            {
+                header: t("Name"),
+                accessorKey: "name",
+                accessorFn: (row) => row.name,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
+                },
             },
-        },
-    ]
+            {
+                header: t("NotifierGroup"),
+                accessorKey: "ngroup",
+                accessorFn: (row) => row.notification_group_id,
+            },
+            {
+                header: t("TriggerMode"),
+                accessorKey: "trigger Mode",
+                accessorFn: (row) => triggerModes[row.trigger_mode] || "",
+            },
+            {
+                header: t("Rules"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <CopyButton text={JSON.stringify(s.rules)} />
+                },
+            },
+            {
+                header: t("TasksToTriggerOnAlert"),
+                accessorKey: "failTriggerTasks",
+                accessorFn: (row) => row.fail_trigger_tasks,
+            },
+            {
+                header: t("TasksToTriggerAfterRecovery"),
+                accessorKey: "recoverTriggerTasks",
+                accessorFn: (row) => row.recover_trigger_tasks,
+            },
+            {
+                header: t("Enable"),
+                accessorKey: "enable",
+                accessorFn: (row) => row.enable,
+            },
+            {
+                id: "actions",
+                header: t("Actions"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <ActionButtonGroup
+                            className="flex gap-2"
+                            delete={{
+                                fn: deleteAlertRules,
+                                id: s.id,
+                                mutate: mutate,
+                            }}
+                        >
+                            <AlertRuleCard mutate={mutate} data={s} />
+                        </ActionButtonGroup>
+                    )
+                },
+            },
+        ],
+        [mutate, t],
+    )
 
     const dataCache = useMemo(() => {
         return data ?? []

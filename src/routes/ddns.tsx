@@ -46,91 +46,96 @@ export default function DDNSPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<typeof selectableTableFeatures, ModelDDNSProfile>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableHiding: false,
-        },
-        {
-            header: "ID",
-            accessorKey: "id",
-            accessorFn: (row) => row.id,
-        },
-        {
-            header: t("Name"),
-            accessorKey: "name",
-            accessorFn: (row) => row.name,
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+    // 列定义必须保持引用稳定：每次渲染都新建的话，单元格渲染函数在 React 眼里是
+    // 新组件，整行会被卸载重挂，列表一刷新就把正在填写的编辑弹窗关掉、输入清空。
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelDDNSProfile>[] = useMemo(
+        () => [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableHiding: false,
             },
-        },
-        {
-            header: "IPv4",
-            accessorKey: "enableIPv4",
-            accessorFn: (row) => row.enable_ipv4 ?? false,
-        },
-        {
-            header: "IPv6",
-            accessorKey: "enableIPv6",
-            accessorFn: (row) => row.enable_ipv6 ?? false,
-        },
-        {
-            header: t("Provider"),
-            accessorKey: "provider",
-            accessorFn: (row) => row.provider,
-        },
-        {
-            header: t("Domains"),
-            accessorKey: "domains",
-            accessorFn: (row) => row.domains,
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.domains}</div>
+            {
+                header: "ID",
+                accessorKey: "id",
+                accessorFn: (row) => row.id,
             },
-        },
-        {
-            header: t("MaximumRetryAttempts"),
-            accessorKey: "maxRetries",
-            accessorFn: (row) => row.max_retries,
-        },
-        {
-            id: "actions",
-            header: t("Actions"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <ActionButtonGroup
-                        className="flex gap-2"
-                        delete={{
-                            fn: deleteDDNSProfiles,
-                            id: s.id,
-                            mutate: mutate,
-                        }}
-                    >
-                        <DDNSCard mutate={mutate} data={s} providers={providers} />
-                    </ActionButtonGroup>
-                )
+            {
+                header: t("Name"),
+                accessorKey: "name",
+                accessorFn: (row) => row.name,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+                },
             },
-        },
-    ]
+            {
+                header: "IPv4",
+                accessorKey: "enableIPv4",
+                accessorFn: (row) => row.enable_ipv4 ?? false,
+            },
+            {
+                header: "IPv6",
+                accessorKey: "enableIPv6",
+                accessorFn: (row) => row.enable_ipv6 ?? false,
+            },
+            {
+                header: t("Provider"),
+                accessorKey: "provider",
+                accessorFn: (row) => row.provider,
+            },
+            {
+                header: t("Domains"),
+                accessorKey: "domains",
+                accessorFn: (row) => row.domains,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <div className="max-w-24 whitespace-normal break-words">{s.domains}</div>
+                },
+            },
+            {
+                header: t("MaximumRetryAttempts"),
+                accessorKey: "maxRetries",
+                accessorFn: (row) => row.max_retries,
+            },
+            {
+                id: "actions",
+                header: t("Actions"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <ActionButtonGroup
+                            className="flex gap-2"
+                            delete={{
+                                fn: deleteDDNSProfiles,
+                                id: s.id,
+                                mutate: mutate,
+                            }}
+                        >
+                            <DDNSCard mutate={mutate} data={s} providers={providers} />
+                        </ActionButtonGroup>
+                    )
+                },
+            },
+        ],
+        [mutate, providers, t],
+    )
 
     const dataCache = useMemo(() => {
         return data ?? []

@@ -8,13 +8,19 @@ on:
 # bun run format 会执行 PR 分支里的脚本（package.json 生命周期脚本、prettier 插件）。
 # 因此只允许同仓库分支触发：fork PR 一旦放行，外部贡献者就能拿写权限 token 推代码、打 tag。
 # GITHUB_TOKEN 本来也推不到 fork 分支，所以对 fork PR 没有功能损失。
+# Dependabot 的分支也在本仓库里，同样要排除：它的 PR 内容就是“刚升级的依赖”，
+# 在这里安装并运行它们，等于让一个尚未审查的新版本包拿到写权限 token。
 permissions:
     contents: write
     pull-requests: write
 
 jobs:
     auto-fix:
-        if: github.actor != 'weblate' && github.event.pull_request.head.repo.full_name == github.repository
+        if: >-
+            github.actor != 'weblate' &&
+            github.actor != 'dependabot[bot]' &&
+            github.event.pull_request.user.login != 'dependabot[bot]' &&
+            github.event.pull_request.head.repo.full_name == github.repository
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -27,7 +33,8 @@ jobs:
             - name: Set up Bun
               uses: oven-sh/setup-bun@v2
               with:
-                  bun-version: "latest"
+                  # 固定版本：带写权限的 job 不跟随上游最新发布。
+                  bun-version: "1.4.5"
 
             - name: Install dependencies
               run: bun install

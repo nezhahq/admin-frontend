@@ -43,75 +43,82 @@ export default function NotificationGroupPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: NotificationGroupColumn[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableHiding: false,
-        },
-        {
-            header: "ID",
-            accessorKey: "id",
-            accessorFn: (row) => row.group.id,
-        },
-        {
-            header: t("Name"),
-            accessorKey: "name",
-            accessorFn: (row) => row.group.name,
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-48 whitespace-normal break-words">{s.group.name}</div>
+    // 列定义必须保持引用稳定：每次渲染都新建的话，单元格渲染函数在 React 眼里是
+    // 新组件，整行会被卸载重挂，列表一刷新就把正在填写的编辑弹窗关掉、输入清空。
+    const columns: NotificationGroupColumn[] = useMemo(
+        () => [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableHiding: false,
             },
-        },
-        {
-            header: t("Notifier") + "(ID)",
-            accessorKey: "notifications",
-            accessorFn: (row) => row.notifications,
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <div className="max-w-48 whitespace-normal break-words">
-                        <span>{(s.notifications || []).join(",")}</span>
-                    </div>
-                )
+            {
+                header: "ID",
+                accessorKey: "id",
+                accessorFn: (row) => row.group.id,
             },
-        },
-        {
-            id: "actions",
-            header: t("Actions"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <ActionButtonGroup
-                        className="flex gap-2"
-                        delete={{
-                            fn: deleteNotificationGroups,
-                            id: s.group.id,
-                            mutate: mutate,
-                        }}
-                    >
-                        <NotificationGroupCard mutate={mutate} data={s} />
-                    </ActionButtonGroup>
-                )
+            {
+                header: t("Name"),
+                accessorKey: "name",
+                accessorFn: (row) => row.group.name,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <div className="max-w-48 whitespace-normal break-words">{s.group.name}</div>
+                    )
+                },
             },
-        },
-    ]
+            {
+                header: t("Notifier") + "(ID)",
+                accessorKey: "notifications",
+                accessorFn: (row) => row.notifications,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <div className="max-w-48 whitespace-normal break-words">
+                            <span>{(s.notifications || []).join(",")}</span>
+                        </div>
+                    )
+                },
+            },
+            {
+                id: "actions",
+                header: t("Actions"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <ActionButtonGroup
+                            className="flex gap-2"
+                            delete={{
+                                fn: deleteNotificationGroups,
+                                id: s.group.id,
+                                mutate: mutate,
+                            }}
+                        >
+                            <NotificationGroupCard mutate={mutate} data={s} />
+                        </ActionButtonGroup>
+                    )
+                },
+            },
+        ],
+        [mutate, t],
+    )
 
     const dataCache = useMemo(() => {
         return data ?? []

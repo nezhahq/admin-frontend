@@ -35,71 +35,76 @@ export default function UserPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<typeof selectableTableFeatures, ModelUser>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableHiding: false,
-        },
-        {
-            header: "ID",
-            accessorKey: "id",
-            accessorFn: (row) => row.id,
-        },
-        {
-            header: t("Username"),
-            accessorKey: "username",
-            accessorFn: (row) => row.username,
-        },
-        {
-            header: t("Role"),
-            accessorKey: "role",
-            accessorFn: (row) => {
-                return row.role === 1 ? t("User") : t("Admin")
+    // 列定义必须保持引用稳定：每次渲染都新建的话，单元格渲染函数在 React 眼里是
+    // 新组件，整行会被卸载重挂，列表一刷新就把正在填写的编辑弹窗关掉、输入清空。
+    const columns: ColumnDef<typeof selectableTableFeatures, ModelUser>[] = useMemo(
+        () => [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableHiding: false,
             },
-        },
-        {
-            header: t("LastLogin"),
-            accessorKey: "updated_at",
-            accessorFn: (row) =>
-                row.updated_at ? new Date(row.updated_at).toLocaleString() : t("Never"),
-        },
-        {
-            id: "actions",
-            header: t("Actions"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <ActionButtonGroup
-                        className="flex gap-2"
-                        delete={{
-                            fn: deleteUser,
-                            id: s.id,
-                            mutate: mutate,
-                        }}
-                    >
-                        <></>
-                    </ActionButtonGroup>
-                )
+            {
+                header: "ID",
+                accessorKey: "id",
+                accessorFn: (row) => row.id,
             },
-        },
-    ]
+            {
+                header: t("Username"),
+                accessorKey: "username",
+                accessorFn: (row) => row.username,
+            },
+            {
+                header: t("Role"),
+                accessorKey: "role",
+                accessorFn: (row) => {
+                    return row.role === 1 ? t("User") : t("Admin")
+                },
+            },
+            {
+                header: t("LastLogin"),
+                accessorKey: "updated_at",
+                accessorFn: (row) =>
+                    row.updated_at ? new Date(row.updated_at).toLocaleString() : t("Never"),
+            },
+            {
+                id: "actions",
+                header: t("Actions"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <ActionButtonGroup
+                            className="flex gap-2"
+                            delete={{
+                                fn: deleteUser,
+                                id: s.id,
+                                mutate: mutate,
+                            }}
+                        >
+                            <></>
+                        </ActionButtonGroup>
+                    )
+                },
+            },
+        ],
+        [mutate, t],
+    )
 
     const dataCache = useMemo(() => {
         return data ?? []

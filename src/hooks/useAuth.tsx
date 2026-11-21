@@ -97,7 +97,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [navigate, setProfile])
 
-    const logout = useCallback(async () => {
+    // 吊销请求在后端慢的时候要等几秒，这期间界面没有变化，用户会再点一次登出。
+    // 进行中的登出只做一遍：重复点击拿到的是同一个 promise，不会重复发请求。
+    const logoutInProgress = useRef<Promise<void> | null>(null)
+
+    const performLogout = useCallback(async () => {
         clearMCPOAuthReturn()
         authEpoch.current++
         // 界面状态立即更新，不等网络；cookie 必须留到吊销请求返回之后再清。
@@ -112,6 +116,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false)
         navigate("/dashboard/login", { replace: true })
     }, [navigate, setProfile])
+
+    const logout = useCallback(() => {
+        if (!logoutInProgress.current) {
+            logoutInProgress.current = performLogout().finally(() => {
+                logoutInProgress.current = null
+            })
+        }
+        return logoutInProgress.current
+    }, [performLogout])
 
     const value = useMemo(
         () => ({

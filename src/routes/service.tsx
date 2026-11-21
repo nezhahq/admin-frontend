@@ -35,131 +35,136 @@ export default function ServicePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<typeof selectableTableFeatures, Service>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableHiding: false,
-        },
-        {
-            header: "ID",
-            accessorKey: "id",
-            accessorFn: (row) => `${row.id}(${row.display_index ?? 0})`,
-        },
-        {
-            header: t("Name"),
-            accessorFn: (row) => row.name,
-            accessorKey: "name",
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+    // 列定义必须保持引用稳定：每次渲染都新建的话，单元格渲染函数在 React 眼里是
+    // 新组件，整行会被卸载重挂，列表一刷新就把正在填写的编辑弹窗关掉、输入清空。
+    const columns: ColumnDef<typeof selectableTableFeatures, Service>[] = useMemo(
+        () => [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableHiding: false,
             },
-        },
-        {
-            header: t("Target"),
-            accessorFn: (row) => row.target,
-            accessorKey: "target",
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.target}</div>
+            {
+                header: "ID",
+                accessorKey: "id",
+                accessorFn: (row) => `${row.id}(${row.display_index ?? 0})`,
             },
-        },
-        {
-            header: t("Coverage"),
-            accessorKey: "cover",
-            accessorFn: (row) => row.cover,
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <div className="max-w-48 whitespace-normal break-words">
-                        {(() => {
-                            switch (s.cover) {
-                                case 0: {
-                                    return <span>{t("CoverAll")}</span>
+            {
+                header: t("Name"),
+                accessorFn: (row) => row.name,
+                accessorKey: "name",
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+                },
+            },
+            {
+                header: t("Target"),
+                accessorFn: (row) => row.target,
+                accessorKey: "target",
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <div className="max-w-24 whitespace-normal break-words">{s.target}</div>
+                },
+            },
+            {
+                header: t("Coverage"),
+                accessorKey: "cover",
+                accessorFn: (row) => row.cover,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <div className="max-w-48 whitespace-normal break-words">
+                            {(() => {
+                                switch (s.cover) {
+                                    case 0: {
+                                        return <span>{t("CoverAll")}</span>
+                                    }
+                                    case 1: {
+                                        return <span>{t("IgnoreAll")}</span>
+                                    }
                                 }
-                                case 1: {
-                                    return <span>{t("IgnoreAll")}</span>
-                                }
-                            }
-                        })()}
-                    </div>
-                )
+                            })()}
+                        </div>
+                    )
+                },
             },
-        },
-        {
-            header: t("SpecificServers"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <div className="max-w-32 whitespace-normal break-words">
-                        {Object.keys(s.skip_servers ?? {}).join(",")}
-                    </div>
-                )
+            {
+                header: t("SpecificServers"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <div className="max-w-32 whitespace-normal break-words">
+                            {Object.keys(s.skip_servers ?? {}).join(",")}
+                        </div>
+                    )
+                },
             },
-        },
-        {
-            header: t("Type"),
-            accessorKey: "type",
-            accessorFn: (row) => row.type,
-            cell: ({ row }) => serviceTypes[row.original.type] || "",
-        },
-        {
-            header: t("Interval"),
-            accessorKey: "duration",
-            accessorFn: (row) => row.duration,
-        },
-        {
-            header: t("NotifierGroupID"),
-            accessorKey: "ngroup",
-            accessorFn: (row) => row.notification_group_id,
-        },
-        {
-            header: t("Trigger"),
-            accessorKey: "triggerTask",
-            accessorFn: (row) => row.enable_trigger_task ?? false,
-        },
-        {
-            header: t("TasksToTriggerOnAlert"),
-            accessorKey: "failTriggerTasks",
-            accessorFn: (row) => row.fail_trigger_tasks,
-        },
-        {
-            header: t("TasksToTriggerAfterRecovery"),
-            accessorKey: "recoverTriggerTasks",
-            accessorFn: (row) => row.recover_trigger_tasks,
-        },
-        {
-            id: "actions",
-            header: t("Actions"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <ActionButtonGroup
-                        className="flex gap-2"
-                        delete={{ fn: deleteService, id: s.id, mutate: mutate }}
-                    >
-                        <ServiceCard mutate={mutate} data={s} />
-                    </ActionButtonGroup>
-                )
+            {
+                header: t("Type"),
+                accessorKey: "type",
+                accessorFn: (row) => row.type,
+                cell: ({ row }) => serviceTypes[row.original.type] || "",
             },
-        },
-    ]
+            {
+                header: t("Interval"),
+                accessorKey: "duration",
+                accessorFn: (row) => row.duration,
+            },
+            {
+                header: t("NotifierGroupID"),
+                accessorKey: "ngroup",
+                accessorFn: (row) => row.notification_group_id,
+            },
+            {
+                header: t("Trigger"),
+                accessorKey: "triggerTask",
+                accessorFn: (row) => row.enable_trigger_task ?? false,
+            },
+            {
+                header: t("TasksToTriggerOnAlert"),
+                accessorKey: "failTriggerTasks",
+                accessorFn: (row) => row.fail_trigger_tasks,
+            },
+            {
+                header: t("TasksToTriggerAfterRecovery"),
+                accessorKey: "recoverTriggerTasks",
+                accessorFn: (row) => row.recover_trigger_tasks,
+            },
+            {
+                id: "actions",
+                header: t("Actions"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <ActionButtonGroup
+                            className="flex gap-2"
+                            delete={{ fn: deleteService, id: s.id, mutate: mutate }}
+                        >
+                            <ServiceCard mutate={mutate} data={s} />
+                        </ActionButtonGroup>
+                    )
+                },
+            },
+        ],
+        [mutate, t],
+    )
 
     const dataCache = useMemo(() => {
         return data ?? []

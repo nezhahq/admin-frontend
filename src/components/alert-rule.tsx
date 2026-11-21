@@ -98,14 +98,14 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
     type AlertRuleFormInput = z.input<typeof alertRuleFormSchema>
     type AlertRuleFormData = z.output<typeof alertRuleFormSchema>
 
-    const form = useForm<AlertRuleFormInput, unknown, AlertRuleFormData>({
-        resolver: zodResolver(alertRuleFormSchema),
-        defaultValues: data
+    // 表单要显示的值。打开编辑弹窗时会用它重置表单（见 handleOpenChange）。
+    const formValuesOf = (source: typeof data) =>
+        source
             ? {
-                  ...data,
-                  rules_raw: JSON.stringify(data.rules),
-                  fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
-                  recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
+                  ...source,
+                  rules_raw: JSON.stringify(source.rules),
+                  fail_trigger_tasks_raw: conv.arrToStr(source.fail_trigger_tasks),
+                  recover_trigger_tasks_raw: conv.arrToStr(source.recover_trigger_tasks),
               }
             : {
                   name: "",
@@ -117,13 +117,28 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                   recover_trigger_tasks_raw: "",
                   notification_group_id: 0,
                   trigger_mode: 0,
-              },
+              }
+
+    const form = useForm<AlertRuleFormInput, unknown, AlertRuleFormData>({
+        resolver: zodResolver(alertRuleFormSchema),
+        defaultValues: formValuesOf(data),
         resetOptions: {
             keepDefaultValues: false,
         },
     })
 
     const [open, setOpen] = useState(false)
+
+    // 编辑弹窗每次打开都要用当前这一行的数据重置表单。表单的初始值只在组件挂载时
+    // 读取一次，而这个组件会跨列表刷新一直存活：不重置的话，保存后再打开看到的
+    // 还是修改前的旧值，直接保存就把新数据盖回去了。
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen && data) {
+            form.reset(formValuesOf(data))
+            setRulesUI(data.rules ?? [])
+        }
+        setOpen(nextOpen)
+    }
 
     // 结构化规则编辑状态：从已有数据或 rules_raw 初始化
     const initialRules = (() => {
@@ -181,7 +196,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
     })) || [{ value: "", label: "" }]
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>

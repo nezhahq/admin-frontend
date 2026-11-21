@@ -99,3 +99,45 @@ test.each([
     expect(profileStore).toBeUndefined()
     expect(navigate).toHaveBeenCalledWith("/dashboard/login", { replace: true })
 })
+
+// The revocation request can take seconds on a slow backend, and nothing on
+// screen changes until it returns. Clicking "log out" again in that time must
+// not send the request again.
+test("clicking logout again while it is in progress does not repeat the request", async () => {
+    let answerLogout: (response: Response) => void = () => {}
+    const logoutAnswered = new Promise<Response>((resolve) => {
+        answerLogout = resolve
+    })
+    const fetchMock = vi.fn(async () => logoutAnswered)
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+    const { AuthProvider, useAuth } = await import("@/hooks/useAuth")
+    const captured: { auth?: ReturnType<typeof useAuth> } = {}
+    function Capture() {
+        captured.auth = useAuth()
+        return null
+    }
+    await act(async () => {
+        render(
+            <AuthProvider>
+                <Capture />
+            </AuthProvider>,
+        )
+    })
+    fetchMock.mockClear()
+
+    let firstClick: Promise<void> = Promise.resolve()
+    let secondClick: Promise<void> = Promise.resolve()
+    await act(async () => {
+        firstClick = Promise.resolve(captured.auth!.logout())
+        secondClick = Promise.resolve(captured.auth!.logout())
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+        answerLogout(new Response(JSON.stringify({ success: true }), { status: 200 }))
+        await Promise.all([firstClick, secondClick])
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(navigate).toHaveBeenCalledTimes(1)
+    expect(profileStore).toBeUndefined()
+})

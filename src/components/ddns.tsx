@@ -72,24 +72,24 @@ type DDNSFormData = z.output<typeof ddnsFormSchema>
 
 export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<DDNSFormInput, unknown, DDNSFormData>({
-        resolver: zodResolver(ddnsFormSchema),
-        defaultValues: data
+    // 表单要显示的值。打开编辑弹窗时会用它重置表单（见 handleOpenChange）。
+    const formValuesOf = (source: typeof data) =>
+        source
             ? {
-                  max_retries: data.max_retries ?? 3,
-                  enable_ipv4: data.enable_ipv4 ?? false,
-                  enable_ipv6: data.enable_ipv6 ?? false,
-                  name: data.name ?? "",
-                  provider: data.provider ?? "dummy",
-                  domains: data.domains ?? [],
-                  domains_raw: conv.arrToStr(data.domains ?? []),
-                  access_id: data.access_id ?? "",
-                  access_secret: data.access_secret ?? "",
-                  webhook_url: data.webhook_url ?? "",
-                  webhook_method: data.webhook_method,
-                  webhook_request_type: data.webhook_request_type,
-                  webhook_request_body: data.webhook_request_body ?? "",
-                  webhook_headers: data.webhook_headers ?? "",
+                  max_retries: source.max_retries ?? 3,
+                  enable_ipv4: source.enable_ipv4 ?? false,
+                  enable_ipv6: source.enable_ipv6 ?? false,
+                  name: source.name ?? "",
+                  provider: source.provider ?? "dummy",
+                  domains: source.domains ?? [],
+                  domains_raw: conv.arrToStr(source.domains ?? []),
+                  access_id: source.access_id ?? "",
+                  access_secret: source.access_secret ?? "",
+                  webhook_url: source.webhook_url ?? "",
+                  webhook_method: source.webhook_method,
+                  webhook_request_type: source.webhook_request_type,
+                  webhook_request_body: source.webhook_request_body ?? "",
+                  webhook_headers: source.webhook_headers ?? "",
               }
             : {
                   max_retries: 3,
@@ -106,13 +106,27 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
                   webhook_request_type: undefined,
                   webhook_request_body: "",
                   webhook_headers: "",
-              },
+              }
+
+    const form = useForm<DDNSFormInput, unknown, DDNSFormData>({
+        resolver: zodResolver(ddnsFormSchema),
+        defaultValues: formValuesOf(data),
         resetOptions: {
             keepDefaultValues: false,
         },
     })
 
     const [open, setOpen] = useState(false)
+
+    // 编辑弹窗每次打开都要用当前这一行的数据重置表单。表单的初始值只在组件挂载时
+    // 读取一次，而这个组件会跨列表刷新一直存活：不重置的话，保存后再打开看到的
+    // 还是修改前的旧值，直接保存就把新数据盖回去了。
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen && data) {
+            form.reset(formValuesOf(data))
+        }
+        setOpen(nextOpen)
+    }
 
     const onSubmit = async (values: DDNSFormData) => {
         try {
@@ -135,7 +149,7 @@ export const DDNSCard: React.FC<DDNSCardProps> = ({ data, providers, mutate }) =
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>

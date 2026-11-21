@@ -44,23 +44,37 @@ const notificationGroupFormSchema = z.object({
 
 export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof notificationGroupFormSchema>>({
-        resolver: zodResolver(notificationGroupFormSchema),
-        defaultValues: data
+    // 表单要显示的值。打开编辑弹窗时会用它重置表单（见 handleOpenChange）。
+    const formValuesOf = (source: typeof data) =>
+        source
             ? {
-                  name: data.group.name,
-                  notifications: data.notifications,
+                  name: source.group.name,
+                  notifications: source.notifications,
               }
             : {
                   name: "",
                   notifications: [],
-              },
+              }
+
+    const form = useForm<z.infer<typeof notificationGroupFormSchema>>({
+        resolver: zodResolver(notificationGroupFormSchema),
+        defaultValues: formValuesOf(data),
         resetOptions: {
             keepDefaultValues: false,
         },
     })
 
     const [open, setOpen] = useState(false)
+
+    // 编辑弹窗每次打开都要用当前这一行的数据重置表单。表单的初始值只在组件挂载时
+    // 读取一次，而这个组件会跨列表刷新一直存活：不重置的话，保存后再打开看到的
+    // 还是修改前的旧值，直接保存就把新数据盖回去了。
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen && data) {
+            form.reset(formValuesOf(data))
+        }
+        setOpen(nextOpen)
+    }
 
     const onSubmit = async (values: z.infer<typeof notificationGroupFormSchema>) => {
         try {
@@ -88,7 +102,7 @@ export const NotificationGroupCard: React.FC<NotificationGroupCardProps> = ({ da
     })) || [{ value: "", label: "" }]
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>

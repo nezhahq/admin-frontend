@@ -68,18 +68,18 @@ type CronFormData = z.output<typeof cronFormSchema>
 
 export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<CronFormInput, unknown, CronFormData>({
-        resolver: zodResolver(cronFormSchema),
-        defaultValues: data
+    // 表单要显示的值。打开编辑弹窗时会用它重置表单（见 handleOpenChange）。
+    const formValuesOf = (source: typeof data) =>
+        source
             ? {
-                  task_type: data.task_type ?? 0,
-                  name: data.name ?? "",
-                  scheduler: data.scheduler ?? "",
-                  command: data.command ?? "",
-                  servers: data.servers ?? [],
-                  cover: data.cover ?? 0,
-                  push_successful: data.push_successful ?? false,
-                  notification_group_id: data.notification_group_id ?? 0,
+                  task_type: source.task_type ?? 0,
+                  name: source.name ?? "",
+                  scheduler: source.scheduler ?? "",
+                  command: source.command ?? "",
+                  servers: source.servers ?? [],
+                  cover: source.cover ?? 0,
+                  push_successful: source.push_successful ?? false,
+                  notification_group_id: source.notification_group_id ?? 0,
               }
             : {
                   task_type: 0,
@@ -90,13 +90,27 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                   cover: 0,
                   push_successful: false,
                   notification_group_id: 0,
-              },
+              }
+
+    const form = useForm<CronFormInput, unknown, CronFormData>({
+        resolver: zodResolver(cronFormSchema),
+        defaultValues: formValuesOf(data),
         resetOptions: {
             keepDefaultValues: false,
         },
     })
 
     const [open, setOpen] = useState(false)
+
+    // 编辑弹窗每次打开都要用当前这一行的数据重置表单。表单的初始值只在组件挂载时
+    // 读取一次，而这个组件会跨列表刷新一直存活：不重置的话，保存后再打开看到的
+    // 还是修改前的旧值，直接保存就把新数据盖回去了。
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen && data) {
+            form.reset(formValuesOf(data))
+        }
+        setOpen(nextOpen)
+    }
 
     const onSubmit = async (values: CronFormData) => {
         try {
@@ -130,7 +144,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
     })) || [{ value: "", label: "" }]
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>

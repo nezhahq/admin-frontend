@@ -51,15 +51,15 @@ type NatFormData = z.output<typeof natFormSchema>
 
 export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<NatFormInput, unknown, NatFormData>({
-        resolver: zodResolver(natFormSchema),
-        defaultValues: data
+    // 表单要显示的值。打开编辑弹窗时会用它重置表单（见 handleOpenChange）。
+    const formValuesOf = (source: typeof data) =>
+        source
             ? {
-                  name: data.name ?? "",
-                  enabled: data.enabled ?? false,
-                  server_id: data.server_id ?? 0,
-                  host: data.host ?? "",
-                  domain: data.domain ?? "",
+                  name: source.name ?? "",
+                  enabled: source.enabled ?? false,
+                  server_id: source.server_id ?? 0,
+                  host: source.host ?? "",
+                  domain: source.domain ?? "",
               }
             : {
                   name: "",
@@ -67,13 +67,27 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                   server_id: 0,
                   host: "",
                   domain: "",
-              },
+              }
+
+    const form = useForm<NatFormInput, unknown, NatFormData>({
+        resolver: zodResolver(natFormSchema),
+        defaultValues: formValuesOf(data),
         resetOptions: {
             keepDefaultValues: false,
         },
     })
 
     const [open, setOpen] = useState(false)
+
+    // 编辑弹窗每次打开都要用当前这一行的数据重置表单。表单的初始值只在组件挂载时
+    // 读取一次，而这个组件会跨列表刷新一直存活：不重置的话，保存后再打开看到的
+    // 还是修改前的旧值，直接保存就把新数据盖回去了。
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen && data) {
+            form.reset(formValuesOf(data))
+        }
+        setOpen(nextOpen)
+    }
 
     const onSubmit = async (values: NatFormData) => {
         try {
@@ -96,7 +110,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
