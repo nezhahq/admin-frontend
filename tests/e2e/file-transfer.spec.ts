@@ -130,269 +130,346 @@ function expectStoredByAgent(directory: string, name: string, expected: Buffer) 
     expect(sha256(stored), name + ": content on the Agent").toBe(sha256(expected))
 }
 
-test.describe("file manager transfers through the real Agent", () => {
-    // The listing only renders the rows that fit on screen; a tall viewport keeps
-    // every fixture of a test in the page.
-    test.use({ viewport: { width: 1280, height: 2000 } })
+// The frontend negotiates a protocol with typed frames when the Agent supports
+// it and falls back to the old unframed one otherwise. Every case runs in both:
+// "legacy" uses the frontend's override so the old path stays covered while the
+// Agent under test is a current one.
+const fileManagerProtocols = ["framed", "legacy"] as const
 
-    test("lists a directory, enters a subdirectory and returns", async ({ adminPage: page }) => {
-        serveFromAgent("listed.txt", Buffer.from("listed"))
-        serveFromAgent("名称 with spaces é.txt", Buffer.from("unicode name"))
-        await openFileManager(page)
-        await goToDirectory(page, agentDirectory)
+for (const protocol of fileManagerProtocols) {
+    test.describe(
+        "file manager transfers through the real Agent (" + protocol + " protocol)",
+        () => {
+            test.beforeEach(async ({ adminPage: page }) => {
+                if (protocol === "legacy") {
+                    await page.addInitScript(() => {
+                        window.localStorage.setItem("nezha-fm-legacy-protocol", "1")
+                    })
+                }
+            })
 
-        await expect(fileRow(page, "listed.txt")).toBeVisible()
-        await expect(fileRow(page, "名称 with spaces é.txt")).toBeVisible()
-        // Only files can be downloaded.
-        await expect(
-            fileRow(page, "listed.txt").locator("button:has(svg.lucide-download)"),
-        ).toHaveCount(1)
-        await expect(
-            fileRow(page, "nested directory").locator("button:has(svg.lucide-download)"),
-        ).toHaveCount(0)
+            // The listing only renders the rows that fit on screen; a tall viewport keeps
+            // every fixture of a test in the page.
+            test.use({ viewport: { width: 1280, height: 2000 } })
 
-        await fileRow(page, "nested directory").click()
-        await expect(fileRow(page, "inside.txt")).toBeVisible()
-        await expect(fileRow(page, "listed.txt")).toHaveCount(0)
+            test("lists a directory, enters a subdirectory and returns", async ({
+                adminPage: page,
+            }) => {
+                serveFromAgent("listed.txt", Buffer.from("listed"))
+                serveFromAgent("名称 with spaces é.txt", Buffer.from("unicode name"))
+                await openFileManager(page)
+                await goToDirectory(page, agentDirectory)
 
-        await goToDirectory(page, agentDirectory)
-        await expect(fileRow(page, "listed.txt")).toBeVisible()
-        await expect(fileRow(page, "inside.txt")).toHaveCount(0)
-    })
+                await expect(fileRow(page, "listed.txt")).toBeVisible()
+                await expect(fileRow(page, "名称 with spaces é.txt")).toBeVisible()
+                // Only files can be downloaded.
+                await expect(
+                    fileRow(page, "listed.txt").locator("button:has(svg.lucide-download)"),
+                ).toHaveCount(1)
+                await expect(
+                    fileRow(page, "nested directory").locator("button:has(svg.lucide-download)"),
+                ).toHaveCount(0)
 
-    test("downloads arrive byte for byte at every chunk boundary", async ({ adminPage: page }) => {
-        const files: [string, Buffer][] = [
-            ["one-byte.bin", serveFromAgent("one-byte.bin", Buffer.from([0x7f]))],
-            ["small.txt", serveFromAgent("small.txt", Buffer.from("a small text file\n"))],
-            [
-                "one-chunk-minus-one.bin",
-                serveFromAgent("one-chunk-minus-one.bin", randomBytes(chunkBytes - 1)),
-            ],
-            [
-                "exactly-one-chunk.bin",
-                serveFromAgent("exactly-one-chunk.bin", randomBytes(chunkBytes)),
-            ],
-            // The last chunk is shorter than the 4-byte frame marker.
-            [
-                "one-chunk-plus-two.bin",
-                serveFromAgent("one-chunk-plus-two.bin", randomBytes(chunkBytes + 2)),
-            ],
-            [
-                "exactly-three-chunks.bin",
-                serveFromAgent("exactly-three-chunks.bin", randomBytes(3 * chunkBytes)),
-            ],
-            [
-                "three-chunks-plus-seven.bin",
-                serveFromAgent("three-chunks-plus-seven.bin", randomBytes(3 * chunkBytes + 7)),
-            ],
-            ["名称 with spaces é.bin", serveFromAgent("名称 with spaces é.bin", randomBytes(4096))],
-        ]
-        await openFileManager(page)
-        await goToDirectory(page, agentDirectory)
+                await fileRow(page, "nested directory").click()
+                await expect(fileRow(page, "inside.txt")).toBeVisible()
+                await expect(fileRow(page, "listed.txt")).toHaveCount(0)
 
-        // All on one connection, one after another: each download has to leave
-        // the connection ready for the next.
-        for (const [name, content] of files) {
-            await expect(fileRow(page, name)).toBeVisible()
-            await expectDownloadMatches(page, name, content)
-        }
-    })
+                await goToDirectory(page, agentDirectory)
+                await expect(fileRow(page, "listed.txt")).toBeVisible()
+                await expect(fileRow(page, "inside.txt")).toHaveCount(0)
+            })
 
-    test("file content that looks like a protocol frame is still file content", async ({
-        adminPage: page,
-    }) => {
-        // Every chunk of this file starts with the error marker: the first full
-        // chunk, the second full chunk and the 5-byte tail.
-        const everyChunkStartsWithErrorMarker = randomBytes(2 * chunkBytes + 5)
-        errorMarker.copy(everyChunkStartsWithErrorMarker, 0)
-        errorMarker.copy(everyChunkStartsWithErrorMarker, chunkBytes)
-        errorMarker.copy(everyChunkStartsWithErrorMarker, 2 * chunkBytes)
-        const files: [string, Buffer][] = [
-            [
-                "every-chunk-starts-with-NERR.bin",
-                serveFromAgent("every-chunk-starts-with-NERR.bin", everyChunkStartsWithErrorMarker),
-            ],
-            [
-                "short-text-starting-with-NERR.txt",
-                serveFromAgent(
-                    "short-text-starting-with-NERR.txt",
-                    Buffer.from("NERR is how this ordinary text file begins"),
-                ),
-            ],
-            ["only-the-marker.bin", serveFromAgent("only-the-marker.bin", Buffer.from("NERR"))],
-            // Markers of the other frame types, as the whole file and after a chunk boundary.
-            [
-                "starts-with-NZTD.bin",
-                serveFromAgent(
-                    "starts-with-NZTD.bin",
-                    Buffer.concat([Buffer.from("NZTD"), randomBytes(64)]),
-                ),
-            ],
-            [
-                "starts-with-NZFN.bin",
-                serveFromAgent(
-                    "starts-with-NZFN.bin",
-                    Buffer.concat([
-                        Buffer.from("NZFN"),
-                        randomBytes(chunkBytes - 4),
-                        // Exactly at the start of the second chunk.
-                        Buffer.from("NZFN"),
-                        randomBytes(9),
-                    ]),
-                ),
-            ],
-            [
-                "starts-with-NZUP.bin",
-                serveFromAgent(
-                    "starts-with-NZUP.bin",
-                    Buffer.concat([
-                        Buffer.from("NZUP"),
-                        randomBytes(chunkBytes - 4),
-                        Buffer.from("NZUP"),
-                    ]),
-                ),
-            ],
-        ]
-        await openFileManager(page)
-        await goToDirectory(page, agentDirectory)
+            test("downloads arrive byte for byte at every chunk boundary", async ({
+                adminPage: page,
+            }) => {
+                const files: [string, Buffer][] = [
+                    ["one-byte.bin", serveFromAgent("one-byte.bin", Buffer.from([0x7f]))],
+                    ["small.txt", serveFromAgent("small.txt", Buffer.from("a small text file\n"))],
+                    [
+                        "one-chunk-minus-one.bin",
+                        serveFromAgent("one-chunk-minus-one.bin", randomBytes(chunkBytes - 1)),
+                    ],
+                    [
+                        "exactly-one-chunk.bin",
+                        serveFromAgent("exactly-one-chunk.bin", randomBytes(chunkBytes)),
+                    ],
+                    // The last chunk is shorter than the 4-byte frame marker.
+                    [
+                        "one-chunk-plus-two.bin",
+                        serveFromAgent("one-chunk-plus-two.bin", randomBytes(chunkBytes + 2)),
+                    ],
+                    [
+                        "exactly-three-chunks.bin",
+                        serveFromAgent("exactly-three-chunks.bin", randomBytes(3 * chunkBytes)),
+                    ],
+                    [
+                        "three-chunks-plus-seven.bin",
+                        serveFromAgent(
+                            "three-chunks-plus-seven.bin",
+                            randomBytes(3 * chunkBytes + 7),
+                        ),
+                    ],
+                    [
+                        "名称 with spaces é.bin",
+                        serveFromAgent("名称 with spaces é.bin", randomBytes(4096)),
+                    ],
+                ]
+                await openFileManager(page)
+                await goToDirectory(page, agentDirectory)
 
-        for (const [name, content] of files) {
-            await expect(fileRow(page, name)).toBeVisible()
-            await expectDownloadMatches(page, name, content)
-        }
-        await expect(page.getByText("FM Error")).toHaveCount(0)
+                // All on one connection, one after another: each download has to leave
+                // the connection ready for the next.
+                for (const [name, content] of files) {
+                    await expect(fileRow(page, name)).toBeVisible()
+                    await expectDownloadMatches(page, name, content)
+                }
+            })
 
-        // The connection still speaks the protocol afterwards.
-        await fileRow(page, "nested directory").click()
-        await expect(fileRow(page, "inside.txt")).toBeVisible()
-    })
+            test("file content that looks like a protocol frame is still file content", async ({
+                adminPage: page,
+            }) => {
+                // Every chunk of this file starts with the error marker: the first full
+                // chunk, the second full chunk and the 5-byte tail.
+                const everyChunkStartsWithErrorMarker = randomBytes(2 * chunkBytes + 5)
+                errorMarker.copy(everyChunkStartsWithErrorMarker, 0)
+                errorMarker.copy(everyChunkStartsWithErrorMarker, chunkBytes)
+                errorMarker.copy(everyChunkStartsWithErrorMarker, 2 * chunkBytes)
+                const files: [string, Buffer][] = [
+                    [
+                        "every-chunk-starts-with-NERR.bin",
+                        serveFromAgent(
+                            "every-chunk-starts-with-NERR.bin",
+                            everyChunkStartsWithErrorMarker,
+                        ),
+                    ],
+                    [
+                        "short-text-starting-with-NERR.txt",
+                        serveFromAgent(
+                            "short-text-starting-with-NERR.txt",
+                            Buffer.from("NERR is how this ordinary text file begins"),
+                        ),
+                    ],
+                    [
+                        "only-the-marker.bin",
+                        serveFromAgent("only-the-marker.bin", Buffer.from("NERR")),
+                    ],
+                    // Markers of the other frame types, as the whole file and after a chunk boundary.
+                    [
+                        "starts-with-NZTD.bin",
+                        serveFromAgent(
+                            "starts-with-NZTD.bin",
+                            Buffer.concat([Buffer.from("NZTD"), randomBytes(64)]),
+                        ),
+                    ],
+                    [
+                        "starts-with-NZFN.bin",
+                        serveFromAgent(
+                            "starts-with-NZFN.bin",
+                            Buffer.concat([
+                                Buffer.from("NZFN"),
+                                randomBytes(chunkBytes - 4),
+                                // Exactly at the start of the second chunk.
+                                Buffer.from("NZFN"),
+                                randomBytes(9),
+                            ]),
+                        ),
+                    ],
+                    [
+                        "starts-with-NZUP.bin",
+                        serveFromAgent(
+                            "starts-with-NZUP.bin",
+                            Buffer.concat([
+                                Buffer.from("NZUP"),
+                                randomBytes(chunkBytes - 4),
+                                Buffer.from("NZUP"),
+                            ]),
+                        ),
+                    ],
+                ]
+                await openFileManager(page)
+                await goToDirectory(page, agentDirectory)
 
-    test("downloading the same name again returns the current content, shorter or longer", async ({
-        adminPage: page,
-    }) => {
-        const longer = serveFromAgent("rewritten.bin", randomBytes(2 * chunkBytes + 3))
-        await openFileManager(page)
-        await goToDirectory(page, agentDirectory)
-        await expectDownloadMatches(page, "rewritten.bin", longer)
+                for (const [name, content] of files) {
+                    await expect(fileRow(page, name)).toBeVisible()
+                    await expectDownloadMatches(page, name, content)
+                }
+                await expect(page.getByText("FM Error")).toHaveCount(0)
 
-        // The browser keeps a temporary file per name; a shorter file must not
-        // come back with the tail of the previous download.
-        const shorter = serveFromAgent("rewritten.bin", randomBytes(1000))
-        await expectDownloadMatches(page, "rewritten.bin", shorter)
+                // The connection still speaks the protocol afterwards.
+                await fileRow(page, "nested directory").click()
+                await expect(fileRow(page, "inside.txt")).toBeVisible()
+            })
 
-        const longest = serveFromAgent("rewritten.bin", randomBytes(3 * chunkBytes + 1))
-        await expectDownloadMatches(page, "rewritten.bin", longest)
-    })
+            test("downloading the same name again returns the current content, shorter or longer", async ({
+                adminPage: page,
+            }) => {
+                const longer = serveFromAgent("rewritten.bin", randomBytes(2 * chunkBytes + 3))
+                await openFileManager(page)
+                await goToDirectory(page, agentDirectory)
+                await expectDownloadMatches(page, "rewritten.bin", longer)
 
-    test("an Agent error ends the download and the connection keeps working", async ({
-        adminPage: page,
-    }) => {
-        serveFromAgent("removed-after-listing.bin", randomBytes(2048))
-        const survivor = serveFromAgent("still-here.bin", randomBytes(chunkBytes + 11))
-        serveFromAgent("empty.bin", Buffer.alloc(0))
-        await openFileManager(page)
-        await goToDirectory(page, agentDirectory)
-        await expect(fileRow(page, "removed-after-listing.bin")).toBeVisible()
+                // The browser keeps a temporary file per name; a shorter file must not
+                // come back with the tail of the previous download.
+                const shorter = serveFromAgent("rewritten.bin", randomBytes(1000))
+                await expectDownloadMatches(page, "rewritten.bin", shorter)
 
-        unlinkSync(path.join(agentDirectory, "removed-after-listing.bin"))
-        await fileRow(page, "removed-after-listing.bin")
-            .locator("button:has(svg.lucide-download)")
-            .click()
+                const longest = serveFromAgent("rewritten.bin", randomBytes(3 * chunkBytes + 1))
+                await expectDownloadMatches(page, "rewritten.bin", longest)
+            })
 
-        await expect(page.getByText("FM Error").first()).toBeVisible()
-        await expect(page.getByText("Downloading...")).toBeHidden()
+            test("an Agent error ends the download and the connection keeps working", async ({
+                adminPage: page,
+            }) => {
+                serveFromAgent("removed-after-listing.bin", randomBytes(2048))
+                const survivor = serveFromAgent("still-here.bin", randomBytes(chunkBytes + 11))
+                serveFromAgent("empty.bin", Buffer.alloc(0))
+                await openFileManager(page)
+                await goToDirectory(page, agentDirectory)
+                await expect(fileRow(page, "removed-after-listing.bin")).toBeVisible()
 
-        // The Agent refuses an empty file with an error frame as well.
-        await fileRow(page, "empty.bin").locator("button:has(svg.lucide-download)").click()
-        await expect(page.getByText("FM Error")).toHaveCount(2)
-        await expect(page.getByText("Downloading...")).toBeHidden()
+                unlinkSync(path.join(agentDirectory, "removed-after-listing.bin"))
+                await fileRow(page, "removed-after-listing.bin")
+                    .locator("button:has(svg.lucide-download)")
+                    .click()
 
-        // Nothing of the failed transfer may leak into what follows.
-        await expectDownloadMatches(page, "still-here.bin", survivor)
-        await refreshListing(page)
-        await expect(fileRow(page, "removed-after-listing.bin")).toHaveCount(0)
-        await expect(fileRow(page, "still-here.bin")).toBeVisible()
-    })
+                await expect(page.getByText("FM Error").first()).toBeVisible()
+                await expect(page.getByText("Downloading...")).toBeHidden()
 
-    test("uploads are stored byte for byte at every chunk boundary", async ({
-        adminPage: page,
-    }) => {
-        const uploadTarget = path.join(agentDirectory, "upload target")
-        mkdirSync(uploadTarget)
-        const everyChunkStartsWithErrorMarker = randomBytes(2 * chunkBytes + 5)
-        errorMarker.copy(everyChunkStartsWithErrorMarker, 0)
-        errorMarker.copy(everyChunkStartsWithErrorMarker, chunkBytes)
-        errorMarker.copy(everyChunkStartsWithErrorMarker, 2 * chunkBytes)
-        const files: [string, Buffer][] = [
-            ["uploaded-one-byte.bin", Buffer.from([0x01])],
-            ["uploaded-small.txt", Buffer.from("uploaded text\n")],
-            ["uploaded-exactly-one-chunk.bin", randomBytes(chunkBytes)],
-            ["uploaded-one-chunk-plus-two.bin", randomBytes(chunkBytes + 2)],
-            ["uploaded-three-chunks-plus-seven.bin", randomBytes(3 * chunkBytes + 7)],
-            ["uploaded-every-chunk-starts-with-NERR.bin", everyChunkStartsWithErrorMarker],
-            ["上传 with spaces é.bin", randomBytes(4096)],
-        ]
-        await openFileManager(page)
-        await goToDirectory(page, uploadTarget)
+                if (protocol === "legacy") {
+                    // Without an end frame an empty file cannot be told from a stalled
+                    // one, so the Agent refuses it with an error frame.
+                    await fileRow(page, "empty.bin")
+                        .locator("button:has(svg.lucide-download)")
+                        .click()
+                    await expect(page.getByText("FM Error")).toHaveCount(2)
+                    await expect(page.getByText("Downloading...")).toBeHidden()
+                } else {
+                    // The framed protocol announces the end, so an empty file downloads.
+                    await expectDownloadMatches(page, "empty.bin", Buffer.alloc(0))
+                }
 
-        for (const [name, content] of files) {
-            await upload(page, name, content)
-            await expect(fileRow(page, name), name + " must appear in the listing").toBeVisible()
-            expectStoredByAgent(uploadTarget, name, content)
-        }
-        await expect(page.getByText("FM Error")).toHaveCount(0)
-    })
+                // Nothing of the failed transfer may leak into what follows.
+                await expectDownloadMatches(page, "still-here.bin", survivor)
+                await refreshListing(page)
+                await expect(fileRow(page, "removed-after-listing.bin")).toHaveCount(0)
+                await expect(fileRow(page, "still-here.bin")).toBeVisible()
+            })
 
-    test("an upload the Agent cannot store fails cleanly and the connection keeps working", async ({
-        adminPage: page,
-    }) => {
-        // A directory with the upload's name makes the Agent fail to create the file.
-        const blockedName = "taken-by-a-directory"
-        mkdirSync(path.join(agentDirectory, blockedName))
-        await openFileManager(page)
-        await goToDirectory(page, agentDirectory)
-        await expect(fileRow(page, blockedName)).toBeVisible()
+            test("uploads are stored byte for byte at every chunk boundary", async ({
+                adminPage: page,
+            }) => {
+                const uploadTarget = path.join(agentDirectory, "upload target")
+                mkdirSync(uploadTarget)
+                const everyChunkStartsWithErrorMarker = randomBytes(2 * chunkBytes + 5)
+                errorMarker.copy(everyChunkStartsWithErrorMarker, 0)
+                errorMarker.copy(everyChunkStartsWithErrorMarker, chunkBytes)
+                errorMarker.copy(everyChunkStartsWithErrorMarker, 2 * chunkBytes)
+                const files: [string, Buffer][] = [
+                    ["uploaded-one-byte.bin", Buffer.from([0x01])],
+                    ["uploaded-small.txt", Buffer.from("uploaded text\n")],
+                    ["uploaded-exactly-one-chunk.bin", randomBytes(chunkBytes)],
+                    ["uploaded-one-chunk-plus-two.bin", randomBytes(chunkBytes + 2)],
+                    ["uploaded-three-chunks-plus-seven.bin", randomBytes(3 * chunkBytes + 7)],
+                    ["uploaded-every-chunk-starts-with-NERR.bin", everyChunkStartsWithErrorMarker],
+                    ["上传 with spaces é.bin", randomBytes(4096)],
+                ]
+                await openFileManager(page)
+                await goToDirectory(page, uploadTarget)
 
-        // Upload content has no frame header. If the Agent stopped reading after
-        // the failure, this content would reach its command loop and read as
-        // "list the nested directory", and the listing below would change.
-        const contentReadingAsListCommand = Buffer.concat([
-            Buffer.from([0x00]),
-            Buffer.from(path.join(agentDirectory, "nested directory")),
-        ])
-        await upload(page, blockedName, contentReadingAsListCommand)
+                for (const [name, content] of files) {
+                    await upload(page, name, content)
+                    await expect(
+                        fileRow(page, name),
+                        name + " must appear in the listing",
+                    ).toBeVisible()
+                    expectStoredByAgent(uploadTarget, name, content)
+                }
+                await expect(page.getByText("FM Error")).toHaveCount(0)
+            })
 
-        await expect(page.getByText("FM Error").first()).toBeVisible()
-        expect(statSync(path.join(agentDirectory, blockedName)).isDirectory()).toBe(true)
-        await expect(fileRow(page, blockedName)).toBeVisible()
-        await expect(fileRow(page, "inside.txt")).toHaveCount(0)
+            test("an upload the Agent cannot store fails cleanly and the connection keeps working", async ({
+                adminPage: page,
+            }) => {
+                // A directory with the upload's name makes the Agent fail to create the file.
+                const blockedName = "taken-by-a-directory"
+                mkdirSync(path.join(agentDirectory, blockedName))
+                await openFileManager(page)
+                await goToDirectory(page, agentDirectory)
+                await expect(fileRow(page, blockedName)).toBeVisible()
 
-        // The same connection accepts the next upload and stores it intact.
-        const next = randomBytes(chunkBytes + 3)
-        await upload(page, "after-the-failure.bin", next)
-        await expect(fileRow(page, "after-the-failure.bin")).toBeVisible()
-        expectStoredByAgent(agentDirectory, "after-the-failure.bin", next)
-        await expect(fileRow(page, "inside.txt")).toHaveCount(0)
-    })
+                // Upload content has no frame header. If the Agent stopped reading after
+                // the failure, this content would reach its command loop and read as
+                // "list the nested directory", and the listing below would change.
+                const contentReadingAsListCommand = Buffer.concat([
+                    Buffer.from([0x00]),
+                    Buffer.from(path.join(agentDirectory, "nested directory")),
+                ])
+                await upload(page, blockedName, contentReadingAsListCommand)
 
-    test("an upload replaces an existing file completely and can be downloaded back", async ({
-        adminPage: page,
-    }) => {
-        const roundTripDirectory = path.join(agentDirectory, "round trip")
-        mkdirSync(roundTripDirectory)
-        writeFileSync(path.join(roundTripDirectory, "replaced.bin"), randomBytes(2 * chunkBytes))
-        await openFileManager(page)
-        await goToDirectory(page, roundTripDirectory)
-        await expect(fileRow(page, "replaced.bin")).toBeVisible()
+                await expect(page.getByText("FM Error").first()).toBeVisible()
+                expect(statSync(path.join(agentDirectory, blockedName)).isDirectory()).toBe(true)
+                await expect(fileRow(page, blockedName)).toBeVisible()
+                await expect(fileRow(page, "inside.txt")).toHaveCount(0)
 
-        const replacement = randomBytes(chunkBytes + 513)
-        await upload(page, "replaced.bin", replacement)
-        expect(statSync(path.join(roundTripDirectory, "replaced.bin")).size).toBe(
-            replacement.byteLength,
-        )
-        expectStoredByAgent(roundTripDirectory, "replaced.bin", replacement)
+                // The same connection accepts the next upload and stores it intact.
+                const next = randomBytes(chunkBytes + 3)
+                await upload(page, "after-the-failure.bin", next)
+                await expect(fileRow(page, "after-the-failure.bin")).toBeVisible()
+                expectStoredByAgent(agentDirectory, "after-the-failure.bin", next)
+                await expect(fileRow(page, "inside.txt")).toHaveCount(0)
+            })
 
-        // Upload and download share the connection: what went up comes back.
-        await expectDownloadMatches(page, "replaced.bin", replacement)
-    })
-})
+            test("a directory listing larger than one relay frame is shown", async ({
+                adminPage: page,
+            }) => {
+                test.skip(
+                    protocol === "legacy",
+                    "the old protocol puts the whole listing into one frame; the dashboard splits it above 1 MiB",
+                )
+                // About 1.4 MiB of names: the dashboard relays at most 1 MiB per frame.
+                const crowded = path.join(agentDirectory, "crowded")
+                mkdirSync(crowded)
+                const filler = "n".repeat(190)
+                for (let index = 0; index < 7000; index++) {
+                    writeFileSync(path.join(crowded, filler + String(index).padStart(5, "0")), "")
+                }
+                const content = serveFromAgent(
+                    path.join("crowded", "000-first.bin"),
+                    randomBytes(2048),
+                )
+                await openFileManager(page)
+                await goToDirectory(page, crowded)
+
+                await expect(fileRow(page, "000-first.bin")).toBeVisible({ timeout: 30_000 })
+                await expect(fileRow(page, filler + "00000")).toBeVisible()
+                await expect(page.getByText("FM Error")).toHaveCount(0)
+                // The connection still transfers files after the paged listing.
+                await expectDownloadMatches(page, "000-first.bin", content)
+            })
+
+            test("an upload replaces an existing file completely and can be downloaded back", async ({
+                adminPage: page,
+            }) => {
+                const roundTripDirectory = path.join(agentDirectory, "round trip")
+                mkdirSync(roundTripDirectory)
+                writeFileSync(
+                    path.join(roundTripDirectory, "replaced.bin"),
+                    randomBytes(2 * chunkBytes),
+                )
+                await openFileManager(page)
+                await goToDirectory(page, roundTripDirectory)
+                await expect(fileRow(page, "replaced.bin")).toBeVisible()
+
+                const replacement = randomBytes(chunkBytes + 513)
+                await upload(page, "replaced.bin", replacement)
+                expect(statSync(path.join(roundTripDirectory, "replaced.bin")).size).toBe(
+                    replacement.byteLength,
+                )
+                expectStoredByAgent(roundTripDirectory, "replaced.bin", replacement)
+
+                // Upload and download share the connection: what went up comes back.
+                await expectDownloadMatches(page, "replaced.bin", replacement)
+            })
+        },
+    )
+}

@@ -106,6 +106,26 @@ vi.mock("@/lib/utils", () => ({
 
             return { path: new TextDecoder().decode(pathBytes), fmList: [] }
         },
+        // Same layout as the real parser in src/lib/utils.ts.
+        parseFMListPage: (buf: ArrayBufferLike) => {
+            const view = new DataView(buf)
+            const pathLength = view.getUint32(5, false)
+            let offset = 9 + pathLength
+            const entries: { type: number; name: string }[] = []
+            while (offset < view.byteLength) {
+                const nameLength = view.getUint16(offset + 1, false)
+                entries.push({
+                    type: view.getUint8(offset),
+                    name: new TextDecoder().decode(new Uint8Array(buf, offset + 3, nameLength)),
+                })
+                offset += 3 + nameLength
+            }
+            return {
+                path: new TextDecoder().decode(new Uint8Array(buf, 9, pathLength)),
+                entries,
+                isLastPage: (view.getUint8(4) & 1) !== 0,
+            }
+        },
         buildUploadHeader: () => new Uint8Array([2]).buffer,
         readFileAsArrayBuffer: async (blob: Blob) => blob.arrayBuffer(),
     },
@@ -504,5 +524,205 @@ test("a frame after the last chunk is a protocol frame even before the worker fi
         emitFromWorker({ type: FMWorkerOpcode.Error, error: "disk full" })
     })
     expect(toast).toHaveBeenLastCalledWith("FM Error", { description: "disk full" })
+    unmount()
+})
+
+const framedIdentifier = {
+    hello: [0x4e, 0x5a, 0x48, 0x49],
+    listingPage: [0x4e, 0x5a, 0x4c, 0x32],
+    downloadChunk: [0x4e, 0x5a, 0x44, 0x43],
+    downloadEnd: [0x4e, 0x5a, 0x44, 0x45],
+}
+
+const encodeListingPage = (path: string, names: [string, boolean][], isLastPage: boolean) => {
+    const encoder = new TextEncoder()
+    const pathBytes = encoder.encode(path)
+    const parts: number[] = [...framedIdentifier.listingPage, isLastPage ? 1 : 0]
+    parts.push(
+        (pathBytes.length >>> 24) & 0xff,
+        (pathBytes.length >>> 16) & 0xff,
+        (pathBytes.length >>> 8) & 0xff,
+        pathBytes.length & 0xff,
+        ...pathBytes,
+    )
+    for (const [name, isDirectory] of names) {
+        const nameBytes = encoder.encode(name)
+        parts.push(isDirectory ? 1 : 0, (nameBytes.length >>> 8) & 0xff, nameBytes.length & 0xff)
+        parts.push(...nameBytes)
+    }
+    return new Uint8Array(parts).buffer
+}
+
+const encodeDownloadEnd = (sentBytes: number) => {
+    const frame = new Uint8Array(12)
+    frame.set(framedIdentifier.downloadEnd, 0)
+    new DataView(frame.buffer).setBigUint64(4, BigInt(sentBytes), false)
+    return frame.buffer
+}
+
+const openFramedFileManager = async () => {
+    const opened = await openFileManager()
+    act(() => {
+        receive(opened.socket, new Uint8Array([...framedIdentifier.hello, 2]).buffer)
+    })
+    return opened
+}
+
+test("the connection greets the Agent before it asks for the listing", async () => {
+    const view = render(<FMComponent wsUrl="/ws/file/test" />)
+    await waitFor(() => {
+        expect(webSockets).toHaveLength(1)
+    })
+    const socket = webSockets[0]
+    act(() => {
+        socket.open()
+    })
+
+    expect(socket.sent).toHaveLength(2)
+    expect(Array.from(socket.sent[0] as Uint8Array)).toEqual([3, 2])
+    expect(decodeListPath(socket.sent[1])).toBe("")
+    view.unmount()
+})
+
+test("the legacy protocol override keeps the connection from greeting", async () => {
+    window.localStorage.setItem("nezha-fm-legacy-protocol", "1")
+    try {
+        const view = render(<FMComponent wsUrl="/ws/file/test" />)
+        await waitFor(() => {
+            expect(webSockets).toHaveLength(1)
+        })
+        const socket = webSockets[0]
+        act(() => {
+            socket.open()
+        })
+
+        expect(socket.sent).toHaveLength(1)
+        expect(decodeListPath(socket.sent[0])).toBe("")
+        view.unmount()
+    } finally {
+        window.localStorage.removeItem("nezha-fm-legacy-protocol")
+    }
+})
+
+// An Agent that does not know the greeting ignores it: its first frame is the
+// old listing, and the connection keeps speaking the old protocol.
+test("an Agent that ignores the greeting is spoken to in the old protocol", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFileManager()
+
+    act(() => {
+        receive(socket, encodeFileNameMessage("/from/an/old/agent"))
+    })
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe("/from/an/old/agent")
+    })
+    const unframedChunk = new Uint8Array([9, 8, 7]).buffer
+    act(() => {
+        receive(socket, encodeDownloadHeader(3))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+        receive(socket, unframedChunk)
+    })
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(
+            expect.objectContaining({ operation: 2, arrayBuffer: unframedChunk }),
+        )
+    })
+    expect(toast).not.toHaveBeenCalled()
+    unmount()
+})
+
+test("a framed listing is shown once its last page has arrived", async () => {
+    const { socket, unmount } = await openFramedFileManager()
+
+    act(() => {
+        receive(socket, encodeListingPage("/paged/listing", [["first.txt", false]], false))
+    })
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(socket.sent.map(decodeListPath)).not.toContain("/paged/listing")
+
+    act(() => {
+        receive(socket, encodeListingPage("/paged/listing", [["nested", true]], true))
+    })
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe("/paged/listing")
+    })
+    expect(toast).not.toHaveBeenCalled()
+    unmount()
+})
+
+// With typed frames a short chunk that begins with the error marker is content,
+// whatever its length, and the end frame closes the transfer.
+test("framed download chunks are written without their marker and need no length guessing", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFramedFileManager()
+    const contentStartingWithErrorMarker = [0x4e, 0x45, 0x52, 0x52, 0x21, 0x21, 0x21]
+    const chunk = new Uint8Array([
+        ...framedIdentifier.downloadChunk,
+        ...contentStartingWithErrorMarker,
+    ])
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(contentStartingWithErrorMarker.length + 100))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+        receive(socket, chunk.buffer)
+    })
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(expect.objectContaining({ operation: 2 }))
+    })
+    const written = postToWorker.mock.calls
+        .map(([message]) => message as { operation: number; arrayBuffer: ArrayBuffer })
+        .filter((message) => message.operation === 2)
+    expect(written).toHaveLength(1)
+    expect(Array.from(new Uint8Array(written[0].arrayBuffer))).toEqual(
+        contentStartingWithErrorMarker,
+    )
+    expect(toast).not.toHaveBeenCalled()
+    expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
+    unmount()
+})
+
+test("a framed download that ends short of its announced size is reported", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFramedFileManager()
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(10))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+        receive(socket, new Uint8Array([...framedIdentifier.downloadChunk, 1, 2, 3]).buffer)
+        receive(socket, encodeDownloadEnd(3))
+    })
+
+    await waitFor(() => {
+        expect(postToWorker).toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
+    })
+    expect(toast).toHaveBeenCalledWith("FM Error", expect.anything())
+
+    // The connection is ready for the next request.
+    act(() => {
+        receive(socket, encodeListingPage("/after/short/download", [], true))
+    })
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe("/after/short/download")
+    })
+    unmount()
+})
+
+test("a framed download of the announced size ends without an error", async () => {
+    const postToWorker = vi.spyOn(fmWorker, "postMessage")
+    const { socket, unmount } = await openFramedFileManager()
+
+    act(() => {
+        receive(socket, encodeDownloadHeader(3))
+        emitFromWorker({ type: FMWorkerOpcode.Progress })
+        receive(socket, new Uint8Array([...framedIdentifier.downloadChunk, 1, 2, 3]).buffer)
+        receive(socket, encodeDownloadEnd(3))
+        receive(socket, encodeListingPage("/after/complete/download", [], true))
+    })
+
+    await waitFor(() => {
+        expect(decodeListPath(socket.sent[socket.sent.length - 1])).toBe("/after/complete/download")
+    })
+    expect(toast).not.toHaveBeenCalled()
+    expect(postToWorker).not.toHaveBeenCalledWith(expect.objectContaining({ operation: 4 }))
     unmount()
 })

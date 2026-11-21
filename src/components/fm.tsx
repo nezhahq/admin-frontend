@@ -29,6 +29,7 @@ import { virtualizedTableFeatures } from "@/lib/table"
 import { copyToClipboard, fm, formatPath, fmWorker as worker } from "@/lib/utils"
 import {
     FMEntry,
+    FMFramedProtocolVersion,
     FMIdentifier,
     FMOpcode,
     FMWorkerData,
@@ -69,6 +70,10 @@ const uploadBufferLimitBytes = 8 * 1048576
 // agent 的错误帧是 4 字节标识加一条错误文本（路径、系统错误信息），远小于这个长度；
 // 而文件分片除最后一片外都是 1MiB。
 const maxErrorFrameBytes = 16 * 1024
+
+// 排障开关：在浏览器 localStorage 里把这一项设为 "1"，文件管理就不再协商带帧头的
+// 协议，始终按旧协议工作。端到端测试也用它来覆盖旧协议这条路径。
+const legacyProtocolOverrideKey = "nezha-fm-legacy-protocol"
 
 const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
     if (a.length !== b.length) return false
@@ -171,6 +176,18 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
     const downloadRemainingBytes = useRef(0)
     const discardingDownloadChunks = useRef(false)
     const uploadAborted = useRef(false)
+    // 本连接是否协商成了带帧头的协议，null 表示还没收到对端的第一帧。
+    //
+    // 旧协议里文件内容是不带帧头的原始分片，只能靠长度猜一帧是内容还是错误；
+    // 下载没有结束帧；目录列表的文件名长度只有 1 字节、整个列表必须装进一帧。
+    // 带帧头的协议里 agent 发出的每一帧都以标识开头（见 FMIdentifier），
+    // 所以下面按标识分发，不再需要任何长度判断。
+    //
+    // 协商方式：连接建立后先发问候命令，紧接着照常发列目录命令。支持的 agent 先回
+    // 问候应答再回列表；旧 agent 不认识问候命令、不会应答，第一帧就是旧格式的列表，
+    // 本端据此继续用旧协议。不需要超时，也不需要面板参与（面板只原样转发）。
+    const framedProtocol = useRef<boolean | null>(null)
+    const listingPagesInProgress = useRef<FMEntry[]>([])
 
     const resetDownloadState = () => {
         firstChunk.current = true
@@ -272,6 +289,12 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
         ws.binaryType = "arraybuffer"
         let connectionClosed = false
         ws.onopen = () => {
+            if (window.localStorage.getItem(legacyProtocolOverrideKey) === "1") {
+                framedProtocol.current = false
+            } else {
+                framedProtocol.current = null
+                ws.send(new Uint8Array([FMOpcode.Hello, FMFramedProtocolVersion]))
+            }
             listFile()
         }
         ws.onclose = (e) => {
@@ -292,6 +315,69 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                 description: tRef.current("Results.UnExpectedError"),
             })
         }
+        // 带帧头的协议：每一帧按标识分发。
+        const handleFramedFrame = async (data: ArrayBufferLike, identifier: Uint8Array) => {
+            if (arraysEqual(identifier, FMIdentifier.error)) {
+                throw new Error(new TextDecoder("utf-8").decode(data.slice(4)))
+            }
+            if (arraysEqual(identifier, FMIdentifier.listingPage)) {
+                const page = fm.parseFMListPage(data)
+                listingPagesInProgress.current.push(...page.entries)
+                if (page.isLastPage) {
+                    setPath(page.path)
+                    setFMEntries(listingPagesInProgress.current)
+                    listingPagesInProgress.current = []
+                }
+                return
+            }
+            if (arraysEqual(identifier, FMIdentifier.file)) {
+                downloadRemainingBytes.current = Number(new DataView(data).getBigUint64(4, false))
+                discardingDownloadChunks.current = false
+                downloadActive.current = true
+                worker.postMessage({
+                    operation: 1,
+                    arrayBuffer: data,
+                    fileName: currentBasename.current,
+                })
+                return
+            }
+            if (arraysEqual(identifier, FMIdentifier.downloadChunk)) {
+                // 下载已经失败或被复位后，agent 仍会把剩余分片发完，直接丢弃。
+                if (!downloadActive.current || discardingDownloadChunks.current) return
+                downloadRemainingBytes.current -= data.byteLength - 4
+                if (!(await waitForHandleReady())) return
+                worker.postMessage({
+                    operation: 2,
+                    arrayBuffer: data.slice(4),
+                    fileName: currentBasename.current,
+                })
+                return
+            }
+            if (arraysEqual(identifier, FMIdentifier.downloadEnd)) {
+                if (!downloadActive.current) return
+                if (discardingDownloadChunks.current) {
+                    resetDownloadState()
+                    return
+                }
+                // 字节数对得上时 worker 会交出文件并关闭弹窗；对不上说明内容不完整。
+                if (downloadRemainingBytes.current !== 0) {
+                    worker.postMessage({ operation: 4 })
+                    resetDownloadState()
+                    setdOpen(false)
+                    toast("FM" + " " + tRef.current("Error"), {
+                        description: tRef.current("Results.UnExpectedError"),
+                    })
+                }
+                return
+            }
+            if (arraysEqual(identifier, FMIdentifier.complete)) {
+                setuOpen(false)
+                listFile()
+                return
+            }
+            throw new Error(tRef.current("Results.UnknownIdentifier"))
+        }
+
         const handleFrame = async (e: MessageEvent<ArrayBufferLike>) => {
             // 连接关闭时下载状态已经复位，还排在队列里的分片不能再处理：
             // 它们会被当成协议帧解析，逐个弹出“未知标识”错误。
@@ -299,6 +385,20 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
             try {
                 // 文件末尾的分片可能不足 4 字节，直接取标识会抛 RangeError。
                 const identifier = new Uint8Array(e.data, 0, Math.min(4, e.data.byteLength))
+                if (framedProtocol.current === null) {
+                    if (arraysEqual(identifier, FMIdentifier.hello)) {
+                        framedProtocol.current =
+                            e.data.byteLength >= 5 &&
+                            new Uint8Array(e.data)[4] >= FMFramedProtocolVersion
+                        return
+                    }
+                    // 旧 agent 忽略了问候，这一帧已经是它对列目录命令的回答。
+                    framedProtocol.current = false
+                }
+                if (framedProtocol.current) {
+                    await handleFramedFrame(e.data, identifier)
+                    return
+                }
                 // 文件内容是不带帧头的原始分片，分片开头完全可能恰好是错误标识的 4 个字节。
                 // 下载进行中只能靠长度区分：agent 每次读满 1MiB 就发一片，最后一片正好是
                 // 剩余字节数；错误帧则是“标识 + 一小段错误文本”。所以长度等于剩余字节数、

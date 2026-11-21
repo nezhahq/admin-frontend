@@ -101,6 +101,29 @@ export const fm = {
         return { path, fmList }
     },
 
+    // 带帧头的协议里目录列表的一页：
+    // 标识(4) + 标志(1，位 0 表示最后一页) + 路径长度(4) + 路径 + 条目…
+    // 条目 = 类型(1) + 文件名长度(2) + 文件名
+    parseFMListPage: (buf: ArrayBufferLike) => {
+        const dataView = new DataView(buf)
+        const isLastPage = (dataView.getUint8(4) & 0x01) !== 0
+        const pathLength = dataView.getUint32(5)
+        let offset = 9
+        const path = new TextDecoder("utf-8").decode(new Uint8Array(buf, offset, pathLength))
+        offset += pathLength
+
+        const entries: FMEntry[] = []
+        while (offset < dataView.byteLength) {
+            const type = dataView.getUint8(offset)
+            const nameLength = dataView.getUint16(offset + 1)
+            offset += 3
+            const name = new TextDecoder("utf-8").decode(new Uint8Array(buf, offset, nameLength))
+            offset += nameLength
+            entries.push({ type, name })
+        }
+        return { path, entries, isLastPage }
+    },
+
     buildUploadHeader: ({ path, file }: { path: string; file: File }) => {
         const filePath = `${path}/${file.name}`
 
