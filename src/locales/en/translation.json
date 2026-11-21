@@ -411,7 +411,9 @@
             "ScheduleLater": "Available after storage and the backup password are set up.",
             "NeedStorage": "configure S3 storage",
             "NeedPassword": "set the backup password",
-            "BackupDisabled": "Backups are disabled until you {{step}}."
+            "BackupDisabled": "Backups are disabled until you {{step}}.",
+            "RestoreTitle": "Restore from a backup file",
+            "RestoreDescription": "Already have a backup? Restore it from a .nzbak file and its password or recovery key, without setting up storage first."
         },
         "Storage": {
             "Title": "S3 storage",
@@ -539,12 +541,14 @@
             "Expired": "The check has expired. Run it again.",
             "Next": "Continue",
             "Back": "Back",
-            "ApplyWarning": "The current database and configuration will be replaced. A pre-restore backup is taken first. The dashboard restarts and every session is signed out.",
+            "ApplyWarning": "The current database and configuration will be replaced. The dashboard restarts and every session is signed out.",
             "ConfirmLabel": "Type the last {{length}} characters of the backup name",
             "LoginPassword": "Your login password",
             "ReauthNeeded": "For your security, sign in again (within the last 10 minutes) before applying a restore.",
             "SignInAgain": "Sign in again",
-            "Apply": "Replace current data and restart"
+            "Apply": "Replace current data and restart",
+            "PreRestoreBackup": "A backup of the current data is taken first (kept as a pre-restore backup).",
+            "NoPreRestoreBackup": "No pre-restore backup will be taken (storage or backup password is not set up). The current data cannot be recovered afterwards."
         },
         "Check": {
             "checksum": "Checksum matches",

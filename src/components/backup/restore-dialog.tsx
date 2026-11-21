@@ -162,15 +162,34 @@ export function RestoreDialog({
         if (tk) void cancelRestore(tk).catch(() => undefined)
     }
 
+    // Each check gets a generation number. Anything that changes what is
+    // being checked (another file, another source, closing) bumps it, so a
+    // response that arrives late is never shown and its staged restore is
+    // released instead of being applied by mistake.
+    const generation = useRef(0)
+    function invalidatePending() {
+        generation.current++
+        setBusy(false)
+        setProgress(null)
+    }
+
     // A new source starts a fresh dialog.
     useEffect(() => {
+        invalidatePending()
         releaseToken()
         resetAll()
     }, [source])
 
-    useEffect(() => () => releaseToken(), [])
+    useEffect(
+        () => () => {
+            generation.current++
+            releaseToken()
+        },
+        [],
+    )
 
     function close() {
+        invalidatePending()
         releaseToken()
         resetAll()
         onClose()
@@ -207,6 +226,8 @@ export function RestoreDialog({
             }
         }
         releaseToken()
+        const gen = ++generation.current
+        const current = () => gen === generation.current
         setBusy(true)
         setResult(null)
         try {
@@ -214,17 +235,28 @@ export function RestoreDialog({
             const res =
                 source.kind === "storage"
                     ? await prepareRestore(source.backup.name, source.backup.sha256, credential)
-                    : await prepareRestoreUpload(file as File, credential, (loaded, total) =>
-                          setProgress(total > 0 ? Math.round((loaded / total) * 100) : null),
-                      )
+                    : await prepareRestoreUpload(file as File, credential, (loaded, total) => {
+                          if (current())
+                              setProgress(total > 0 ? Math.round((loaded / total) * 100) : null)
+                      })
+            if (!current()) {
+                // Stale: the user switched files or closed the dialog meanwhile.
+                if (res?.restore_token) void cancelRestore(res.restore_token).catch(() => undefined)
+                return
+            }
             setResult(res)
             setAcked(new Set())
             setApplyKind(credKind)
         } catch (e) {
-            toast.error(t("Backup.Restore.CheckFailed"), { description: (e as Error).message })
+            if (current())
+                toast.error(t("Backup.Restore.CheckFailed"), {
+                    description: (e as Error).message,
+                })
         } finally {
-            setBusy(false)
-            setProgress(null)
+            if (current()) {
+                setBusy(false)
+                setProgress(null)
+            }
         }
     }
 
@@ -232,6 +264,9 @@ export function RestoreDialog({
     const allAcked = requiredAcks.every((c) => acked.has(c))
     const canContinue = !!result?.can_apply && !!token && !expired && allAcked
     const confirmWord = restoreConfirmWord(result?.name, result?.confirm_word_length ?? 6)
+    // The server takes a pre-restore backup only when storage and a key are
+    // set up; otherwise it says so with this warning.
+    const preRestoreSkipped = (result?.warnings ?? []).some((w) => w.code === "pre_restore_skipped")
     const requires = result?.apply_requires ?? { login_password: false, reauth_needed: false }
     const canApply =
         canContinue &&
@@ -296,9 +331,11 @@ export function RestoreDialog({
                                     type="file"
                                     accept=".nzbak"
                                     onChange={(e) => {
+                                        invalidatePending()
+                                        releaseToken()
                                         setFile(e.target.files?.[0] ?? null)
                                         setResult(null)
-                                        releaseToken()
+                                        setAcked(new Set())
                                     }}
                                 />
                                 <span className="text-muted-foreground text-xs">
@@ -361,7 +398,12 @@ export function RestoreDialog({
                             role="alert"
                             className="border-destructive bg-destructive/10 text-destructive rounded border p-3 text-sm"
                         >
-                            {t("Backup.Restore.ApplyWarning")}
+                            <p>{t("Backup.Restore.ApplyWarning")}</p>
+                            <p className="mt-1 font-medium" data-testid="restore-pre-backup">
+                                {preRestoreSkipped
+                                    ? t("Backup.Restore.NoPreRestoreBackup")
+                                    : t("Backup.Restore.PreRestoreBackup")}
+                            </p>
                         </div>
                         {remaining !== null && (
                             <p

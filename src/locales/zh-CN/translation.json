@@ -411,7 +411,9 @@
             "ScheduleLater": "配置好存储和备份密码后即可设置。",
             "NeedStorage": "配置 S3 存储",
             "NeedPassword": "设置备份密码",
-            "BackupDisabled": "需要先{{step}}，才能备份。"
+            "BackupDisabled": "需要先{{step}}，才能备份。",
+            "RestoreTitle": "从备份文件恢复",
+            "RestoreDescription": "已有备份？可以直接用 .nzbak 文件和对应的密码或恢复密钥恢复，不需要先配置存储。"
         },
         "Storage": {
             "Title": "S3 存储",
@@ -539,12 +541,14 @@
             "Expired": "检查结果已失效，请重新检查。",
             "Next": "下一步",
             "Back": "上一步",
-            "ApplyWarning": "当前的数据库和配置将被覆盖。执行前会自动备份一份当前数据。面板会重启，所有会话都将退出登录。",
+            "ApplyWarning": "当前的数据库和配置将被覆盖。面板会重启，所有会话都将退出登录。",
             "ConfirmLabel": "输入备份名的后 {{length}} 位",
             "LoginPassword": "你的登录密码",
             "ReauthNeeded": "为了安全，执行恢复前需要重新登录（10 分钟内登录过）。",
             "SignInAgain": "重新登录",
-            "Apply": "覆盖当前数据并重启面板"
+            "Apply": "覆盖当前数据并重启面板",
+            "PreRestoreBackup": "执行前会先备份一份当前数据（作为恢复前备份保留）。",
+            "NoPreRestoreBackup": "不会生成恢复前备份（尚未配置存储或备份密码），当前数据之后将无法找回。"
         },
         "Check": {
             "checksum": "校验值一致",

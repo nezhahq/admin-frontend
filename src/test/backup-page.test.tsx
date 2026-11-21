@@ -138,6 +138,9 @@ test("unconfigured dashboards are guided step by step and cannot back up", () =>
     )
     // the list is not requested before setup is complete
     expect(mocks.swr.mock.calls.some((c) => c[0] === "/api/v1/backup")).toBe(false)
+    // a fresh dashboard can still restore from a local file
+    fireEvent.click(screen.getByRole("button", { name: "Backup.Restore.FromUpload" }))
+    expect(screen.getByText("Backup.Restore.TitleUpload")).toBeTruthy()
 })
 
 test("password step appears once storage is configured", () => {

@@ -262,3 +262,79 @@ test("upload restore checks the size limit locally and sends the file with the r
         expect.any(Function),
     )
 })
+
+function deferred<T>() {
+    let resolve!: (v: T) => void
+    const promise = new Promise<T>((r) => (resolve = r))
+    return { promise, resolve }
+}
+
+async function startUploadCheck(file: File) {
+    fireEvent.change(screen.getByLabelText("Backup.Restore.File"), { target: { files: [file] } })
+    fireEvent.change(screen.getByLabelText("Backup.Restore.BackupPassword"), {
+        target: { value: "backup-password-1" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Backup.Restore.Check" }))
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalled())
+}
+
+test("a late check response for a replaced file is discarded and its staging released", async () => {
+    const late = deferred<RestorePrepareResponse>()
+    mocks.upload.mockReturnValueOnce(late.promise)
+    renderDialog({ kind: "upload" })
+    await startUploadCheck(new File([new Uint8Array(8)], "first.nzbak"))
+
+    // Switch to another file while the first check is still running.
+    fireEvent.change(screen.getByLabelText("Backup.Restore.File"), {
+        target: { files: [new File([new Uint8Array(8)], "second.nzbak")] },
+    })
+    late.resolve(prepared({ restore_token: "stale-token", source: "upload", warnings: [] }))
+    await waitFor(() => expect(mocks.cancel).toHaveBeenCalledWith("stale-token"))
+    expect(screen.queryByTestId("restore-check-result")).toBeNull()
+    expect(next().disabled).toBe(true)
+    // The check button is usable again for the new file.
+    expect(
+        (screen.getByRole("button", { name: "Backup.Restore.Check" }) as HTMLButtonElement)
+            .disabled,
+    ).toBe(false)
+})
+
+test("a check that finishes after the dialog closed releases its staging", async () => {
+    const late = deferred<RestorePrepareResponse>()
+    mocks.upload.mockReturnValueOnce(late.promise)
+    const { onClose } = renderDialog({ kind: "upload" })
+    await startUploadCheck(new File([new Uint8Array(8)], "first.nzbak"))
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }))
+    expect(onClose).toHaveBeenCalled()
+    late.resolve(prepared({ restore_token: "late-token", source: "upload", warnings: [] }))
+    await waitFor(() => expect(mocks.cancel).toHaveBeenCalledWith("late-token"))
+    expect(screen.queryByTestId("restore-check-result")).toBeNull()
+})
+
+test("the apply step says whether a pre-restore backup will be taken", async () => {
+    mocks.upload.mockResolvedValue(
+        prepared({
+            source: "upload",
+            warnings: [{ code: "pre_restore_skipped", require_ack: true }],
+        }),
+    )
+    renderDialog({ kind: "upload" })
+    await startUploadCheck(new File([new Uint8Array(8)], "b.nzbak"))
+    await screen.findByTestId("restore-check-result")
+    expect(next().disabled).toBe(true)
+    fireEvent.click(screen.getByRole("checkbox", { name: "Backup.Restore.Acknowledge" }))
+    fireEvent.click(next())
+    expect(screen.getByTestId("restore-pre-backup").textContent).toBe(
+        "Backup.Restore.NoPreRestoreBackup",
+    )
+})
+
+test("with storage configured the apply step announces the pre-restore backup", async () => {
+    mocks.prepare.mockResolvedValue(prepared({ warnings: [] }))
+    renderDialog()
+    await runCheck()
+    fireEvent.click(next())
+    expect(screen.getByTestId("restore-pre-backup").textContent).toBe(
+        "Backup.Restore.PreRestoreBackup",
+    )
+})

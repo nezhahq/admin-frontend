@@ -148,6 +148,24 @@ export default function BackupPage() {
                             {t("Backup.Setup.ScheduleLater")}
                         </p>
                     </SetupStep>
+                    <Card data-testid="backup-setup-restore">
+                        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0">
+                            <div>
+                                <CardTitle className="text-lg">
+                                    {t("Backup.Setup.RestoreTitle")}
+                                </CardTitle>
+                                <CardDescription>
+                                    {t("Backup.Setup.RestoreDescription")}
+                                </CardDescription>
+                            </div>
+                            <Button
+                                variant="outline"
+                                onClick={() => setRestoreSource({ kind: "upload" })}
+                            >
+                                {t("Backup.Restore.FromUpload")}
+                            </Button>
+                        </CardHeader>
+                    </Card>
                 </div>
             )}
 
