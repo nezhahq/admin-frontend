@@ -36,8 +36,20 @@ export function toCredential(kind: CredentialKind, value: string): BackupCredent
 }
 
 /** The server voids a token on expiry, reuse or repeated failures. */
+// The server marks an invalid, expired or used restore token with a fixed,
+// untranslated prefix (same convention as ApiErrorUnauthorized /
+// ApiErrorForbidden); the text after the colon may be localized.
+const RESTORE_TOKEN_ERROR = "ApiErrorRestoreToken"
+
 export function isRestoreTokenError(message: string): boolean {
-    return /restore token/i.test(message)
+    return message.startsWith(RESTORE_TOKEN_ERROR)
+}
+
+/** The localized explanation without the protocol prefix, for display. */
+export function restoreErrorText(message: string): string {
+    if (!isRestoreTokenError(message)) return message
+    const text = message.slice(RESTORE_TOKEN_ERROR.length).replace(/^:\s*/, "")
+    return text || message
 }
 
 function CredentialInput({
@@ -293,7 +305,7 @@ export function RestoreDialog({
             onApplied()
         } catch (e) {
             const msg = (e as Error).message
-            toast.error(t("Error"), { description: msg })
+            toast.error(t("Error"), { description: restoreErrorText(msg) })
             if (isRestoreTokenError(msg)) backToPrepare()
         } finally {
             setBusy(false)

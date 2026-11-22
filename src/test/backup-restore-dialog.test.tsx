@@ -207,11 +207,9 @@ test("closing the dialog releases the staged restore", async () => {
     expect(onClose).toHaveBeenCalled()
 })
 
-test("an invalid token sends the user back to the check step", async () => {
+async function applyWith(error: string) {
     mocks.prepare.mockResolvedValue(prepared({ warnings: [] }))
-    mocks.apply.mockRejectedValue(
-        new Error("restore token is invalid or expired; run the check again"),
-    )
+    mocks.apply.mockRejectedValue(new Error(error))
     renderDialog()
     await runCheck()
     fireEvent.click(next())
@@ -225,8 +223,23 @@ test("an invalid token sends the user back to the check step", async () => {
         target: { value: "login-pw" },
     })
     fireEvent.click(screen.getByRole("button", { name: "Backup.Restore.Apply" }))
+    await waitFor(() => expect(mocks.error).toHaveBeenCalled())
+}
+
+test("an invalid token (prefix + translated text) sends the user back to the check step", async () => {
+    await applyWith("ApiErrorRestoreToken: 恢复令牌无效或已过期，请重新检查")
     await screen.findByRole("button", { name: "Backup.Restore.Check" })
     expect(screen.queryByTestId("restore-check-result")).toBeNull()
+    // the protocol prefix is not shown to the user
+    expect(mocks.error).toHaveBeenCalledWith("Error", {
+        description: "恢复令牌无效或已过期，请重新检查",
+    })
+})
+
+test("other errors keep the user on the apply step, even if the text mentions a restore token", async () => {
+    await applyWith("restore token is invalid or expired; run the check again")
+    expect(screen.getByRole("button", { name: "Backup.Restore.Apply" })).toBeTruthy()
+    expect(screen.queryByRole("button", { name: "Backup.Restore.Check" })).toBeNull()
 })
 
 test("an expired check cannot continue", async () => {

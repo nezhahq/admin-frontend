@@ -12,7 +12,11 @@ import {
 } from "@/api/backup"
 import { passwordProblem } from "@/components/backup/password"
 import { waitForRestart } from "@/components/backup/restart-overlay"
-import { isRestoreTokenError, toCredential } from "@/components/backup/restore-dialog"
+import {
+    isRestoreTokenError,
+    restoreErrorText,
+    toCredential,
+} from "@/components/backup/restore-dialog"
 import { looksLikeCron6, parseRetention } from "@/components/backup/schedule-form"
 import { afterEach, expect, test, vi } from "vitest"
 
@@ -85,9 +89,17 @@ test("helpers for names, sizes and credentials", () => {
     expect(toCredential("recovery_key", " AGE-SECRET-KEY-1X \n")).toEqual({
         recovery_key: "AGE-SECRET-KEY-1X",
     })
+    // The flow keys on the fixed prefix only, never on the (translatable) text.
+    expect(isRestoreTokenError("ApiErrorRestoreToken: 恢复令牌无效或已过期，请重新检查")).toBe(true)
+    expect(isRestoreTokenError("ApiErrorRestoreToken")).toBe(true)
     expect(isRestoreTokenError("restore token is invalid or expired; run the check again")).toBe(
-        true,
+        false,
     )
+    expect(restoreErrorText("ApiErrorRestoreToken: 恢复令牌无效或已过期")).toBe(
+        "恢复令牌无效或已过期",
+    )
+    expect(restoreErrorText("ApiErrorRestoreToken")).toBe("ApiErrorRestoreToken")
+    expect(restoreErrorText("wrong login password")).toBe("wrong login password")
     expect(isRestoreTokenError("wrong login password")).toBe(false)
 })
 
