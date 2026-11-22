@@ -89,14 +89,32 @@ export interface BackupKeyResponse {
     created_at: string
 }
 
+// Check and warning codes as declared by the dashboard swagger (enum values of
+// backup.Check.code and backup.Warning.code). Regenerate from swagger when the
+// backend adds a code; the i18n test then fails to type-check until text exists.
+export type BackupCheckCode =
+    "checksum" | "decrypt" | "payload" | "origin" | "version" | "database_integrity" | "admin_user"
+
+export type BackupWarningCode =
+    | "origin_unverified"
+    | "pre_restore_skipped"
+    | "older_version"
+    | "version_unknown"
+    | "version_differs"
+    | "config_not_in_backup"
+    | "tsdb_not_restored"
+    | "agents_after_backup_offline"
+    | "revoked_credentials_revived"
+    | "sessions_cleared"
+
 export interface BackupCheck {
-    code: string
+    code: BackupCheckCode
     ok: boolean
     message?: string
 }
 
 export interface BackupWarning {
-    code: string
+    code: BackupWarningCode
     message?: string
     require_ack: boolean
 }
