@@ -563,12 +563,13 @@
             "origin_unverified": "无法验证这份备份的来源（不是本面板生成的）。只有确认文件可信时才继续。",
             "pre_restore_skipped": "无法在恢复前备份当前数据，当前数据将无法找回。",
             "older_version": "备份来自较旧的面板版本，启动时会自动升级数据库。",
-            "version_unknown": "无法确定这份备份的面板版本。",
+            "version_unknown": "无法比较这份备份或当前面板的版本（例如开发构建），无法检查兼容性。只有确认两者版本一致时才继续。",
             "config_not_in_backup": "备份中不含配置文件，将保留当前配置。",
             "tsdb_not_restored": "监控时序数据（TSDB）不会恢复，保持现状。",
             "agents_after_backup_offline": "备份之后新增的 agent 会离线。",
             "revoked_credentials_revived": "备份之后吊销的 API Token 和 OAuth 授权会重新生效。",
-            "sessions_cleared": "所有会话都将退出登录。"
+            "sessions_cleared": "所有会话都将退出登录。",
+            "version_differs": "这份备份来自同一核心版本（X.Y.Z 相同）的另一个构建（后缀不同）。不同构建之间可能有数据库改动，只有确认差异无害时才继续。"
         },
         "Restart": {
             "Title": "面板正在重启并换入数据...",
