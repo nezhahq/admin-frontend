@@ -9,6 +9,7 @@ import glTranslation from "../locales/gl/translation.json"
 import idTranslation from "../locales/id/translation.json"
 import itTranslation from "../locales/it/translation.json"
 import jaTranslation from "../locales/ja/translation.json"
+import ptBRTranslation from "../locales/pt-BR/translation.json"
 import roTranslation from "../locales/ro/translation.json"
 import ruTranslation from "../locales/ru/translation.json"
 import taTranslation from "../locales/ta/translation.json"
@@ -58,6 +59,9 @@ const resources = {
     },
     "gl-ES": {
         translation: glTranslation,
+    },
+    "pt-BR": {
+        translation: ptBRTranslation,
     },
 }
 
