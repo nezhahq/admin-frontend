@@ -146,7 +146,7 @@ export function BackupList({
                                         {done && !b.key_matches_current && (
                                             <Badge
                                                 variant="outline"
-                                                className="ml-2"
+                                                className="ml-2 whitespace-nowrap"
                                                 title={t("Backup.List.OldKeyHint")}
                                             >
                                                 {t("Backup.List.OldKey")}
@@ -156,10 +156,10 @@ export function BackupList({
                                     <TableCell className="text-xs">
                                         {new Date(b.created_at).toLocaleString()}
                                     </TableCell>
-                                    <TableCell className="text-xs">
+                                    <TableCell className="text-xs whitespace-nowrap">
                                         {done ? formatBytes(b.size) : "-"}
                                     </TableCell>
-                                    <TableCell className="text-xs">
+                                    <TableCell className="text-xs whitespace-nowrap">
                                         {t(triggerKey[b.trigger] ?? b.trigger)}
                                     </TableCell>
                                     <TableCell>
@@ -231,15 +231,25 @@ export function BackupList({
 function StatusBadge({ backup }: { backup: BackupInfo }) {
     const { t } = useTranslation()
     if (backup.status === "running")
-        return <Badge variant="default">{t("Backup.Status.Running")}</Badge>
+        return (
+            <Badge variant="default" className="whitespace-nowrap">
+                {t("Backup.Status.Running")}
+            </Badge>
+        )
     if (backup.status === "failed")
         return (
             <div className="space-y-1">
-                <Badge variant="destructive">{t("Backup.Status.Failed")}</Badge>
+                <Badge variant="destructive" className="whitespace-nowrap">
+                    {t("Backup.Status.Failed")}
+                </Badge>
                 {backup.error && (
                     <p className="text-destructive max-w-xs text-xs break-words">{backup.error}</p>
                 )}
             </div>
         )
-    return <Badge variant="secondary">{t("Backup.Status.Success")}</Badge>
+    return (
+        <Badge variant="secondary" className="whitespace-nowrap">
+            {t("Backup.Status.Success")}
+        </Badge>
+    )
 }
