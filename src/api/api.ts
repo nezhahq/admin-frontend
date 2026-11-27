@@ -52,7 +52,7 @@ function isSameOrigin(path: string): boolean {
 
 // Double-submit CSRF: backend requires X-CSRF-Token == nz-csrf cookie on
 // cookie-authenticated unsafe methods.
-function csrfHeaders(method: FetcherMethod, path: string): Record<string, string> {
+export function csrfHeaders(method: FetcherMethod, path: string): Record<string, string> {
     if (!isUnsafeMethod(method)) return {}
     if (!isSameOrigin(path)) return {}
     const token = readCookie(csrfCookieName)
