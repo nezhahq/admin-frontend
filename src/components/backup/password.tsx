@@ -26,15 +26,63 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/hooks/useAuth"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+/**
+ * Length in characters (code points), as the dashboard counts it. String.length
+ * counts UTF-16 units, so emoji counted twice and a too short password passed
+ * this check only to be rejected by the server.
+ */
+function characterCount(s: string): number {
+    return Array.from(s).length
+}
+
 /** Returns an i18n key describing the first problem, or null. */
 export function passwordProblem(pw: string, confirm: string, minLength: number): string | null {
-    if (pw.length < minLength) return "Backup.Password.TooShort"
+    if (characterCount(pw) < minLength) return "Backup.Password.TooShort"
     if (pw !== confirm) return "Backup.Password.Mismatch"
     return null
+}
+
+/**
+ * Accounts with a login password confirm with it; OAuth-only accounts (no
+ * usable password) need a recent sign-in instead, which the server checks.
+ */
+function useLoginPasswordRequired(): boolean {
+    const { profile } = useAuth()
+    return !profile?.reject_password
+}
+
+function LoginPasswordField({
+    idPrefix,
+    value,
+    onChange,
+}: {
+    idPrefix: string
+    value: string
+    onChange: (v: string) => void
+}) {
+    const { t } = useTranslation()
+    return (
+        <div className="grid gap-2">
+            <Label htmlFor={`${idPrefix}-login-password`}>
+                {t("Backup.Password.LoginPassword")}
+            </Label>
+            <Input
+                id={`${idPrefix}-login-password`}
+                type="password"
+                autoComplete="current-password"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+            <span className="text-muted-foreground text-xs">
+                {t("Backup.Password.LoginPasswordHint")}
+            </span>
+        </div>
+    )
 }
 
 function NewPasswordFields({
@@ -65,7 +113,10 @@ function NewPasswordFields({
                     onChange={(e) => onPassword(e.target.value)}
                 />
                 <span className="text-muted-foreground text-xs">
-                    {t("Backup.Password.LengthHint", { min: minLength, length: password.length })}
+                    {t("Backup.Password.LengthHint", {
+                        min: minLength,
+                        length: characterCount(password),
+                    })}
                 </span>
             </div>
             <div className="grid gap-2">
@@ -82,19 +133,25 @@ function NewPasswordFields({
     )
 }
 
-/** First-time setup: password twice, then the recovery key is revealed once. */
+/**
+ * First-time setup: password twice. The recovery key is handed to the page,
+ * which shows it: this form unmounts as soon as the configuration counts as
+ * complete (e.g. on a revalidation when the window regains focus), and a
+ * dialog kept here disappeared with it before the key was saved.
+ */
 export function SetBackupPasswordForm({
     config,
-    onDone,
+    onKeyCreated,
 }: {
     config: BackupConfigView
-    onDone: () => void
+    onKeyCreated: (key: BackupKeyResponse) => void
 }) {
     const { t } = useTranslation()
     const [password, setPassword] = useState("")
     const [confirm, setConfirm] = useState("")
+    const [loginPassword, setLoginPassword] = useState("")
     const [busy, setBusy] = useState(false)
-    const [revealed, setRevealed] = useState<BackupKeyResponse | null>(null)
+    const loginRequired = useLoginPasswordRequired()
     const min = config.password_min_length || 12
 
     async function submit() {
@@ -103,12 +160,17 @@ export function SetBackupPasswordForm({
             toast.error(t("Error"), { description: t(problem, { min }) })
             return
         }
+        if (loginRequired && !loginPassword) {
+            toast.error(t("Error"), { description: t("Backup.Password.LoginPasswordRequired") })
+            return
+        }
         setBusy(true)
         try {
-            const res = await setBackupPassword(password)
+            const res = await setBackupPassword(password, loginRequired ? loginPassword : undefined)
             setPassword("")
             setConfirm("")
-            setRevealed(res)
+            setLoginPassword("")
+            onKeyCreated(res)
         } catch (e) {
             toast.error(t("Error"), { description: (e as Error).message })
         } finally {
@@ -133,18 +195,18 @@ export function SetBackupPasswordForm({
                 onPassword={setPassword}
                 onConfirm={setConfirm}
             />
+            {loginRequired && (
+                <LoginPasswordField
+                    idPrefix="backup-setup"
+                    value={loginPassword}
+                    onChange={setLoginPassword}
+                />
+            )}
             <div>
                 <Button type="submit" disabled={busy}>
                     {busy ? t("Loading") + "..." : t("Backup.Password.Set")}
                 </Button>
             </div>
-            <RecoveryKeyDialog
-                keyResponse={revealed}
-                onClose={() => {
-                    setRevealed(null)
-                    onDone()
-                }}
-            />
         </form>
     )
 }
@@ -360,12 +422,15 @@ export function ResetBackupPasswordDialog({
     const [password, setPassword] = useState("")
     const [confirm, setConfirm] = useState("")
     const [typed, setTyped] = useState("")
+    const [loginPassword, setLoginPassword] = useState("")
     const [busy, setBusy] = useState(false)
+    const loginRequired = useLoginPasswordRequired()
 
     const reset = () => {
         setPassword("")
         setConfirm("")
         setTyped("")
+        setLoginPassword("")
     }
 
     async function submit() {
@@ -374,9 +439,17 @@ export function ResetBackupPasswordDialog({
             toast.error(t("Error"), { description: t(problem, { min: minLength }) })
             return
         }
+        if (loginRequired && !loginPassword) {
+            toast.error(t("Error"), { description: t("Backup.Password.LoginPasswordRequired") })
+            return
+        }
         setBusy(true)
         try {
-            const res = await resetBackupPassword(password, typed)
+            const res = await resetBackupPassword(
+                password,
+                typed,
+                loginRequired ? loginPassword : undefined,
+            )
             reset()
             onOpenChange(false)
             onReset(res)
@@ -436,6 +509,13 @@ export function ResetBackupPasswordDialog({
                             onChange={(e) => setTyped(e.target.value)}
                         />
                     </div>
+                    {loginRequired && (
+                        <LoginPasswordField
+                            idPrefix="backup-reset"
+                            value={loginPassword}
+                            onChange={setLoginPassword}
+                        />
+                    )}
                 </form>
                 <DialogFooter>
                     <DialogClose asChild>

@@ -117,6 +117,9 @@ export interface BackupWarning {
     code: BackupWarningCode
     message?: string
     require_ack: boolean
+    /** Set on the version warnings, for the translated texts. */
+    backup_version?: string
+    dashboard_version?: string
 }
 
 export interface BackupManifestView {
@@ -178,16 +181,27 @@ export const updateBackupConfig = (data: BackupConfigUpdate) =>
 export const testBackupStorage = (data: BackupS3Update) =>
     fetcher<void>(FetcherMethod.POST, "/api/v1/backup/config/test", data)
 
-export const setBackupPassword = (password: string) =>
-    fetcher<BackupKeyResponse>(FetcherMethod.POST, "/api/v1/backup/password", { password })
+// Setting or resetting the backup password needs the login password (OAuth-only
+// accounts: a recent sign-in instead), because the new password decrypts every
+// later backup.
+export const setBackupPassword = (password: string, login_password?: string) =>
+    fetcher<BackupKeyResponse>(FetcherMethod.POST, "/api/v1/backup/password", {
+        password,
+        login_password,
+    })
 
 export const changeBackupPassword = (old_password: string, new_password: string) =>
     fetcher<void>(FetcherMethod.PATCH, "/api/v1/backup/password", { old_password, new_password })
 
-export const resetBackupPassword = (new_password: string, confirm: string) =>
+export const resetBackupPassword = (
+    new_password: string,
+    confirm: string,
+    login_password?: string,
+) =>
     fetcher<BackupKeyResponse>(FetcherMethod.POST, "/api/v1/backup/password/reset", {
         new_password,
         confirm,
+        login_password,
     })
 
 export const listBackups = async () =>

@@ -316,7 +316,12 @@ test("reset requires the confirmation word and shows the warning", async () => {
         target: { value: "RESET" },
     })
     expect(submit.disabled).toBe(false)
+    fireEvent.change(screen.getByLabelText("Backup.Password.LoginPassword"), {
+        target: { value: "login password" },
+    })
     fireEvent.click(submit)
-    await waitFor(() => expect(mocks.reset).toHaveBeenCalledWith("a-new-long-password", "RESET"))
+    await waitFor(() =>
+        expect(mocks.reset).toHaveBeenCalledWith("a-new-long-password", "RESET", "login password"),
+    )
     await waitFor(() => expect(onReset).toHaveBeenCalled())
 })

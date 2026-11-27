@@ -27,13 +27,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/useAuth"
 import { cn } from "@/lib/utils"
-import { ReactNode, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Navigate } from "react-router-dom"
 import { toast } from "sonner"
 import useSWR from "swr"
 
 const LIST_POLL_MS = 2000
+
+/** localStorage key holding the finish time of the last dismissed restore result. */
+const DISMISSED_RESTORE_KEY = "nezha-backup-restore-result-dismissed"
+
+function restoreResultStamp(result: RestoreResult): string {
+    return result.finished_at || result.applied_at || ""
+}
 
 export default function BackupPage() {
     const { t } = useTranslation()
@@ -61,7 +68,16 @@ export default function BackupPage() {
     const [restarting, setRestarting] = useState(false)
     const [changeOpen, setChangeOpen] = useState(false)
     const [resetOpen, setResetOpen] = useState(false)
-    const [resetKey, setResetKey] = useState<BackupKeyResponse | null>(null)
+    // The recovery key of a new key pair (set or reset) lives here, above the
+    // setup and configured views, so a revalidation that switches between them
+    // cannot drop it before the user confirmed saving it.
+    const [recoveryKey, setRecoveryKey] = useState<BackupKeyResponse | null>(null)
+    const [dismissedRestore, setDismissedRestore] = useState(
+        () => localStorage.getItem(DISMISSED_RESTORE_KEY) ?? "",
+    )
+    useEffect(() => {
+        if (dismissedRestore) localStorage.setItem(DISMISSED_RESTORE_KEY, dismissedRestore)
+    }, [dismissedRestore])
 
     if (loading) return null
     if (!isAdmin) return <Navigate to="/dashboard/settings/api-tokens" replace />
@@ -109,7 +125,12 @@ export default function BackupPage() {
                 </p>
             </div>
 
-            {restoreStatus.data && <RestoreStatusBanner result={restoreStatus.data} />}
+            {restoreStatus.data && restoreResultStamp(restoreStatus.data) !== dismissedRestore && (
+                <RestoreStatusBanner
+                    result={restoreStatus.data}
+                    onDismiss={() => setDismissedRestore(restoreResultStamp(restoreStatus.data!))}
+                />
+            )}
 
             {config.error && (
                 <p className="text-destructive text-sm" role="alert">
@@ -137,10 +158,7 @@ export default function BackupPage() {
                         disabled={!cfg.storage_configured}
                     >
                         {cfg.storage_configured && (
-                            <SetBackupPasswordForm
-                                config={cfg}
-                                onDone={() => void config.mutate()}
-                            />
+                            <SetBackupPasswordForm config={cfg} onKeyCreated={setRecoveryKey} />
                         )}
                     </SetupStep>
                     <SetupStep index={3} title={t("Backup.Setup.Schedule")} done={false} disabled>
@@ -263,15 +281,7 @@ export default function BackupPage() {
                         minLength={cfg.password_min_length || 12}
                         confirmWord={cfg.reset_confirm_word || "RESET"}
                         affectedBackups={affected}
-                        onReset={(res) => setResetKey(res)}
-                    />
-                    <RecoveryKeyDialog
-                        keyResponse={resetKey}
-                        onClose={() => {
-                            setResetKey(null)
-                            void config.mutate()
-                            void backups.mutate()
-                        }}
+                        onReset={(res) => setRecoveryKey(res)}
                     />
                     <RestoreDialog
                         source={restoreSource}
@@ -284,6 +294,14 @@ export default function BackupPage() {
                     />
                 </>
             )}
+            <RecoveryKeyDialog
+                keyResponse={recoveryKey}
+                onClose={() => {
+                    setRecoveryKey(null)
+                    void config.mutate()
+                    void backups.mutate()
+                }}
+            />
             <RestartOverlay active={restarting} />
         </div>
     )
@@ -333,7 +351,13 @@ function SetupStep({
     )
 }
 
-function RestoreStatusBanner({ result }: { result: RestoreResult }) {
+function RestoreStatusBanner({
+    result,
+    onDismiss,
+}: {
+    result: RestoreResult
+    onDismiss: () => void
+}) {
     const { t } = useTranslation()
     const ok = result.status === "success"
     const when = result.finished_at || result.applied_at
@@ -348,13 +372,18 @@ function RestoreStatusBanner({ result }: { result: RestoreResult }) {
                     : "border-destructive bg-destructive/10",
             )}
         >
-            <p className="font-medium">
-                {ok
-                    ? t("Backup.RestoreStatus.Success", { name: result.name ?? "" })
-                    : result.rolled_back
-                      ? t("Backup.RestoreStatus.RolledBack", { name: result.name ?? "" })
-                      : t("Backup.RestoreStatus.Failed", { name: result.name ?? "" })}
-            </p>
+            <div className="flex items-start justify-between gap-2">
+                <p className="font-medium">
+                    {ok
+                        ? t("Backup.RestoreStatus.Success", { name: result.name ?? "" })
+                        : result.rolled_back
+                          ? t("Backup.RestoreStatus.RolledBack", { name: result.name ?? "" })
+                          : t("Backup.RestoreStatus.Failed", { name: result.name ?? "" })}
+                </p>
+                <Button type="button" size="sm" variant="ghost" onClick={onDismiss}>
+                    {t("Backup.RestoreStatus.Dismiss")}
+                </Button>
+            </div>
             {when && (
                 <p className="text-muted-foreground text-xs">{new Date(when).toLocaleString()}</p>
             )}

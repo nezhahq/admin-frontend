@@ -464,7 +464,10 @@
             "ResetWarning": "A new key pair will be generated. All previous backups can only be restored with the OLD password or the OLD recovery key. Without either, they are lost for good.",
             "ResetAffected": "Backups encrypted with the current key: {{count}}",
             "ResetTypeWord": "Type {{word}} to confirm",
-            "ResetSubmit": "Reset and generate a new key"
+            "ResetSubmit": "Reset and generate a new key",
+            "LoginPassword": "Your login password",
+            "LoginPasswordHint": "Whoever sets the backup password can decrypt every later backup, so confirm with your login password.",
+            "LoginPasswordRequired": "Enter your login password"
         },
         "RecoveryKey": {
             "Title": "Save your recovery key",
@@ -562,14 +565,14 @@
         "Warning": {
             "origin_unverified": "The origin of this backup cannot be verified (it was not made by this dashboard). Only continue if you trust the file.",
             "pre_restore_skipped": "A pre-restore backup of the current data cannot be taken. The current data will not be recoverable.",
-            "older_version": "The backup was made by an older dashboard version; the database is upgraded on start.",
-            "version_unknown": "The dashboard version of this backup, or of this dashboard, cannot be compared (for example a development build). Compatibility cannot be checked; continue only if you know both versions match.",
+            "older_version": "The backup was made by an older dashboard version ({{backup}}, this dashboard is {{current}}); the database is upgraded on start.",
+            "version_unknown": "The dashboard version of this backup ({{backup}}) or of this dashboard ({{current}}) cannot be compared (for example a development build). Compatibility cannot be checked; continue only if you know both versions match.",
             "config_not_in_backup": "The backup does not contain the configuration; the current configuration is kept.",
             "tsdb_not_restored": "Monitoring time-series data (TSDB) is not restored and stays as it is.",
             "agents_after_backup_offline": "Agents added after this backup will go offline.",
             "revoked_credentials_revived": "API tokens and OAuth grants revoked after this backup become valid again.",
             "sessions_cleared": "All sessions will be signed out.",
-            "version_differs": "The backup was made by a different build of the same dashboard version (same X.Y.Z, different suffix). Builds can differ in database changes; continue only if you know the difference is safe."
+            "version_differs": "The backup was made by a different build of the same dashboard version ({{backup}}, this dashboard is {{current}}: same X.Y.Z, different suffix). Builds can differ in database changes; continue only if you know the difference is safe."
         },
         "Restart": {
             "Title": "The dashboard is restarting and swapping in the data...",
@@ -580,7 +583,8 @@
         "RestoreStatus": {
             "Success": "Last restore succeeded: {{name}}",
             "RolledBack": "Last restore failed and was rolled back: {{name}}",
-            "Failed": "Last restore failed: {{name}}"
+            "Failed": "Last restore failed: {{name}}",
+            "Dismiss": "Dismiss"
         }
     }
 }

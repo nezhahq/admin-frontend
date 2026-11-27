@@ -602,6 +602,9 @@ function PrepareResult({
                             <p>
                                 {t(`Backup.Warning.${w.code}`, {
                                     defaultValue: w.message || w.code,
+                                    ...(w.backup_version
+                                        ? { backup: w.backup_version, current: w.dashboard_version }
+                                        : {}),
                                 })}
                             </p>
                             {w.require_ack && (

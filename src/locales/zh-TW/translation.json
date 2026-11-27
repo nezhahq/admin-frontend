@@ -440,7 +440,10 @@
             "ResetWarning": "將產生新的金鑰對。先前所有備份只能用舊密碼或舊復原金鑰還原；如果兩者都沒有，舊備份將永久無法還原。",
             "ResetAffected": "使用目前金鑰加密的備份：{{count}} 份",
             "ResetTypeWord": "輸入 {{word}} 以確認",
-            "ResetSubmit": "重設並產生新金鑰"
+            "ResetSubmit": "重設並產生新金鑰",
+            "LoginPassword": "你的登入密碼",
+            "LoginPasswordHint": "設定備份密碼的人可以解密之後的所有備份，所以需要用登入密碼確認。",
+            "LoginPasswordRequired": "請輸入登入密碼"
         },
         "RecoveryKey": {
             "Title": "保存復原金鑰",
@@ -538,9 +541,9 @@
         "Warning": {
             "origin_unverified": "無法驗證這份備份的來源（不是本面板產生的）。只有確認檔案可信時才繼續。",
             "pre_restore_skipped": "無法在還原前備份目前的資料，目前的資料將無法找回。",
-            "older_version": "備份來自較舊的面板版本，啟動時會自動升級資料庫。",
-            "version_unknown": "無法比較這份備份或目前面板的版本（例如開發版建置），無法檢查相容性。只有確認兩者版本一致時才繼續。",
-            "version_differs": "這份備份來自同一核心版本（X.Y.Z 相同）的另一個建置（後綴不同）。不同建置之間可能有資料庫變更，只有確認差異無害時才繼續。",
+            "older_version": "備份來自較舊的面板版本（備份 {{backup}}，目前 {{current}}），啟動時會自動升級資料庫。",
+            "version_unknown": "無法比較這份備份的版本（{{backup}}）與目前面板的版本（{{current}}）（例如開發版建置），無法檢查相容性。只有確認兩者版本一致時才繼續。",
+            "version_differs": "這份備份來自同一核心版本的另一個建置（備份 {{backup}}，目前 {{current}}：X.Y.Z 相同，後綴不同）。不同建置之間可能有資料庫變更，只有確認差異無害時才繼續。",
             "config_not_in_backup": "備份中不含設定檔，將保留目前的設定。",
             "tsdb_not_restored": "監控時序資料（TSDB）不會還原，維持現狀。",
             "agents_after_backup_offline": "備份之後新增的 agent 會離線。",
@@ -556,7 +559,8 @@
         "RestoreStatus": {
             "Success": "最近一次還原成功：{{name}}",
             "RolledBack": "最近一次還原失敗，已回復：{{name}}",
-            "Failed": "最近一次還原失敗：{{name}}"
+            "Failed": "最近一次還原失敗：{{name}}",
+            "Dismiss": "關閉"
         }
     }
 }

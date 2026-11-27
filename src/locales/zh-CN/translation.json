@@ -464,7 +464,10 @@
             "ResetWarning": "将生成新的密钥对。之前的所有备份只能用旧密码或旧恢复密钥恢复；如果两者都没有，旧备份将永久无法恢复。",
             "ResetAffected": "使用当前密钥加密的备份：{{count}} 份",
             "ResetTypeWord": "输入 {{word}} 以确认",
-            "ResetSubmit": "重置并生成新密钥"
+            "ResetSubmit": "重置并生成新密钥",
+            "LoginPassword": "你的登录密码",
+            "LoginPasswordHint": "设置备份密码的人可以解密之后的所有备份，所以需要用登录密码确认。",
+            "LoginPasswordRequired": "请输入登录密码"
         },
         "RecoveryKey": {
             "Title": "保存恢复密钥",
@@ -562,14 +565,14 @@
         "Warning": {
             "origin_unverified": "无法验证这份备份的来源（不是本面板生成的）。只有确认文件可信时才继续。",
             "pre_restore_skipped": "无法在恢复前备份当前数据，当前数据将无法找回。",
-            "older_version": "备份来自较旧的面板版本，启动时会自动升级数据库。",
-            "version_unknown": "无法比较这份备份或当前面板的版本（例如开发构建），无法检查兼容性。只有确认两者版本一致时才继续。",
+            "older_version": "备份来自较旧的面板版本（备份 {{backup}}，当前 {{current}}），启动时会自动升级数据库。",
+            "version_unknown": "无法比较这份备份的版本（{{backup}}）与当前面板的版本（{{current}}）（例如开发构建），无法检查兼容性。只有确认两者版本一致时才继续。",
             "config_not_in_backup": "备份中不含配置文件，将保留当前配置。",
             "tsdb_not_restored": "监控时序数据（TSDB）不会恢复，保持现状。",
             "agents_after_backup_offline": "备份之后新增的 agent 会离线。",
             "revoked_credentials_revived": "备份之后吊销的 API Token 和 OAuth 授权会重新生效。",
             "sessions_cleared": "所有会话都将退出登录。",
-            "version_differs": "这份备份来自同一核心版本（X.Y.Z 相同）的另一个构建（后缀不同）。不同构建之间可能有数据库改动，只有确认差异无害时才继续。"
+            "version_differs": "这份备份来自同一核心版本的另一个构建（备份 {{backup}}，当前 {{current}}：X.Y.Z 相同，后缀不同）。不同构建之间可能有数据库改动，只有确认差异无害时才继续。"
         },
         "Restart": {
             "Title": "面板正在重启并换入数据...",
@@ -580,7 +583,8 @@
         "RestoreStatus": {
             "Success": "最近一次恢复成功：{{name}}",
             "RolledBack": "最近一次恢复失败，已回滚：{{name}}",
-            "Failed": "最近一次恢复失败：{{name}}"
+            "Failed": "最近一次恢复失败：{{name}}",
+            "Dismiss": "关闭"
         }
     }
 }
